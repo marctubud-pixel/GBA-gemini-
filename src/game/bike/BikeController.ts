@@ -5,10 +5,10 @@ export class BikeController {
   public velocityX = 0;
   public facing: 1 | -1 = 1; // 1 = right, -1 = left
 
-  private readonly baseMaxSpeed = 190;
-  private readonly slowZoneMaxSpeed = 110;
-  private readonly acceleration = 340;
-  private readonly deceleration = 420;
+  private readonly baseMaxSpeed = 340;
+  private readonly slowZoneMaxSpeed = 220;
+  private readonly acceleration = 680;
+  private readonly deceleration = 550;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     this.sprite = scene.add.sprite(x, y, 'bike_ride_sheet', 0);

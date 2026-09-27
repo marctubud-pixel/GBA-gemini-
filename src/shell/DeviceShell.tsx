@@ -31,17 +31,13 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
 
   if (playerState === 'RIDING') {
     if (nearParkingZone) {
-      actionPrompt = { key: 'E', text: `PARK BIKE · 停靠单车 (${nearParkingZone.name})`, color: 'bg-amber-500 text-slate-950' };
-    } else {
-      actionPrompt = { key: 'A / D', text: 'RIDE · 骑行探索', color: 'bg-slate-900/80 text-white' };
+      actionPrompt = { key: 'E', text: `PARK · 停靠单车 (${nearParkingZone.name})`, color: 'bg-amber-400 text-slate-950' };
     }
   } else if (playerState === 'WALKING') {
     if (nearParkedBike) {
-      actionPrompt = { key: 'E', text: 'RIDE BIKE · 骑上单车', color: 'bg-blue-600 text-white' };
+      actionPrompt = { key: 'E', text: 'RIDE · 骑上单车', color: 'bg-blue-600 text-white' };
     } else if (nearInteraction) {
       actionPrompt = { key: 'E', text: `${nearInteraction.promptText} · ${nearInteraction.name}`, color: 'bg-emerald-600 text-white' };
-    } else {
-      actionPrompt = { key: 'A / D', text: 'WALK · 漫步探索', color: 'bg-slate-900/80 text-white' };
     }
   }
 

@@ -59,7 +59,7 @@ export const useWorldStore = create<WorldState>((set, get) => ({
   soundEnabled: true,
 
   playerState: 'RIDING',
-  playerX: 200,
+  playerX: 140,
   playerY: 270,
   bikeSpeed: 0,
   currentSegment: WORLD_SEGMENTS[0],

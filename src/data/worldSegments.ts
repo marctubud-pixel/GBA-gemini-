@@ -7,9 +7,9 @@ export interface WorldSegment {
   backgroundTheme: 'coastal-start' | 'town-center' | 'town-dense' | 'creative-block' | 'cinema-strip' | 'lab-quarter' | 'arcade-corner' | 'studio-green' | 'hill-uphill' | 'observatory-summit';
   assetSet: string[];
   locationId?: string;
-  slope?: number; // 0: flat, > 0: uphill slope factor
-  elevationStart?: number; // Y offset baseline
-  elevationEnd?: number; // Y offset at end
+  slope?: number;
+  elevationStart?: number;
+  elevationEnd?: number;
   description: string;
 }
 
@@ -19,7 +19,7 @@ export const WORLD_SEGMENTS: WorldSegment[] = [
     name: '01 ENTRANCE',
     subname: '海边入口 · The Journey Begins',
     startX: 0,
-    endX: 1000,
+    endX: 600,
     backgroundTheme: 'coastal-start',
     assetSet: ['sea', 'low-wall', 'flowers', 'my-world-sign', 'bike-path'],
     slope: 0,
@@ -31,8 +31,8 @@ export const WORLD_SEGMENTS: WorldSegment[] = [
     id: 'central-plaza',
     name: '02 CENTRAL PLAZA',
     subname: '中央广场 · Heart of Town',
-    startX: 1000,
-    endX: 2100,
+    startX: 600,
+    endX: 1200,
     backgroundTheme: 'town-center',
     assetSet: ['fountain', 'benches', 'clock-tower', 'direction-board', 'trees'],
     slope: 0,
@@ -44,8 +44,8 @@ export const WORLD_SEGMENTS: WorldSegment[] = [
     id: 'print-house',
     name: '03 PRINT HOUSE',
     subname: '印刷与字像所 · Narrative & Editorial',
-    startX: 2100,
-    endX: 3200,
+    startX: 1200,
+    endX: 1800,
     backgroundTheme: 'town-dense',
     assetSet: ['print-shop-facade', 'poster-rack', 'books-window', 'cream-wall'],
     locationId: 'print-house',
@@ -58,8 +58,8 @@ export const WORLD_SEGMENTS: WorldSegment[] = [
     id: 'brand-museum',
     name: '04 BRAND & CREATIVE MUSEUM',
     subname: '品牌创意馆 · Strategy & Campaign',
-    startX: 3200,
-    endX: 4400,
+    startX: 1800,
+    endX: 2400,
     backgroundTheme: 'creative-block',
     assetSet: ['gallery-facade', 'modern-window', 'curated-posters', 'sculpture'],
     locationId: 'brand-museum',
@@ -72,8 +72,8 @@ export const WORLD_SEGMENTS: WorldSegment[] = [
     id: 'marc-cinema',
     name: '05 MARC CINEMA',
     subname: '马克影院 · Visual Storytelling & Film',
-    startX: 4400,
-    endX: 5700,
+    startX: 2400,
+    endX: 3050,
     backgroundTheme: 'cinema-strip',
     assetSet: ['cinema-hero', 'marquee', 'poster-boxes', 'awning', 'lamps'],
     locationId: 'marc-cinema',
@@ -86,8 +86,8 @@ export const WORLD_SEGMENTS: WorldSegment[] = [
     id: 'experiment-lab',
     name: '06 EXPERIMENT LAB',
     subname: '灵感实验坊 · Interaction & AI Prototypes',
-    startX: 5700,
-    endX: 6800,
+    startX: 3050,
+    endX: 3700,
     backgroundTheme: 'lab-quarter',
     assetSet: ['lab-facade', 'pipes', 'workshop-door', 'exp-sign', 'gadgets'],
     locationId: 'experiment-lab',
@@ -100,8 +100,8 @@ export const WORLD_SEGMENTS: WorldSegment[] = [
     id: 'arcade',
     name: '07 ARCADE',
     subname: '街机厅 · Play & Memories',
-    startX: 6800,
-    endX: 7900,
+    startX: 3700,
+    endX: 4350,
     backgroundTheme: 'arcade-corner',
     assetSet: ['arcade-blue-facade', 'arcade-sign', 'vending-machine', 'game-posters'],
     locationId: 'arcade',
@@ -114,44 +114,44 @@ export const WORLD_SEGMENTS: WorldSegment[] = [
     id: 'my-studio',
     name: '08 MY STUDIO',
     subname: '个人画室与工坊 · Personal Studio',
-    startX: 7900,
-    endX: 9000,
+    startX: 4350,
+    endX: 5000,
     backgroundTheme: 'studio-green',
     assetSet: ['studio-facade', 'plants', 'window-desk', 'camera-tripod', 'bookshelf'],
     locationId: 'my-studio',
     slope: 0,
     elevationStart: 0,
     elevationEnd: 0,
-    description: '绿植缠绕的私人工坊，放着摄影器材、唱片架与手稿桌，记录平日真实的创作生活。'
+    description: '绿植缠绕的私人工坊，放着摄影器材、唱片架与手稿桌，连接上山的石阶。'
   },
   {
     id: 'future-hill',
     name: '09 FUTURE HILL',
     subname: '向阳之坡 · Uphill Road',
-    startX: 9000,
-    endX: 10800,
+    startX: 5000,
+    endX: 6600,
     backgroundTheme: 'hill-uphill',
     assetSet: ['stone-retaining-wall', 'mountain-guardrail', 'cypress-trees', 'wildflowers', 'slope-road'],
-    slope: 0.25, // uphill slope grade
+    slope: 0.25,
     elevationStart: 0,
-    elevationEnd: 160, // rises 160px over 1800px width
+    elevationEnd: 150,
     description: '持续延伸向右上方的海边盘山路，建筑物逐渐退去，石墙、野花与松柏相伴，坡度逐渐升高。'
   },
   {
     id: 'observatory',
     name: '10 OBSERVATORY',
     subname: '星穹天文台 · The Summit & Horizons',
-    startX: 10800,
-    endX: 12000,
+    startX: 6600,
+    endX: 7400,
     backgroundTheme: 'observatory-summit',
     assetSet: ['observatory-dome', 'telescope', 'lookout-fence', 'vast-sky'],
     locationId: 'observatory',
     slope: 0,
-    elevationStart: 160,
-    elevationEnd: 160, // summit plateau
+    elevationStart: 150,
+    elevationEnd: 150,
     description: '屹立于最高坡顶的白色圆顶天文台与观景台，背靠广阔无际的天空与大海，望向未来的可能性。'
   }
 ];
 
-export const TOTAL_WORLD_WIDTH = 12000;
-export const WORLD_BASE_Y = 270; // ground baseline in 640x360 logic resolution
+export const TOTAL_WORLD_WIDTH = 7400;
+export const WORLD_BASE_Y = 270;

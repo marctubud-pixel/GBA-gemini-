@@ -5,7 +5,7 @@ export class WalkingController {
   public velocityX = 0;
   public facing: 1 | -1 = 1;
 
-  private readonly walkSpeed = 95;
+  private readonly walkSpeed = 150;
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     this.sprite = scene.add.sprite(x, y, 'character_walk_sheet', 0);

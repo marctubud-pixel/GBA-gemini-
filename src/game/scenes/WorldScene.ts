@@ -44,8 +44,8 @@ export class WorldScene extends Phaser.Scene {
       this.keyEsc = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
     }
 
-    // 3. Setup Entities at initial position (x: 200)
-    const initialX = 200;
+    // 3. Setup Entities at initial position (x: 140)
+    const initialX = 140;
     const initialY = WorldBuilder.getGroundY(initialX);
 
     this.bike = new BikeController(this, initialX, initialY);
@@ -225,9 +225,9 @@ export class WorldScene extends Phaser.Scene {
     const store = useWorldStore.getState();
     const currentX = this.walker.x;
 
-    // Walking movement bounds around the active landmark
+    // Walking movement bounds around the active landmark (snug beside entrance)
     const anchorX = this.activeParkedLocation?.parkingX ?? currentX;
-    const maxWalkRadius = 260;
+    const maxWalkRadius = 130;
 
     if (currentX < anchorX - maxWalkRadius && leftPressed) {
       // Reached walking left limit
