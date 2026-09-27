@@ -59,9 +59,37 @@ export class WorldScene extends Phaser.Scene {
 
     // 4. Setup Camera
     this.cameraController = new SideScrollCamera(this);
-    this.cameraController.setBounds(0, 0, WorldBuilder.TOTAL_WORLD_WIDTH, 400);
+    this.cameraController.setBounds(0, -100, WorldBuilder.TOTAL_WORLD_WIDTH, 600);
+    this.cameraController.initCenter(initialX, initialY);
 
-    // 5. Teleport event listener for INDEX fast-travel
+    // 5. Window level direct key tracker for foolproof input
+    const onKeyDown = (e: KeyboardEvent) => {
+      const code = e.code;
+      if (code === 'KeyA' || code === 'ArrowLeft') this.rawKeys.left = true;
+      if (code === 'KeyD' || code === 'ArrowRight') this.rawKeys.right = true;
+      if (code === 'KeyE' || code === 'Space' || code === 'Enter') this.rawKeys.action = true;
+      if (code === 'Escape') {
+        const store = useWorldStore.getState();
+        if (store.isOverlayOpen) store.closeOverlay();
+      }
+    };
+
+    const onKeyUp = (e: KeyboardEvent) => {
+      const code = e.code;
+      if (code === 'KeyA' || code === 'ArrowLeft') this.rawKeys.left = false;
+      if (code === 'KeyD' || code === 'ArrowRight') this.rawKeys.right = false;
+      if (code === 'KeyE' || code === 'Space' || code === 'Enter') this.rawKeys.action = false;
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keyup', onKeyUp);
+
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('keyup', onKeyUp);
+    });
+
+    // 6. Teleport event listener for INDEX fast-travel
     window.addEventListener('teleport-player', (e: Event) => {
       const customEvent = e as CustomEvent<{ x: number }>;
       if (customEvent.detail && customEvent.detail.x !== undefined) {
@@ -69,6 +97,12 @@ export class WorldScene extends Phaser.Scene {
       }
     });
   }
+
+  private rawKeys = {
+    left: false,
+    right: false,
+    action: false
+  };
 
   update(time: number, delta: number) {
     const store = useWorldStore.getState();
@@ -85,9 +119,11 @@ export class WorldScene extends Phaser.Scene {
       return;
     }
 
-    const leftPressed = (this.cursors?.left?.isDown || this.keyA?.isDown) ?? false;
-    const rightPressed = (this.cursors?.right?.isDown || this.keyD?.isDown) ?? false;
-    const actionPressed = (this.keyE?.isDown) ?? false;
+    // Combine Phaser keyboard, window key events, and on-screen virtual inputs
+    const vInput = store.virtualInput;
+    const leftPressed = this.rawKeys.left || (this.cursors?.left?.isDown ?? false) || (this.keyA?.isDown ?? false) || vInput.left;
+    const rightPressed = this.rawKeys.right || (this.cursors?.right?.isDown ?? false) || (this.keyD?.isDown ?? false) || vInput.right;
+    const actionPressed = this.rawKeys.action || (this.keyE?.isDown ?? false) || vInput.action;
 
     if (currentState === 'RIDING') {
       this.handleRidingUpdate(time, delta, leftPressed, rightPressed, actionPressed);

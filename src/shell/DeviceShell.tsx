@@ -20,7 +20,8 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
     nearParkingZone,
     nearParkedBike,
     nearInteraction,
-    setCurrentView
+    setCurrentView,
+    setVirtualInput
   } = useWorldStore();
 
   const progressPercent = Math.min(100, Math.max(0, (playerX / TOTAL_WORLD_WIDTH) * 100));
@@ -160,6 +161,24 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
                 <div className="absolute inset-y-0 left-5 w-6 bg-[#1e243b] rounded-md shadow-md" />
                 <div className="absolute inset-x-0 top-5 h-6 bg-[#1e243b] rounded-md shadow-md" />
                 <div className="absolute inset-5 bg-[#181c2f] rounded-xs" />
+                {/* Clickable Left */}
+                <button
+                  onMouseDown={() => setVirtualInput({ left: true })}
+                  onMouseUp={() => setVirtualInput({ left: false })}
+                  onTouchStart={() => setVirtualInput({ left: true })}
+                  onTouchEnd={() => setVirtualInput({ left: false })}
+                  className="absolute inset-y-4 left-0 w-6 hover:bg-white/10 active:bg-white/20 rounded-l cursor-pointer"
+                  title="向左移动"
+                />
+                {/* Clickable Right */}
+                <button
+                  onMouseDown={() => setVirtualInput({ right: true })}
+                  onMouseUp={() => setVirtualInput({ right: false })}
+                  onTouchStart={() => setVirtualInput({ right: true })}
+                  onTouchEnd={() => setVirtualInput({ right: false })}
+                  className="absolute inset-y-4 right-0 w-6 hover:bg-white/10 active:bg-white/20 rounded-r cursor-pointer"
+                  title="向右移动"
+                />
               </div>
               <span className="text-[9px] font-bold text-slate-400/80 tracking-widest mt-4">
                 GAME BOY
@@ -174,12 +193,26 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
             {/* GBA Right A/B Buttons */}
             <div className="hidden sm:flex flex-col items-center justify-center w-24 gap-3">
               <div className="flex gap-3 rotate-[-25deg]">
-                <div className="w-8 h-8 rounded-full bg-[#832646] border-2 border-[#a8325a] shadow-md flex items-center justify-center text-white text-[10px] font-bold">
+                <button
+                  onClick={() => {
+                    const store = useWorldStore.getState();
+                    if (store.isOverlayOpen) store.closeOverlay();
+                  }}
+                  className="w-8 h-8 rounded-full bg-[#832646] hover:bg-[#a8325a] active:scale-95 border-2 border-[#a8325a] shadow-md flex items-center justify-center text-white text-[10px] font-bold cursor-pointer"
+                  title="B键 (返回/关闭)"
+                >
                   B
-                </div>
-                <div className="w-8 h-8 rounded-full bg-[#832646] border-2 border-[#a8325a] shadow-md flex items-center justify-center text-white text-[10px] font-bold">
+                </button>
+                <button
+                  onClick={() => {
+                    setVirtualInput({ action: true });
+                    setTimeout(() => setVirtualInput({ action: false }), 250);
+                  }}
+                  className="w-8 h-8 rounded-full bg-[#832646] hover:bg-[#a8325a] active:scale-95 border-2 border-[#a8325a] shadow-md flex items-center justify-center text-white text-[10px] font-bold cursor-pointer"
+                  title="A键 (停车/互动)"
+                >
                   A
-                </div>
+                </button>
               </div>
               <span className="text-[9px] font-bold text-slate-400/80 tracking-widest mt-6">
                 ADVANCE
@@ -197,21 +230,47 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
       </div>
 
       {/* Bottom Floating Interaction & Control Banner */}
-      <footer className="absolute bottom-2 left-0 right-0 z-30 flex items-center justify-between px-6 pointer-events-none">
-        <div className="hidden sm:flex items-center gap-2 bg-slate-900/80 backdrop-blur px-3 py-1.5 rounded-xl border border-white/10 text-[11px] text-slate-300 font-mono">
-          <kbd className="px-1.5 py-0.5 bg-slate-800 rounded border border-slate-700">A / D</kbd> 移动 · 
-          <kbd className="px-1.5 py-0.5 bg-slate-800 rounded border border-slate-700">E</kbd> 停车/互动 · 
-          <kbd className="px-1.5 py-0.5 bg-slate-800 rounded border border-slate-700">ESC</kbd> 关闭
+      <footer className="absolute bottom-2 left-0 right-0 z-30 flex items-center justify-between px-4 sm:px-6 pointer-events-none">
+        {/* On-screen Movement Buttons */}
+        <div className="pointer-events-auto flex items-center gap-1.5 bg-slate-900/90 backdrop-blur p-1 rounded-xl border border-white/15 shadow-md">
+          <button
+            onMouseDown={() => setVirtualInput({ left: true })}
+            onMouseUp={() => setVirtualInput({ left: false })}
+            onMouseLeave={() => setVirtualInput({ left: false })}
+            onTouchStart={() => setVirtualInput({ left: true })}
+            onTouchEnd={() => setVirtualInput({ left: false })}
+            className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 active:bg-blue-600 text-white font-bold text-xs flex items-center gap-1 transition select-none cursor-pointer"
+            title="向左骑行 (A / ←)"
+          >
+            ◀ 骑行左
+          </button>
+          <button
+            onMouseDown={() => setVirtualInput({ right: true })}
+            onMouseUp={() => setVirtualInput({ right: false })}
+            onMouseLeave={() => setVirtualInput({ right: false })}
+            onTouchStart={() => setVirtualInput({ right: true })}
+            onTouchEnd={() => setVirtualInput({ right: false })}
+            className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 active:bg-blue-600 text-white font-bold text-xs flex items-center gap-1 transition select-none cursor-pointer"
+            title="向右骑行 (D / →)"
+          >
+            骑行右 ▶
+          </button>
         </div>
 
-        {/* Dynamic Action Prompt */}
+        {/* Dynamic Action Button */}
         {actionPrompt && (
-          <div className={`pointer-events-auto mx-auto px-4 py-2 rounded-2xl shadow-xl border border-white/20 flex items-center gap-2.5 font-bold text-xs sm:text-sm animate-bounce ${actionPrompt.color}`}>
+          <button
+            onClick={() => {
+              setVirtualInput({ action: true });
+              setTimeout(() => setVirtualInput({ action: false }), 250);
+            }}
+            className={`pointer-events-auto mx-auto px-4 py-2 rounded-2xl shadow-xl border border-white/20 flex items-center gap-2.5 font-bold text-xs sm:text-sm active:scale-95 transition cursor-pointer ${actionPrompt.color}`}
+          >
             <kbd className="px-2 py-0.5 rounded-lg bg-black/30 font-mono text-xs">
               {actionPrompt.key}
             </kbd>
             <span>{actionPrompt.text}</span>
-          </div>
+          </button>
         )}
 
         <div className="hidden sm:flex items-center gap-2 bg-slate-900/80 backdrop-blur px-3 py-1.5 rounded-xl border border-white/10 text-[11px] text-slate-400 font-mono">

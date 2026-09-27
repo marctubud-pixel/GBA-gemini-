@@ -31,6 +31,11 @@ export class PixelArtGenerator {
         this.drawBikeFrame(ctx, ox, 0, f, false);
       }
       rideCanvas.refresh();
+
+      // Explicitly register animation frames 0..3
+      for (let f = 0; f < 4; f++) {
+        rideCanvas.add(f, 0, f * w, 0, w, h);
+      }
     }
 
     // 2. Bike Idle
@@ -212,6 +217,10 @@ export class PixelArtGenerator {
         this.drawWalkingFrame(ctx, f * w, 0, f);
       }
       walkCanvas.refresh();
+
+      for (let f = 0; f < 4; f++) {
+        walkCanvas.add(f, 0, f * w, 0, w, h);
+      }
     }
 
     // 2. Idle Sheet (2 frames)
@@ -222,6 +231,10 @@ export class PixelArtGenerator {
       this.drawIdleFrame(ctx, 0, 0, 0);
       this.drawIdleFrame(ctx, w, 0, 1);
       idleCanvas.refresh();
+
+      for (let f = 0; f < 2; f++) {
+        idleCanvas.add(f, 0, f * w, 0, w, h);
+      }
     }
   }
 

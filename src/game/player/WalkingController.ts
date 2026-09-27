@@ -15,21 +15,27 @@ export class WalkingController {
 
     // Animations
     if (!scene.anims.exists('char_walk')) {
-      scene.anims.create({
-        key: 'char_walk',
-        frames: scene.anims.generateFrameNumbers('character_walk_sheet', { start: 0, end: 3 }),
-        frameRate: 8,
-        repeat: -1
-      });
+      const frames = scene.anims.generateFrameNumbers('character_walk_sheet', { start: 0, end: 3 });
+      if (frames && frames.length > 0) {
+        scene.anims.create({
+          key: 'char_walk',
+          frames: frames,
+          frameRate: 8,
+          repeat: -1
+        });
+      }
     }
 
     if (!scene.anims.exists('char_idle')) {
-      scene.anims.create({
-        key: 'char_idle',
-        frames: scene.anims.generateFrameNumbers('character_idle_sheet', { start: 0, end: 1 }),
-        frameRate: 2,
-        repeat: -1
-      });
+      const frames = scene.anims.generateFrameNumbers('character_idle_sheet', { start: 0, end: 1 });
+      if (frames && frames.length > 0) {
+        scene.anims.create({
+          key: 'char_idle',
+          frames: frames,
+          frameRate: 2,
+          repeat: -1
+        });
+      }
     }
   }
 

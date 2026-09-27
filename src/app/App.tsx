@@ -86,8 +86,15 @@ export const App: React.FC = () => {
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
               <button
-                onClick={() => setCurrentView('game')}
-                className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-500 hover:to-teal-500 text-white font-bold text-sm shadow-lg hover:shadow-cyan-500/25 transition-all duration-150 flex items-center justify-center gap-2 group active:scale-95"
+                onClick={() => {
+                  setCurrentView('game');
+                  setTimeout(() => {
+                    window.focus();
+                    const canvas = document.querySelector('canvas');
+                    if (canvas) canvas.focus();
+                  }, 50);
+                }}
+                className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-500 hover:to-teal-500 text-white font-bold text-sm shadow-lg hover:shadow-cyan-500/25 transition-all duration-150 flex items-center justify-center gap-2 group active:scale-95 cursor-pointer"
               >
                 <Bike className="w-5 h-5 group-hover:animate-bounce" />
                 <span>进入世界 (Start Ride)</span>

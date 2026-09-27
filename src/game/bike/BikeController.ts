@@ -17,12 +17,15 @@ export class BikeController {
 
     // Create animation if not already created
     if (!scene.anims.exists('bike_pedal')) {
-      scene.anims.create({
-        key: 'bike_pedal',
-        frames: scene.anims.generateFrameNumbers('bike_ride_sheet', { start: 0, end: 3 }),
-        frameRate: 10,
-        repeat: -1
-      });
+      const frames = scene.anims.generateFrameNumbers('bike_ride_sheet', { start: 0, end: 3 });
+      if (frames && frames.length > 0) {
+        scene.anims.create({
+          key: 'bike_pedal',
+          frames: frames,
+          frameRate: 10,
+          repeat: -1
+        });
+      }
     }
   }
 

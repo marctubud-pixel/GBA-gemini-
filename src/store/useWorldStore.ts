@@ -25,6 +25,10 @@ interface WorldState {
   nearParkedBike: boolean;
   nearInteraction: WorldLocation | null;
 
+  // Virtual inputs for on-screen controls
+  virtualInput: { left: boolean; right: boolean; action: boolean };
+  setVirtualInput: (input: Partial<{ left: boolean; right: boolean; action: boolean }>) => void;
+
   // Active Overlay / Content
   activeLocation: WorldLocation | null;
   activeProject: PortfolioProject | null;
@@ -63,6 +67,12 @@ export const useWorldStore = create<WorldState>((set, get) => ({
   nearParkingZone: null,
   nearParkedBike: false,
   nearInteraction: null,
+
+  virtualInput: { left: false, right: false, action: false },
+  setVirtualInput: (input) =>
+    set((state) => ({
+      virtualInput: { ...state.virtualInput, ...input }
+    })),
 
   activeLocation: null,
   activeProject: null,

@@ -9,6 +9,10 @@ export class SideScrollCamera {
     this.camera = scene.cameras.main;
   }
 
+  public initCenter(targetX: number, targetY: number) {
+    this.camera.centerOn(targetX, targetY - 45);
+  }
+
   public update(targetX: number, targetY: number, facing: 1 | -1, isMoving: boolean) {
     // 1. Look-ahead calculation
     const targetLookAhead = isMoving ? facing * this.maxLookAhead : 0;
