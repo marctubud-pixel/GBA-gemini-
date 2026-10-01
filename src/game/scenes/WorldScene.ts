@@ -6,6 +6,8 @@ import { WorldBuilder } from '../world/WorldBuilder';
 import { WORLD_LOCATIONS, WorldLocation } from '../../data/locations';
 import { useWorldStore, PlayerState } from '../../store/useWorldStore';
 import { pixelSound } from '../audio/PixelSoundManager';
+import { isInteriorId } from '../interiors/types';
+import type { InteriorId } from '../interiors/types';
 
 export class WorldScene extends Phaser.Scene {
   private bike!: BikeController;
@@ -32,6 +34,11 @@ export class WorldScene extends Phaser.Scene {
 
   // Active parked spot location if dismounted
   private activeParkedLocation: WorldLocation | null = null;
+  private interiorReturnPosition: { x: number; y: number } | null = null;
+  private isEnteringLandmark = false;
+  private landmarkTransition: Phaser.Time.TimerEvent | null = null;
+  private pendingAction = false;
+  private previousVirtualAction = false;
 
   // Keyboard controls
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -98,6 +105,9 @@ export class WorldScene extends Phaser.Scene {
 
     // 5. Window level direct key tracker for foolproof input
     const onKeyDown = (e: KeyboardEvent) => {
+      const store = useWorldStore.getState();
+      if (!this.scene.isActive('WorldScene') || store.activeInterior || store.currentView !== 'game') return;
+      if (e.target instanceof HTMLElement && e.target.closest('input, textarea, select, [contenteditable="true"]')) return;
       const code = e.code;
       if (code === 'KeyA' || code === 'ArrowLeft') this.rawKeys.left = true;
       if (code === 'KeyD' || code === 'ArrowRight') this.rawKeys.right = true;
@@ -109,22 +119,20 @@ export class WorldScene extends Phaser.Scene {
       if (code === 'KeyK' || code === 'KeyE' || code === 'Space' || code === 'Enter') {
         this.rawKeys.brake = true;
         this.rawKeys.action = true;
+        if (!e.repeat) this.pendingAction = true;
       }
       if (code === 'Escape') {
-        const store = useWorldStore.getState();
         if (store.isEndingModalOpen) {
           store.closeEndingModal();
-          pixelSound.playClose();
         } else if (store.isPostcardOpen) {
           store.closePostcard();
-          pixelSound.playClose();
+        } else if (store.activeLandmarkModal) {
+          store.closeLandmarkModal();
         } else if (store.isPrintHouseBookOpen) {
           store.closePrintHouseModal();
-          pixelSound.playClose();
         } else if (store.isOverlayOpen) {
           store.closeOverlay();
           this.cameraController.setTargetZoom(1.4);
-          pixelSound.playClose();
         }
       }
     };
@@ -179,36 +187,34 @@ export class WorldScene extends Phaser.Scene {
 
 
 
-    const onExitPrintHouse = () => {
+    const onExitInterior = () => {
+      this.resetInputs(true);
       this.walker.setAlpha(1);
-      this.walker.setPosition(1510, WorldBuilder.getGroundY(1510) + 1);
+      const position = this.interiorReturnPosition;
+      if (position) this.walker.setPosition(position.x, position.y);
+      this.interiorReturnPosition = null;
       this.cameras.main.fadeIn(200, 0, 0, 0);
       this.cameraController.setTargetZoom(1.4);
+      this.cameraController.currentCamera.setZoom(1.4);
+      this.cameraController.initCenter(this.walker.x, this.walker.y);
     };
-    window.addEventListener('exit-print-house-interior', onExitPrintHouse);
-
-    const onEnterPrintHouse = () => {
-      if (this.scene.isActive('WorldScene')) {
-        this.scene.pause();
-        this.scene.launch('PrintHouseScene');
-      }
+    const onEnterInterior = (event: Event) => {
+      const id = (event as CustomEvent<{ id?: unknown }>).detail?.id;
+      if (isInteriorId(id)) this.enterInterior(id);
     };
-    window.addEventListener('enter-print-house-interior', onEnterPrintHouse);
-
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
-      window.removeEventListener('keydown', onKeyDown);
-      window.removeEventListener('keyup', onKeyUp);
-      window.removeEventListener('exit-print-house-interior', onExitPrintHouse);
-      window.removeEventListener('enter-print-house-interior', onEnterPrintHouse);
-    });
+    const onBlur = () => this.resetInputs(true);
+    window.addEventListener('exit-interior', onExitInterior);
+    window.addEventListener('enter-interior', onEnterInterior);
+    window.addEventListener('blur', onBlur);
 
     // 6. Teleport event listener for INDEX fast-travel
-    window.addEventListener('teleport-player', (e: Event) => {
+    const onTeleport = (e: Event) => {
       const customEvent = e as CustomEvent<{ x: number }>;
       if (customEvent.detail && customEvent.detail.x !== undefined) {
         this.handleTeleport(customEvent.detail.x);
       }
-    });
+    };
+    window.addEventListener('teleport-player', onTeleport);
 
     // 7. Ending Sequence: Ride bicycle off-screen / out of the frame
     const onPlayEndingRideOut = () => {
@@ -216,17 +222,45 @@ export class WorldScene extends Phaser.Scene {
     };
     window.addEventListener('play-ending-ride-out', onPlayEndingRideOut);
 
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
-      window.removeEventListener('play-ending-ride-out', onPlayEndingRideOut);
-    });
-
     // Listen for overlay closure from React to restore camera zoom
-    useWorldStore.subscribe((state, prevState) => {
+    const unsubscribeStore = useWorldStore.subscribe((state, prevState) => {
+      if (state.currentView !== 'game' && state.currentView !== prevState.currentView) {
+        this.cancelLandmarkTransition();
+      }
       if ((prevState.isOverlayOpen && !state.isOverlayOpen) ||
-          (prevState.isPrintHouseBookOpen && !state.isPrintHouseBookOpen)) {
+          (prevState.isPrintHouseBookOpen && !state.isPrintHouseBookOpen) ||
+          (prevState.activeLandmarkModal && !state.activeLandmarkModal) ||
+          (prevState.isPostcardOpen && !state.isPostcardOpen)) {
         this.cameraController.setTargetZoom(1.4);
       }
+      const locked = state.currentView !== 'game' || state.activeInterior || state.isOverlayOpen || state.activeLandmarkModal;
+      const previouslyLocked = prevState.currentView !== 'game' || prevState.activeInterior || prevState.isOverlayOpen || prevState.activeLandmarkModal;
+      if (locked && !previouslyLocked) this.resetInputs(true);
     });
+
+    let disposed = false;
+    const cleanup = () => {
+      if (disposed) return;
+      disposed = true;
+      this.events.off(Phaser.Scenes.Events.SHUTDOWN, cleanup);
+      this.events.off(Phaser.Scenes.Events.DESTROY, cleanup);
+      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('keyup', onKeyUp);
+      window.removeEventListener('blur', onBlur);
+      window.removeEventListener('exit-interior', onExitInterior);
+      window.removeEventListener('enter-interior', onEnterInterior);
+      window.removeEventListener('teleport-player', onTeleport);
+      window.removeEventListener('play-ending-ride-out', onPlayEndingRideOut);
+      unsubscribeStore();
+      this.cancelLandmarkTransition();
+      this.resetInputs();
+    };
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, cleanup);
+    this.events.once(Phaser.Scenes.Events.DESTROY, cleanup);
+
+    // Support direct navigation before Phaser finishes booting.
+    const activeInterior = useWorldStore.getState().activeInterior;
+    if (activeInterior) this.enterInterior(activeInterior);
   }
 
   private rawKeys = {
@@ -302,7 +336,9 @@ export class WorldScene extends Phaser.Scene {
       return;
     }
 
-    if (currentState === 'INTERACTING') {
+    if (store.currentView !== 'game' || store.activeInterior || currentState === 'INTERACTING') {
+      this.resetInputs(true);
+      pixelSound.stopBikeRoll();
       this.updatePromptBubble(null, 0, 0, time);
       return;
     }
@@ -313,7 +349,9 @@ export class WorldScene extends Phaser.Scene {
     const rightPressed = this.rawKeys.right || (this.cursors?.right?.isDown ?? false) || (this.keyD?.isDown ?? false) || vInput.right;
     const acceleratePressed = this.rawKeys.accelerate || (vInput.accelerate ?? false);
     const brakePressed = this.rawKeys.brake || (vInput.brake ?? false);
-    const actionPressed = this.rawKeys.action || (this.keyE?.isDown ?? false) || vInput.action;
+    const actionPressed = this.pendingAction || (vInput.action && !this.previousVirtualAction);
+    this.pendingAction = false;
+    this.previousVirtualAction = vInput.action;
 
     if (currentState === 'RIDING') {
       this.handleRidingUpdate(time, delta, leftPressed, rightPressed, acceleratePressed, brakePressed, actionPressed);
@@ -636,7 +674,10 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private triggerLandmarkInteraction(location: WorldLocation) {
+    if (this.isEnteringLandmark) return;
+    this.isEnteringLandmark = true;
     const store = useWorldStore.getState();
+    store.setPlayerState('INTERACTING');
 
     // Play retro interaction sound
     pixelSound.playInteract();
@@ -657,18 +698,18 @@ export class WorldScene extends Phaser.Scene {
     // 3. Subtle camera flash transition
     this.cameras.main.flash(180, 255, 255, 255, false);
 
-    // 4. Open the corresponding bespoke landmark modal
-    this.time.delayedCall(160, () => {
-      if (location.id === 'print-house') {
-        store.openLandmarkModal('write-house');
-      } else if (location.id === 'brand-museum') {
-        store.openLandmarkModal('brand-museum');
-      } else if (location.id === 'marc-cinema') {
-        store.openLandmarkModal('marc-cinema');
-      } else if (location.id === 'arcade') {
-        store.openLandmarkModal('arcade');
-      } else if (location.id === 'my-studio') {
-        store.openLandmarkModal('my-hobby');
+    // 4. Enter a walkable room; the work UI opens at the room's interaction point.
+    this.landmarkTransition = this.time.delayedCall(160, () => {
+      this.landmarkTransition = null;
+      const state = useWorldStore.getState();
+      if (!this.isEnteringLandmark || state.currentView !== 'game' || state.activeInterior ||
+          state.activeLandmarkModal || state.isOverlayOpen || state.playerState !== 'INTERACTING') {
+        this.cancelLandmarkTransition();
+        return;
+      }
+      this.isEnteringLandmark = false;
+      if (isInteriorId(location.id)) {
+        store.enterInterior(location.id);
       } else {
         // Fallback for general landmarks (entrance, central plaza, etc.)
         store.openLocationOverlay(location);
@@ -677,26 +718,73 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private enterPrintHouse() {
-    pixelSound.playInteract();
-    this.cameraController.setTargetZoom(1.52);
+    useWorldStore.getState().enterInterior('print-house');
+  }
 
-    // Character joyful hop toward the entrance
-    const currentY = WorldBuilder.getGroundY(this.walker.x);
-    this.tweens.add({
-      targets: this.walker,
-      y: currentY - 8,
-      duration: 120,
-      yoyo: true,
-      ease: 'Sine.easeOut'
-    });
+  private resetInputs(clearVirtual = false) {
+    this.rawKeys = {
+      left: false, right: false, up: false, down: false,
+      accelerate: false, brake: false, action: false,
+    };
+    this.pendingAction = false;
+    this.previousVirtualAction = false;
+    this.input.keyboard?.resetKeys();
+    if (clearVirtual) {
+      const store = useWorldStore.getState();
+      if (Object.values(store.virtualInput).some(Boolean)) {
+        store.setVirtualInput({
+          left: false, right: false, up: false, down: false,
+          action: false, accelerate: false, brake: false,
+        });
+      }
+    }
+  }
 
-    // Subtle camera flash transition
-    this.cameras.main.flash(180, 255, 255, 255, false);
+  private enterInterior(id: InteriorId) {
+    const location = WORLD_LOCATIONS.find((item) => item.id === id);
+    if (!location) return;
+    this.cancelLandmarkTransition();
+    this.resetInputs(true);
+    this.isEnteringLandmark = false;
+    // Direct navigation from the index must also establish the correct parked bike.
+    if (!this.walker.sprite.visible || this.activeParkedLocation?.id !== id) {
+      this.dismountBike(location);
+      this.walker.setPosition(location.interactionX, WorldBuilder.getGroundY(location.interactionX) + 1);
+    }
+    this.tweens.killTweensOf(this.walker);
+    this.walker.y = WorldBuilder.getGroundY(this.walker.x) + 1;
+    this.interiorReturnPosition = { x: this.walker.x, y: this.walker.y };
+    this.walker.velocityX = 0;
+    this.bike.velocityX = 0;
+    pixelSound.stopBikeRoll();
+    this.updatePromptBubble(null, 0, 0, this.time.now);
+    const store = useWorldStore.getState();
+    store.setNearParkingZone(null);
+    store.setNearInteraction(null);
+    store.setNearParkedBike(false);
+    this.cameraController.setTargetZoom(1.4);
+    this.cameraController.currentCamera.setZoom(1.4);
+    this.scene.pause('WorldScene');
+    if (this.scene.isActive('InteriorScene')) {
+      this.scene.get('InteriorScene').scene.restart({ id });
+    } else {
+      this.scene.launch('InteriorScene', { id });
+    }
+  }
 
-    // Open Write House Modal directly
-    this.time.delayedCall(160, () => {
-      useWorldStore.getState().openLandmarkModal('write-house');
-    });
+  private cancelLandmarkTransition() {
+    if (!this.isEnteringLandmark && !this.landmarkTransition) return;
+    this.landmarkTransition?.remove(false);
+    this.landmarkTransition = null;
+    this.isEnteringLandmark = false;
+    this.tweens.killTweensOf(this.walker);
+    this.walker.y = WorldBuilder.getGroundY(this.walker.x) + 1;
+    this.cameraController.setTargetZoom(1.4);
+    const store = useWorldStore.getState();
+    if (store.playerState === 'INTERACTING' && !store.activeInterior &&
+        !store.activeLandmarkModal && !store.isOverlayOpen && !store.isPostcardOpen && !store.isEndingModalOpen) {
+      store.setPlayerState('WALKING');
+    }
   }
 
   private mountBike() {
@@ -792,14 +880,18 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private handleTeleport(targetX: number) {
+    this.cancelLandmarkTransition();
+    this.resetInputs(true);
     this.isEndingRide = false;
     this.bike.setVisible(true);
     const targetY = WorldBuilder.getGroundY(targetX);
     // Find closest location
     const closest = WORLD_LOCATIONS.find((loc) => Math.abs(loc.parkingX - targetX) < 150) || WORLD_LOCATIONS[0];
     this.dismountBike(closest);
-    this.walker.setPosition(targetX, targetY);
-    this.cameraController.update(targetX, targetY, 1, false);
+    this.walker.setPosition(targetX, targetY + 1);
+    this.cameraController.setTargetZoom(1.4);
+    this.cameraController.currentCamera.setZoom(1.4);
+    this.cameraController.initCenter(targetX, targetY + 1);
   }
 
   private updatePromptBubble(

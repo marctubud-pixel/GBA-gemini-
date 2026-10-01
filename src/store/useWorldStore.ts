@@ -3,6 +3,8 @@ import { WorldLocation, WORLD_LOCATIONS } from '../data/locations';
 import { WorldSegment, WORLD_SEGMENTS } from '../data/worldSegments';
 import { PortfolioProject, PORTFOLIO_PROJECTS } from '../data/projects';
 import { pixelSound } from '../game/audio/PixelSoundManager';
+import type { InteriorId } from '../game/interiors/types';
+import { useContentStore } from './useContentStore';
 
 export type PlayerState = 'RIDING' | 'PARKING' | 'WALKING' | 'INTERACTING';
 export type ViewMode = 'welcome' | 'game' | 'index' | 'info';
@@ -14,10 +16,16 @@ interface WorldState {
   currentView: ViewMode;
   deviceShell: ShellType;
   soundEnabled: boolean;
+  activeInterior: InteriorId | null;
+  interiorPrompt: string | null;
+  modalContext: string | null;
+  enterInterior: (id: InteriorId) => void;
+  exitInterior: () => void;
+  setInteriorPrompt: (prompt: string | null) => void;
 
   // Active Landmark Modal (5 bespoke pixel UI experiences)
   activeLandmarkModal: LandmarkModalType;
-  openLandmarkModal: (modal: Exclude<LandmarkModalType, null>) => void;
+  openLandmarkModal: (modal: Exclude<LandmarkModalType, null>, context?: string) => void;
   closeLandmarkModal: () => void;
 
   // Player gameplay state
@@ -55,6 +63,8 @@ interface WorldState {
   // Active Overlay / Content
   activeLocation: WorldLocation | null;
   activeProject: PortfolioProject | null;
+  activeContentId: string | null;
+  openContentOverlay: (id: string) => void;
   isOverlayOpen: boolean;
   isPostcardOpen: boolean;
 
@@ -101,6 +111,27 @@ export const useWorldStore = create<WorldState>((set, get) => ({
   currentView: 'welcome',
   deviceShell: 'gba',
   soundEnabled: true,
+  activeInterior: null,
+  interiorPrompt: null,
+  modalContext: null,
+  enterInterior: (id) => {
+    set({ activeInterior: id, interiorPrompt: null, activeLandmarkModal: null,
+      modalContext: null, isOverlayOpen: false, isPrintHouseBookOpen: false,
+      activeContentId: null, activeProject: null, isPostcardOpen: false, isEndingModalOpen: false,
+      playerState: 'WALKING', currentView: 'game', nearInteraction: null,
+      nearParkedBike: false, nearParkingZone: null,
+      virtualInput: { left: false, right: false, action: false } });
+    window.dispatchEvent(new CustomEvent('enter-interior', { detail: { id } }));
+  },
+  exitInterior: () => {
+    if (!get().activeInterior) return;
+    set({ activeInterior: null, interiorPrompt: null, activeLandmarkModal: null,
+      modalContext: null, isOverlayOpen: false, isPrintHouseBookOpen: false,
+      activeContentId: null, activeProject: null,
+      playerState: 'WALKING', virtualInput: { left: false, right: false, action: false } });
+    window.dispatchEvent(new CustomEvent('exit-interior'));
+  },
+  setInteriorPrompt: (prompt) => { if (get().interiorPrompt !== prompt) set({ interiorPrompt: prompt }); },
 
   playerState: 'RIDING',
   playerX: 200,
@@ -120,6 +151,7 @@ export const useWorldStore = create<WorldState>((set, get) => ({
 
   activeLocation: null,
   activeProject: null,
+  activeContentId: null,
   isOverlayOpen: false,
   isPostcardOpen: false,
 
@@ -127,10 +159,11 @@ export const useWorldStore = create<WorldState>((set, get) => ({
   isPrintHouseInterior: false,
   isPrintHouseBookOpen: false,
 
-  openLandmarkModal: (modal) => {
+  openLandmarkModal: (modal, context) => {
     pixelSound.playInteract();
     set({
       activeLandmarkModal: modal,
+      modalContext: context || null,
       isPrintHouseBookOpen: modal === 'write-house',
       playerState: 'INTERACTING'
     });
@@ -140,12 +173,13 @@ export const useWorldStore = create<WorldState>((set, get) => ({
     pixelSound.playClose();
     set({
       activeLandmarkModal: null,
+      modalContext: null,
       isPrintHouseBookOpen: false,
       playerState: 'WALKING'
     });
   },
 
-  setCurrentView: (view) => set({ currentView: view }),
+  setCurrentView: (view) => set({ currentView: view, virtualInput: { left: false, right: false, action: false } }),
   setDeviceShell: (shell) => set({ deviceShell: shell }),
   toggleSound: () => set((state) => ({ soundEnabled: !state.soundEnabled })),
 
@@ -171,18 +205,32 @@ export const useWorldStore = create<WorldState>((set, get) => ({
     const loc = WORLD_LOCATIONS.find((l) => l.id === project.locationId) || null;
     set({
       activeProject: project,
+      activeContentId: null,
       activeLocation: loc,
       isOverlayOpen: true,
       playerState: 'INTERACTING'
     });
   },
 
-  openLocationOverlay: (location) => {
+  openContentOverlay: (id) => {
+    const entry = useContentStore.getState().entries.find(item => item.id === id);
+    if (!entry) return;
     pixelSound.playInteract();
-    const project = PORTFOLIO_PROJECTS.find((p) => p.locationId === location.id) || PORTFOLIO_PROJECTS[0];
+    set({ activeContentId: id, activeProject: null,
+      activeLocation: WORLD_LOCATIONS.find(loc => loc.id === entry.locationId) || null,
+      isOverlayOpen: true, playerState: 'INTERACTING' });
+  },
+
+  openLocationOverlay: (location) => {
+    const content = useContentStore.getState();
+    const entry = content.entries.find(item => item.locationId === location.id);
+    if (entry) { get().openContentOverlay(entry.id); return; }
+    pixelSound.playInteract();
+    const project = content.status === 'ready' ? null : PORTFOLIO_PROJECTS.find((p) => p.locationId === location.id) || null;
     set({
       activeLocation: location,
       activeProject: project,
+      activeContentId: null,
       isOverlayOpen: true,
       playerState: 'INTERACTING'
     });
@@ -193,6 +241,7 @@ export const useWorldStore = create<WorldState>((set, get) => ({
     set({
       isOverlayOpen: false,
       activeProject: null,
+      activeContentId: null,
       activeLocation: null,
       playerState: 'WALKING'
     });
@@ -279,11 +328,16 @@ export const useWorldStore = create<WorldState>((set, get) => ({
   teleportToLocation: (locationId: string) => {
     const loc = WORLD_LOCATIONS.find((l) => l.id === locationId);
     if (!loc) return;
+    if (get().activeInterior) get().exitInterior();
     pixelSound.playMount();
     set({
       currentView: 'game',
       playerState: 'WALKING',
-      playerX: loc.parkingX + 30
+      playerX: loc.parkingX + 30,
+      activeLandmarkModal: null, modalContext: null, isOverlayOpen: false,
+      activeContentId: null, activeProject: null, isPrintHouseBookOpen: false,
+      isPostcardOpen: false, isEndingModalOpen: false,
+      virtualInput: { left: false, right: false, action: false }
     });
     // Dispatch custom event to notify Phaser scene
     window.dispatchEvent(new CustomEvent('teleport-player', { detail: { x: loc.parkingX + 30 } }));

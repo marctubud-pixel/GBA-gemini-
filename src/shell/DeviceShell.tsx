@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useWorldStore } from '../store/useWorldStore';
 import { TOTAL_WORLD_WIDTH } from '../data/worldSegments';
+import { WORLD_LOCATIONS } from '../data/locations';
 import { Volume2, VolumeX, Compass, User, Sparkles } from 'lucide-react';
 import { pixelSound } from '../game/audio/PixelSoundManager';
 import { GBAPixelShellRenderer, GBAPressedKeys } from './GBAPixelShellRenderer';
@@ -32,6 +33,9 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
     setCurrentView,
     setVirtualInput,
     activeLandmarkModal,
+    activeInterior,
+    interiorPrompt,
+    exitInterior,
     closeLandmarkModal,
     closePrintHouseModal,
     isPrintHouseBookOpen,
@@ -97,7 +101,11 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
   // Determine bottom action prompt
   let actionPrompt: { key: string; text: string; color: string } | null = null;
 
-  if (playerState === 'RIDING') {
+  if (activeLandmarkModal || isOverlayOpen) {
+    actionPrompt = { key: 'J / K', text: 'J 确认 · K 返回 · 方向键选择', color: 'bg-slate-800 text-slate-200' };
+  } else if (activeInterior) {
+    actionPrompt = { key: 'A / D', text: interiorPrompt || '在房间里走走 · 靠近物件按 J / E 查看 · ESC 出门', color: 'bg-[#245587] text-white' };
+  } else if (playerState === 'RIDING') {
     if (nearParkingZone) {
       actionPrompt = { key: 'K', text: `PARK · 停靠单车 (${nearParkingZone.name})`, color: 'bg-[#ea580c] text-white' };
     } else if (playerX > 6200) {
@@ -117,18 +125,31 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
     }
   }
 
-  // Handle J Button Click (Accelerate / Start)
+  const sendPanelKey = (code: string, key: string, type: 'keydown' | 'keyup' = 'keydown') => {
+    window.dispatchEvent(new KeyboardEvent(type, { code, key, bubbles: true, cancelable: true }));
+  };
+
+  // Shell controls use the same navigation as the physical keyboard in panels.
   const handleButtonJ = () => {
     pixelSound.playInteract();
+    if (currentView === 'welcome' || activeLandmarkModal || isOverlayOpen) {
+      sendPanelKey('KeyJ', 'j');
+      return;
+    }
+    if (activeInterior) {
+      sendPanelKey('KeyJ', 'j');
+      setVirtualInput({ action: true });
+      return;
+    }
+    sendPanelKey('KeyJ', 'j');
     setVirtualInput({ accelerate: true });
-    setTimeout(() => setVirtualInput({ accelerate: false }), 200);
   };
 
   // Handle K Button Click (Brake / Action / Enter / Close)
   const handleButtonK = () => {
     pixelSound.playInteract();
-    if (activeLandmarkModal) {
-      closeLandmarkModal();
+    if (currentView === 'welcome' || activeLandmarkModal || isOverlayOpen) {
+      sendPanelKey('KeyK', 'k');
       return;
     }
     if (isEndingModalOpen) {
@@ -147,9 +168,53 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
       closeOverlay();
       return;
     }
+    sendPanelKey('KeyK', 'k');
     setVirtualInput({ brake: true, action: true });
-    setTimeout(() => setVirtualInput({ brake: false, action: false }), 200);
   };
+
+  type ShellControl = 'up' | 'down' | 'left' | 'right' | 'j' | 'k';
+  const controlKeys: Record<ShellControl, [string, string]> = {
+    up: ['ArrowUp', 'ArrowUp'], down: ['ArrowDown', 'ArrowDown'],
+    left: ['ArrowLeft', 'ArrowLeft'], right: ['ArrowRight', 'ArrowRight'],
+    j: ['KeyJ', 'j'], k: ['KeyK', 'k'],
+  };
+  const startControl = (control: ShellControl) => {
+    setPressedKeys(p => ({ ...p, [control]: true }));
+    if (control === 'j') handleButtonJ();
+    else if (control === 'k') handleButtonK();
+    else if (activeLandmarkModal || isOverlayOpen) sendPanelKey(...controlKeys[control]);
+    else setVirtualInput({ [control]: true });
+  };
+  const releaseControl = (control: ShellControl) => {
+    setPressedKeys(p => ({ ...p, [control]: false }));
+    sendPanelKey(...controlKeys[control], 'keyup');
+    if (control === 'j') setVirtualInput({ accelerate: false, action: false });
+    else if (control === 'k') setVirtualInput({ brake: false, action: false });
+    else setVirtualInput({ [control]: false });
+  };
+  const controlEvents = (control: ShellControl) => ({
+    onPointerDown: (event: React.PointerEvent<HTMLButtonElement>) => {
+      event.preventDefault();
+      event.currentTarget.setPointerCapture(event.pointerId);
+      startControl(control);
+    },
+    onPointerUp: () => releaseControl(control),
+    onPointerCancel: () => releaseControl(control),
+    onLostPointerCapture: () => releaseControl(control),
+    onClick: (event: React.MouseEvent<HTMLButtonElement>) => {
+      // A focused control may be activated by native Enter/Space in a panel.
+      if (event.detail === 0) { startControl(control); releaseControl(control); }
+    },
+    onKeyDown: (event: React.KeyboardEvent<HTMLButtonElement>) => {
+      if (event.code === 'Enter' || event.code === 'Space') {
+        event.preventDefault(); event.stopPropagation();
+        if (!event.repeat) startControl(control);
+      }
+    },
+    onKeyUp: (event: React.KeyboardEvent<HTMLButtonElement>) => {
+      if (event.code === 'Enter' || event.code === 'Space') { event.preventDefault(); event.stopPropagation(); releaseControl(control); }
+    },
+  });
 
   return (
     <div className="relative w-full h-full flex flex-col items-center justify-center bg-[#090d14] select-none overflow-hidden">
@@ -159,15 +224,15 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5 font-bold tracking-wide">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-sky-300 font-pixel text-xs">{currentSegment.name}</span>
+            <span className="text-sky-300 font-pixel text-xs">{activeInterior ? WORLD_LOCATIONS.find(loc => loc.id === activeInterior)?.name : currentSegment.name}</span>
           </div>
           <span className="hidden md:inline text-[11px] font-pixel text-slate-400 border-l border-white/10 pl-3">
-            {currentSegment.subname}
+            {activeInterior ? '室内探索 · 步行模式' : currentSegment.subname}
           </span>
         </div>
 
         {/* Center: World Journey Progress Bar */}
-        <div className="hidden lg:flex items-center gap-2.5 w-64 xl:w-80">
+        <div className={`${activeInterior ? 'hidden' : 'hidden lg:flex'} items-center gap-2.5 w-64 xl:w-80`}>
           <span className="text-[10px] text-slate-400 font-pixel">01</span>
           <div className="flex-1 h-2 bg-slate-800 rounded-full overflow-hidden p-0.5 border border-white/10">
             <div 
@@ -180,6 +245,7 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
 
         {/* Right Controls */}
         <div className="flex items-center gap-2">
+          {activeInterior && <button onClick={exitInterior} className="px-2.5 py-1 bg-slate-800 text-slate-200 font-pixel text-[10px] cursor-pointer" title="返回建筑外 · ESC">出门</button>}
           <button
             onClick={() => {
               pixelSound.playConfirm();
@@ -284,106 +350,16 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
             }}
           >
             <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center">
-              {/* Up */}
-              <button
-                onMouseDown={() => {
-                  setPressedKeys(p => ({ ...p, up: true }));
-                  setVirtualInput({ up: true });
-                }}
-                onMouseUp={() => {
-                  setPressedKeys(p => ({ ...p, up: false }));
-                  setVirtualInput({ up: false });
-                }}
-                onMouseLeave={() => {
-                  setPressedKeys(p => ({ ...p, up: false }));
-                  setVirtualInput({ up: false });
-                }}
-                onTouchStart={() => {
-                  setPressedKeys(p => ({ ...p, up: true }));
-                  setVirtualInput({ up: true });
-                }}
-                onTouchEnd={() => {
-                  setPressedKeys(p => ({ ...p, up: false }));
-                  setVirtualInput({ up: false });
-                }}
-                className="absolute top-0 w-6 h-6 rounded cursor-pointer"
-                title="▲ 上"
-              />
-              {/* Down */}
-              <button
-                onMouseDown={() => {
-                  setPressedKeys(p => ({ ...p, down: true }));
-                  setVirtualInput({ down: true });
-                }}
-                onMouseUp={() => {
-                  setPressedKeys(p => ({ ...p, down: false }));
-                  setVirtualInput({ down: false });
-                }}
-                onMouseLeave={() => {
-                  setPressedKeys(p => ({ ...p, down: false }));
-                  setVirtualInput({ down: false });
-                }}
-                onTouchStart={() => {
-                  setPressedKeys(p => ({ ...p, down: true }));
-                  setVirtualInput({ down: true });
-                }}
-                onTouchEnd={() => {
-                  setPressedKeys(p => ({ ...p, down: false }));
-                  setVirtualInput({ down: false });
-                }}
-                className="absolute bottom-0 w-6 h-6 rounded cursor-pointer"
-                title="▼ 下"
-              />
-              {/* Left */}
-              <button
-                onMouseDown={() => {
-                  setPressedKeys(p => ({ ...p, left: true }));
-                  setVirtualInput({ left: true });
-                }}
-                onMouseUp={() => {
-                  setPressedKeys(p => ({ ...p, left: false }));
-                  setVirtualInput({ left: false });
-                }}
-                onMouseLeave={() => {
-                  setPressedKeys(p => ({ ...p, left: false }));
-                  setVirtualInput({ left: false });
-                }}
-                onTouchStart={() => {
-                  setPressedKeys(p => ({ ...p, left: true }));
-                  setVirtualInput({ left: true });
-                }}
-                onTouchEnd={() => {
-                  setPressedKeys(p => ({ ...p, left: false }));
-                  setVirtualInput({ left: false });
-                }}
-                className="absolute left-0 w-6 h-6 rounded cursor-pointer"
-                title="◀ 向左移动"
-              />
-              {/* Right */}
-              <button
-                onMouseDown={() => {
-                  setPressedKeys(p => ({ ...p, right: true }));
-                  setVirtualInput({ right: true });
-                }}
-                onMouseUp={() => {
-                  setPressedKeys(p => ({ ...p, right: false }));
-                  setVirtualInput({ right: false });
-                }}
-                onMouseLeave={() => {
-                  setPressedKeys(p => ({ ...p, right: false }));
-                  setVirtualInput({ right: false });
-                }}
-                onTouchStart={() => {
-                  setPressedKeys(p => ({ ...p, right: true }));
-                  setVirtualInput({ right: true });
-                }}
-                onTouchEnd={() => {
-                  setPressedKeys(p => ({ ...p, right: false }));
-                  setVirtualInput({ right: false });
-                }}
-                className="absolute right-0 w-6 h-6 rounded cursor-pointer"
-                title="▶ 向右移动"
-              />
+              {([
+                ['up', 'absolute top-0 w-6 h-6', '▲ 上'],
+                ['down', 'absolute bottom-0 w-6 h-6', '▼ 下'],
+                ['left', 'absolute left-0 w-6 h-6', '◀ 向左移动'],
+                ['right', 'absolute right-0 w-6 h-6', '▶ 向右移动'],
+              ] as const).map(([control, position, label]) => <button
+                key={control} {...controlEvents(control)}
+                className={`${position} rounded cursor-pointer touch-none`}
+                title={label} aria-label={label}
+              />)}
             </div>
           </div>
 
@@ -400,56 +376,12 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
             }}
           >
             <div className="relative w-16 h-16 sm:w-20 sm:h-20">
-              {/* J Button (Lower-Left: Accelerate / Start) */}
-              <button
-                onMouseDown={() => {
-                  setPressedKeys(p => ({ ...p, j: true }));
-                  handleButtonJ();
-                }}
-                onMouseUp={() => {
-                  setPressedKeys(p => ({ ...p, j: false }));
-                  setVirtualInput({ accelerate: false });
-                }}
-                onMouseLeave={() => {
-                  setPressedKeys(p => ({ ...p, j: false }));
-                  setVirtualInput({ accelerate: false });
-                }}
-                onTouchStart={() => {
-                  setPressedKeys(p => ({ ...p, j: true }));
-                  handleButtonJ();
-                }}
-                onTouchEnd={() => {
-                  setPressedKeys(p => ({ ...p, j: false }));
-                  setVirtualInput({ accelerate: false });
-                }}
-                className="absolute bottom-1 left-0 w-8 h-8 sm:w-9 sm:h-9 rounded-full cursor-pointer"
-                title="J 键 (加速 / 开始)"
-              />
-              {/* K Button (Upper-Right: Brake / Action / Enter) */}
-              <button
-                onMouseDown={() => {
-                  setPressedKeys(p => ({ ...p, k: true }));
-                  handleButtonK();
-                }}
-                onMouseUp={() => {
-                  setPressedKeys(p => ({ ...p, k: false }));
-                  setVirtualInput({ brake: false, action: false });
-                }}
-                onMouseLeave={() => {
-                  setPressedKeys(p => ({ ...p, k: false }));
-                  setVirtualInput({ brake: false, action: false });
-                }}
-                onTouchStart={() => {
-                  setPressedKeys(p => ({ ...p, k: true }));
-                  handleButtonK();
-                }}
-                onTouchEnd={() => {
-                  setPressedKeys(p => ({ ...p, k: false }));
-                  setVirtualInput({ brake: false, action: false });
-                }}
-                className="absolute top-1 right-0 w-8 h-8 sm:w-9 sm:h-9 rounded-full cursor-pointer"
-                title="K 键 (刹车 / 互动 / 进入房间)"
-              />
+              <button {...controlEvents('j')}
+                className="absolute bottom-1 left-0 w-8 h-8 sm:w-9 sm:h-9 rounded-full cursor-pointer touch-none"
+                title="J 键 (加速 / 确认)" aria-label="J 确认" />
+              <button {...controlEvents('k')}
+                className="absolute top-1 right-0 w-8 h-8 sm:w-9 sm:h-9 rounded-full cursor-pointer touch-none"
+                title="K 键 (互动 / 返回)" aria-label="K 互动或返回" />
             </div>
           </div>
 

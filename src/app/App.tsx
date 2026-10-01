@@ -15,6 +15,7 @@ import { EndingModal } from '../portfolio/EndingModal';
 import Phaser from 'phaser';
 import { pixelSound } from '../game/audio/PixelSoundManager';
 import { PixelPalmTree, PixelSpeaker } from '../shell/PixelIcons';
+import { useContentStore } from '../store/useContentStore';
 
 export const App: React.FC = () => {
   const { currentView, setCurrentView } = useWorldStore();
@@ -22,6 +23,8 @@ export const App: React.FC = () => {
   const phaserGameRef = useRef<Phaser.Game | null>(null);
   const [isQuitStandby, setIsQuitStandby] = useState(false);
   const [isLoadingTransition, setIsLoadingTransition] = useState(false);
+
+  useEffect(() => { void useContentStore.getState().load(); }, []);
 
   // Connect PixelSoundManager with world store lifecycle
   useEffect(() => {
@@ -76,7 +79,8 @@ export const App: React.FC = () => {
       if (e.key === 'j' || e.key === 'J') {
         handleStartGame();
       } else if (e.key === 'k' || e.key === 'K') {
-        handleQuitGame();
+        pixelSound.playConfirm();
+        setCurrentView('info');
       }
     };
 
