@@ -1,12 +1,50 @@
 # MY WORLD — Bright Coastal GBA 横版最终开发方案
 
-> 版本：v1.0  
+> 版本：v1.4 (环境生机与山顶留念综合交付版)  
 > 项目类型：Playable Portfolio / Interactive Personal Homepage  
 > 最终视觉方向：Bright Coastal GBA-inspired Side-scrolling Pixel Art  
 > 平台：Desktop Web First  
-> 技术栈：Vite + React + TypeScript + Phaser 3 + Zustand + React DOM Overlay  
+> 技术栈：Vite + React + TypeScript + Phaser 3 + Zustand + Web Audio API + React DOM Overlay  
 > 当前决策：停止继续扩展高成本实时 3D 方案；不再做测试分支，直接按本方案进入正式生产。  
-> 核心体验：骑自行车沿一条横向展开的海边创作世界，从入口一路经过作品、兴趣与未来，最终上坡抵达 Observatory。
+> 核心体验：骑自行车沿一条横向展开的海边创作世界，从入口一路经过作品、兴趣与未来，最终上坡抵达 Observatory。  
+> 最近更新：2026-09-28（沿海潮汐海浪声、海鸥群鸣叫、工作室猫咪抚摸互动、微风飘花粒子、山顶天文台望远镜眺望与登顶明信片、Vite 模块性能拆包）
+
+---
+
+## ⚠️ 绝对开发铁律（IRONCLAD PRINCIPLE）
+
+> **【绝对禁止静态切图 / 贴图糊弄】**  
+> 1. 用户提供的所有参考图（包括建筑外观、室内场景、家具道具、书本界面、交互 UI 等），**必须 100% 通过纯代码进行程序化像素重绘（Procedural Pixel Art with CanvasRenderingContext2D / Vector Pixel CSS）**！  
+> 2. **严禁直接把用户参考图切图、裁剪为静态 PNG/JPG 贴在画面中敷衍**。  
+> 3. 所有内景、建筑和道具必须拥有统一的 GBA 调色板、清晰的像素网格、分层的景深投影与程序化动态细节。每一处资产都必须经得起放大检验。
+
+---
+
+## 📌 最新执行进度报告（2026-09-28 更新 v1.4）
+
+### ✅ 已完成模块与核心突破
+1. **程序化沿海微风与环境声景合成（Web Audio API 纯代码合成）**：
+   - **8-bit 阳光骑行 BGM 音量增强**：优化低音、琶音与主旋律音量配比，温暖明亮，舒适悦耳；
+   - **程序化海浪潮汐声（Ocean Wave Wash）**：粉红噪声通过 LFO（0.133Hz，约 7.5 秒呼吸周期）动态扫频低通滤波器，呈现逼真的沿海海浪涌动与退潮声；
+   - **程序化沿海海鸥鸣叫（Seagull Chirps）**：纯正弦双频滑音模拟真实海鸥清脆鸣叫（kwee-kwee!），在沿海空旷区自发周期性回响；
+   - **程序化猫咪萌叫（Cat Meow）**：三角波配合轻微喉音共振模拟真实的 8-bit 猫咪软萌叫声；
+   - **全局声学动态避让与开启**：首屏一键点击即刻唤醒 AudioContext，阅读 Case Study 时 BGM 与海浪同步声学避让（Ducking）。
+2. **小镇生态微动态与交互彩蛋**：
+   - **沿海展翅海鸥群（Coastal Gulls）**：在小镇与海面上空动态巡航，3 帧细腻扇翅与滑翔动作；
+   - **工作室露台猫咪（Studio Tabby Cat，x: 4610）**：在 My Studio 门前打盹晒太阳，玩家步行靠近时立刻端坐张望（<kbd>E</kbd> 抚摸猫咪，触发猫咪伸懒腰、喵叫及爱心升起粒子）；
+   - **微风花瓣粒子（Breeze Petals）**：在街道中低空随风摇曳缓缓向左飘落，营建通透浪漫的日系沿海漫步氛围。
+3. **山顶天文台终点留念与求职名片**：
+   - **天文望远镜互动（Summit Telescope，x: 6060）**：在山顶悬崖边放置纯黄铜复古天文望远镜，按 <kbd>E</kbd> 眺望整座世界；
+   - **探索纪念拍立得明信片（PostcardModal）**：自动统计 10/10 地标全探索、6400px 里程与 CREATOR 评级，支持一键“复制分享文本”到剪贴板，或一键“再次骑行”、“查看简历”。
+4. **打包分包与性能极致优化**：
+   - Vite 配置 Rollup `manualChunks` 将 Phaser 引擎、React、Lucide 图标库拆分为独立 vendor 包，彻底消除 >500kB 警报，保障亚秒级极速首屏呈现。
+3. **真实作品集内容与 Case Study 详情页全地标覆盖**：
+   - 为 **01 Entrance** 与 **02 Central Plaza** 补齐独立项目卡片（《MY WORLD: 互动世界观宣言》与《中央广场导览与创作版图》），实现 10 个地标 100% 独立专属故事全覆盖；
+   - `PortfolioOverlay.tsx` 全面接入全套 9 大地标手绘 1:1 像素艺术 Hero Banner，新增 `Case Study 详析` 与 `技术与工具栈` 双标签自由切换，阅读体验专业典雅；
+   - `ProjectIndex.tsx` 分类标签动态化生成，支持全类别实时筛选与快速传送骑行。
+4. **底层物理与动画基准坚如磐石**：
+   - 角色单车手绘 4 帧脚踏与步行循环无噪点；
+   - 双轮坡道贴地实时几何求解，起步胎噪、石板路脚步与弹性上下车音效自然过渡。
 
 ---
 

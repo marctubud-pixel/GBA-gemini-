@@ -2,6 +2,7 @@ import React from 'react';
 import { useWorldStore } from '../store/useWorldStore';
 import { profile } from '../data/profile';
 import { X, Mail, MapPin, ExternalLink, Sparkles, Code2, Palette, Cpu } from 'lucide-react';
+import { PixelBike } from '../shell/PixelIcons';
 
 export const InfoView: React.FC = () => {
   const { currentView, setCurrentView } = useWorldStore();
@@ -31,8 +32,8 @@ export const InfoView: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 -mt-12">
             <div className="flex items-end gap-4">
               <div className="w-24 h-24 rounded-2xl bg-white p-1.5 shadow-lg border border-slate-100">
-                <div className="w-full h-full rounded-xl bg-slate-900 flex items-center justify-center text-3xl">
-                  🚲
+                <div className="w-full h-full rounded-xl bg-slate-900 flex items-center justify-center">
+                  <PixelBike className="w-10 h-10 text-sky-400" />
                 </div>
               </div>
               <div className="space-y-0.5">

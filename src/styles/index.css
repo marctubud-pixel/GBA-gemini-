@@ -1,5 +1,32 @@
 @import "tailwindcss";
 
+/* ------------------------------------------------------------------------- */
+/* 1. AUTHENTIC RETRO CJK PIXEL FONTS (中文像素字体)                        */
+/* - Cubic 11 (俐方体11号: 经典11x11点阵像素，完整覆盖简体/繁体常用汉字)    */
+/* - Zpix (最像素: 经典GBA/FC复古点阵字)                                     */
+/* ------------------------------------------------------------------------- */
+@font-face {
+  font-family: 'Cubic 11';
+  src: url('https://cdn.jsdelivr.net/npm/@fontpkg/cubic-11/Cubic_11_1.100_R.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Zpix';
+  src: url('https://cdn.jsdelivr.net/gh/SolidZORO/zpix-pixel-font@master/dist/zpix.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/gh/hellodigua/cdn/zpix.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme {
+  --font-pixel: 'Press Start 2P', 'DotGothic16', 'Cubic 11', 'Zpix', monospace, sans-serif;
+  --font-pixel-cjk: 'DotGothic16', 'Press Start 2P', 'Cubic 11', 'Zpix', monospace, sans-serif;
+}
+
 :root {
   --c-sky: #78c8ec;
   --c-sea: #2a8b9f;
@@ -15,9 +42,53 @@
   --c-yellow: #f8cb47;
   --c-blue-accent: #2e6db4;
   --c-font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --c-font-pixel: 'Press Start 2P', monospace;
-  --c-font-code: 'JetBrains Mono', monospace;
+  --c-font-pixel: 'DotGothic16', 'Press Start 2P', 'Cubic 11', 'Zpix', monospace;
+  --c-font-code: 'JetBrains Mono', 'DotGothic16', monospace;
 }
+
+/* Turn off smooth vector anti-aliasing for all pixel elements to guarantee sharp bitmap dots */
+.font-pixel,
+.pixel-text,
+.font-pixel-cjk,
+[data-pixel-font="true"] {
+  font-family: 'DotGothic16', 'Press Start 2P', 'Cubic 11', 'Zpix', 'SimSun', monospace, sans-serif !important;
+  -webkit-font-smoothing: none !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  font-smooth: never !important;
+  text-rendering: geometricPrecision !important;
+  image-rendering: pixelated !important;
+  letter-spacing: 0.03em;
+}
+
+.font-pixel-title {
+  font-family: 'Press Start 2P', 'DotGothic16', 'Silkscreen', monospace, sans-serif !important;
+  -webkit-font-smoothing: none !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  font-smooth: never !important;
+  text-rendering: geometricPrecision !important;
+}
+
+/* Stepped Retro Pixel Text Shadow Utilities */
+.pixel-shadow-sm {
+  text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.9);
+}
+
+.pixel-shadow {
+  text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.9);
+}
+
+.pixel-shadow-gold {
+  text-shadow: 2px 2px 0px #b45309;
+}
+
+.pixel-stroke-dark {
+  text-shadow: 
+    1px 0 0 #000, 
+    -1px 0 0 #000, 
+    0 1px 0 #000, 
+    0 -1px 0 #000;
+}
+
 
 * {
   box-sizing: border-box;
@@ -33,10 +104,32 @@ html, body, #root {
   background-color: #0d131a;
   font-family: var(--c-font-main);
   color: #192736;
+  cursor: default !important;
 }
 
-/* Crisp pixel rendering */
+canvas, #phaser-container, .pixel-canvas {
+  cursor: default !important;
+}
+
+button, a, [role="button"], .cursor-pointer {
+  cursor: pointer !important;
+}
+
+/* Crisp pixel rendering & full screen fill without black bars */
+#phaser-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+#phaser-container canvas,
 .pixel-canvas canvas {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
   image-rendering: -moz-crisp-edges;
   image-rendering: -webkit-crisp-edges;
   image-rendering: pixelated;
@@ -60,3 +153,78 @@ html, body, #root {
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
+
+/* Retro Loading Transition Animations */
+@keyframes bikePedalLoop {
+  0% { background-position: 0px 0px; }
+  100% { background-position: -200px 0px; }
+}
+
+@keyframes rideAcrossLine {
+  0% {
+    left: -70px;
+  }
+  100% {
+    left: calc(100% + 50px);
+  }
+}
+
+@keyframes roadDashMove {
+  0% { background-position: 0px 0px; }
+  100% { background-position: -64px 0px; }
+}
+
+@keyframes loadingProgressBar {
+  0% { width: 4%; }
+  100% { width: 100%; }
+}
+
+@keyframes dustPuff {
+  0% { transform: scale(0.6) translate(0, 0); opacity: 0.9; }
+  100% { transform: scale(1.4) translate(-12px, -3px); opacity: 0; }
+}
+
+/* ========================================================================= */
+/* AUTHENTIC 16-BIT GBA PIXEL-ART UI SYSTEM                                  */
+/* - Crisp 2px-3px solid pixel borders                                       */
+/* - Classic 16-bit highlight & shadow bevels                                */
+/* - Zero modern web blur, zero vector smoothing                             */
+/* ========================================================================= */
+.gba-pixel-frame {
+  background-color: #1e40af;
+  border: 3px solid #0c2340;
+  box-shadow: inset 1px 1px 0 #60a5fa, inset -1px -1px 0 #0f172a, 0 4px 0 rgba(0, 0, 0, 0.85);
+  image-rendering: pixelated;
+}
+
+.gba-pixel-window {
+  background-color: #fffdf7;
+  border: 2px solid #0c2340;
+  box-shadow: inset 1px 1px 0 #ffffff, inset -1px -1px 0 #cbd5e1;
+  image-rendering: pixelated;
+}
+
+.gba-pixel-btn-primary {
+  background-color: #0284c7;
+  color: #ffffff;
+  border: 2px solid #0c2340;
+  box-shadow: inset 1px 1px 0 #38bdf8, inset -1px -1px 0 #0369a1, 0 3px 0 #0c2340;
+  image-rendering: pixelated;
+}
+.gba-pixel-btn-primary:active {
+  transform: translateY(2px);
+  box-shadow: inset 1px 1px 0 #0369a1, 0 1px 0 #0c2340;
+}
+
+.gba-pixel-btn-secondary {
+  background-color: #fffdf7;
+  color: #0c2340;
+  border: 2px solid #0c2340;
+  box-shadow: inset 1px 1px 0 #ffffff, inset -1px -1px 0 #cbd5e1, 0 3px 0 #0c2340;
+  image-rendering: pixelated;
+}
+.gba-pixel-btn-secondary:active {
+  transform: translateY(2px);
+  box-shadow: inset 1px 1px 0 #cbd5e1, 0 1px 0 #0c2340;
+}
+

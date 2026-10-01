@@ -129,29 +129,29 @@ export const WORLD_SEGMENTS: WorldSegment[] = [
     name: '09 FUTURE HILL',
     subname: '向阳之坡 · Uphill Road',
     startX: 5000,
-    endX: 6600,
+    endX: 5750,
     backgroundTheme: 'hill-uphill',
     assetSet: ['stone-retaining-wall', 'mountain-guardrail', 'cypress-trees', 'wildflowers', 'slope-road'],
     slope: 0.25,
     elevationStart: 0,
-    elevationEnd: 150,
+    elevationEnd: 95,
     description: '持续延伸向右上方的海边盘山路，建筑物逐渐退去，石墙、野花与松柏相伴，坡度逐渐升高。'
   },
   {
     id: 'observatory',
     name: '10 OBSERVATORY',
     subname: '星穹天文台 · The Summit & Horizons',
-    startX: 6600,
-    endX: 7400,
+    startX: 5750,
+    endX: 6400,
     backgroundTheme: 'observatory-summit',
     assetSet: ['observatory-dome', 'telescope', 'lookout-fence', 'vast-sky'],
     locationId: 'observatory',
     slope: 0,
-    elevationStart: 150,
-    elevationEnd: 150,
+    elevationStart: 95,
+    elevationEnd: 95,
     description: '屹立于最高坡顶的白色圆顶天文台与观景台，背靠广阔无际的天空与大海，望向未来的可能性。'
   }
 ];
 
-export const TOTAL_WORLD_WIDTH = 7400;
+export const TOTAL_WORLD_WIDTH = 6400;
 export const WORLD_BASE_Y = 270;

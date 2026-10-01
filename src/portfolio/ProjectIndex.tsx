@@ -5,12 +5,19 @@ import { WORLD_LOCATIONS } from '../data/locations';
 import { X, Bike, ArrowUpRight, Compass, Filter, Sparkles } from 'lucide-react';
 
 export const ProjectIndex: React.FC = () => {
-  const { currentView, setCurrentView, openProjectOverlay, teleportToLocation } = useWorldStore();
+  const {
+    currentView,
+    setCurrentView,
+    openProjectOverlay,
+    teleportToLocation,
+    enterPrintHouseInterior,
+    setPrintHouseBookOpen
+  } = useWorldStore();
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
   if (currentView !== 'index') return null;
 
-  const categories = ['All', 'Film & Visual Storytelling', 'Brand & Creative Strategy', 'Writing & Narrative', 'Game & Interaction Prototype'];
+  const categories = ['All', ...Array.from(new Set(PORTFOLIO_PROJECTS.map((p) => p.category)))];
 
   const filteredProjects = selectedCategory === 'All'
     ? PORTFOLIO_PROJECTS
@@ -21,6 +28,11 @@ export const ProjectIndex: React.FC = () => {
   };
 
   const handleOpenDetail = (project: PortfolioProject) => {
+    if (project.locationId === 'print-house') {
+      setCurrentView('game');
+      useWorldStore.getState().openPrintHouseModal();
+      return;
+    }
     openProjectOverlay(project);
   };
 
