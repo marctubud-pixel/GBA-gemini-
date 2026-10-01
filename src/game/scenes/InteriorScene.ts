@@ -119,11 +119,6 @@ export class InteriorScene extends Phaser.Scene {
       zone.on('pointerover', () => { this.hoveredPoint = point; });
       zone.on('pointerout', () => { if (this.hoveredPoint === point) this.hoveredPoint = null; });
       zone.on('pointerdown', () => this.openInteraction(point));
-      const label = this.add.text(x + width / 2, y + height + 6, '查看 · CLICK', {
-        fontFamily: "'Cubic 11', 'Zpix', monospace, sans-serif", fontSize: '9px',
-        color: '#e9faff', backgroundColor: '#133d61', padding: { x: 4, y: 2 },
-      }).setOrigin(0.5, 0).setDepth(31).setInteractive({ useHandCursor: true });
-      label.on('pointerdown', () => this.openInteraction(point));
     }
 
     const onKeyDown = (event: KeyboardEvent) => {
@@ -242,7 +237,7 @@ export class InteriorScene extends Phaser.Scene {
       if (store.interiorPrompt !== prompt) store.setInteriorPrompt(prompt);
       this.promptBadge.setVisible(Boolean(prompt));
       if (prompt) {
-        this.promptText.setText(prompt);
+        this.promptText.setText(this.promptExits ? 'ESC' : 'E');
         const width = Math.ceil(this.promptText.width) + 16;
         this.promptBackground.clear();
         this.promptBackground.fillStyle(0x0f3a5e, 0.97);
@@ -258,6 +253,7 @@ export class InteriorScene extends Phaser.Scene {
       }
     }
     if (prompt) {
+      this.promptBadge.y = this.promptPoint ? Math.max(42, this.promptPoint.bounds.y - 18) : 150;
       const halfWidth = this.promptText.width / 2 + 10;
       this.promptBadge.x = Phaser.Math.Clamp(x, halfWidth, INTERIOR_WIDTH - halfWidth);
     }
@@ -300,21 +296,17 @@ export class InteriorScene extends Phaser.Scene {
         this.hoveredPoint = null;
       }
     }
-    const pulse = 0.5 + Math.sin(time / 320) * 0.18;
+    const pulse = 0.8 + Math.sin(time / 480) * 0.1;
     const nearest = nearestInteriorInteraction(this.interiorId, this.walker.x);
     for (const point of INTERIORS[this.interiorId].interactions) {
       const { x, y, width, height } = point.bounds;
       const selected = point === this.hoveredPoint || point === nearest;
-      graphics.lineStyle(6, 0x56dfff, selected ? 0.26 : pulse * 0.2);
+      if (!selected) continue;
+      graphics.lineStyle(5, 0x56dfff, 0.13 * pulse);
       graphics.strokeRect(x - 3, y - 3, width + 6, height + 6);
-      graphics.lineStyle(2, selected ? 0xffdc79 : 0x8feaff, selected ? 1 : pulse);
+      graphics.lineStyle(1, 0xb5eff5, pulse);
       graphics.strokeRect(x - 2, y - 2, width + 4, height + 4);
-      graphics.lineStyle(1, 0xf0ffff, selected ? 1 : 0.75);
-      for (const [cx, cy, dx, dy] of [[x - 4, y - 4, 1, 1], [x + width + 4, y - 4, -1, 1],
-        [x - 4, y + height + 4, 1, -1], [x + width + 4, y + height + 4, -1, -1]]) {
-        graphics.lineBetween(cx, cy, cx + dx * 7, cy);
-        graphics.lineBetween(cx, cy, cx, cy + dy * 7);
-      }
+
     }
   }
 

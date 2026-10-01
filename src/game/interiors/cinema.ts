@@ -2,7 +2,7 @@
 import {
   R, L, poly, ellipse, text, room, plant, poster, table,
   sign, cabinet, frame, hangingPlant, stringLights, paperStack, P,
-} from './kit';
+pixelGroup, } from './kit';
 import type { InteriorDrawAssets } from './types';
 
 // A little coastal screening room: all large shapes sit behind the walk strip.
@@ -25,15 +25,12 @@ export default function drawCinema(ctx: CanvasRenderingContext2D, assets: Interi
     R(ctx, x - 4, 49, 21, 5, '#e9d6b7');
   }
   returnDoor(ctx);
-  sign(ctx, 'MARC CINEMA', 371, 19, 217, P.coral);
 
   // Framed movie posters and a compact original projector on the left.
   poster(ctx, 55, 64, 65, 97, 'film', P.blue);
   poster(ctx, 138, 64, 65, 97, 'film', P.coral);
   R(ctx, 60, 150, 55, 9, P.navy);
-  text(ctx, 'SEA FILM', 87, 151, 7, P.cream, 'center');
   R(ctx, 143, 150, 55, 9, P.coral);
-  text(ctx, 'ROAD FILM', 170, 151, 7, P.cream, 'center');
 
   // Projection booth: cyan glass, wooden cabinet, reels and a brass lens.
   cabinet(ctx, 55, 207, 154, 40, P.wood);
@@ -50,7 +47,6 @@ export default function drawCinema(ctx: CanvasRenderingContext2D, assets: Interi
   filmReel(ctx, 133, 173, 15);
   R(ctx, 111, 190, 4, 8, '#9da39a');
   R(ctx, 122, 192, 11, 3, '#5a8ca5');
-  text(ctx, 'PROJECTOR 01', 132, 217, 7, '#e9c895', 'center');
   R(ctx, 68, 230, 27, 8, '#573e31');
   R(ctx, 72, 232, 19, 2, '#d8ba83');
   R(ctx, 178, 230, 17, 6, '#234859');
@@ -69,7 +65,6 @@ export default function drawCinema(ctx: CanvasRenderingContext2D, assets: Interi
   screenFilm(ctx, 321, 77, 333, 99);
   R(ctx, 321, 77, 333, 8, '#172d3b');
   R(ctx, 321, 166, 333, 10, '#172d3b');
-  text(ctx, 'A COASTAL STORY', 488, 177, 7, '#fff4cf', 'center');
   // Curtain valance, folds and a warm front-of-stage brass strip.
   R(ctx, 273, 62, 429, 9, '#ab2826');
   R(ctx, 276, 64, 424, 3, '#e76043');
@@ -97,16 +92,12 @@ export default function drawCinema(ctx: CanvasRenderingContext2D, assets: Interi
   // Concession counter on the right, plus a second film poster.
   poster(ctx, 818, 66, 74, 87, 'film', P.blue);
   R(ctx, 823, 142, 64, 10, P.navy);
-  text(ctx, 'FILM CLUB', 855, 144, 7, '#fff2da', 'center');
-  sign(ctx, 'POP & SODA', 755, 155, 154, P.coral);
   cabinet(ctx, 752, 207, 160, 40, '#c78859');
   R(ctx, 749, 199, 166, 10, P.navy);
   R(ctx, 752, 199, 160, 2, '#58a9d2');
   R(ctx, 758, 211, 145, 5, '#e3b585');
   R(ctx, 802, 218, 54, 22, '#ab362b');
   R(ctx, 805, 220, 48, 18, '#e45638');
-  text(ctx, 'MARC', 829, 221, 7, P.cream, 'center');
-  text(ctx, 'CINEMA', 829, 230, 7, '#fff0ca', 'center');
   popcornMachine(ctx, 767, 170);
   sodaCup(ctx, 837, 184, 13);
   sodaCup(ctx, 858, 184, 13);
@@ -135,8 +126,6 @@ export default function drawCinema(ctx: CanvasRenderingContext2D, assets: Interi
 
   // Exit and small framed details complete the room without filling the walk strip.
   R(ctx, 6, 49, 45, 10, '#315d52');
-  text(ctx, 'EXIT', 29, 51, 7, '#e4f1d1', 'center');
-  text(ctx, 'FILM / STORIES / MOTION', 487, 49, 7, '#947755', 'center');
   R(ctx, 41, 254, 878, 2, '#624b3b');
   R(ctx, 43, 256, 874, 1, '#cfaa77');
 };
@@ -255,7 +244,6 @@ function popcornMachine(ctx: CanvasRenderingContext2D, x: number, y: number) {
   R(ctx, x - 1, y + 27, 48, 3, '#b2362c');
   R(ctx, x + 3, y + 5, 2, 21, '#f6e8c5');
   R(ctx, x + 40, y + 5, 2, 21, '#edecd1');
-  text(ctx, 'POP', x + 22, y - 1, 7, '#ffe8b3', 'center');
 }
 
 function sodaCup(ctx: CanvasRenderingContext2D, x: number, y: number, w: number) {

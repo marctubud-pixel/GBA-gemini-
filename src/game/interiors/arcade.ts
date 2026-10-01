@@ -1,7 +1,8 @@
 /** A collected, frequently played arcade, drawn at 960 × 320 logical pixels. */
 import {
   R, L, poly, ellipse, text, room, plant, poster, shelf,
-  sign, cabinet, frame, hangingPlant, pinnedNote, stringLights, wallClock, P,
+  cabinet, frame, hangingPlant, pinnedNote, stringLights, wallClock, P,
+  pixelGroup,
 } from './kit';
 import type { InteriorDrawAssets } from './types';
 
@@ -12,6 +13,7 @@ interface ArcadePalette {
 
 // Front-facing cabinets and an open foreground keep this a playable arcade.
 export default function drawArcade(ctx: CanvasRenderingContext2D, assets: InteriorDrawAssets = {}) {
+  const roomContext = ctx;
   room(ctx, {
     wall: '#e9e0c9', wallShade: '#d4c4a9', trim: '#194d85',
     trimHi: P.blueHi, floor: '#76929b', floorShade: '#506b7b',
@@ -31,27 +33,21 @@ export default function drawArcade(ctx: CanvasRenderingContext2D, assets: Interi
     R(ctx, x - 2, 239, 14, 7, '#1a4270');
   }
   returnDoor(ctx);
-  sign(ctx, 'MY GAME', 362, 15, 191, P.coral);
-  text(ctx, 'PLAY / MAKE / REMEMBER', 416, 57, 7, '#71523b', 'center');
 
   // A framed adventure poster and a little glass collectible cabinet.
   gamePoster(ctx, 68, 75, 74, 95, 'adventure');
-  text(ctx, 'PLAYER FILE', 105, 182, 7, '#225780', 'center');
   collectionCabinet(ctx, 67, 190, 77, 57);
   plant(ctx, 150, 248, 0.65, '#d27142');
 
-  // The two main cabinets are intentionally large and have distinct palettes.
-  mainCabinet(ctx, 185, 79, 130, 169, 'GAME', 'JOURNEY', {
+  // Four cabinets retain their tall silhouettes at a common, smaller scale.
+  compactCabinet(pixelGroup(ctx, 246, 247, 0.58, 0.58, 260), 210, 113, 'GAME', 'JOURNEY', {
     body: '#245c9c', shade: '#173b68', light: '#4d9ada', edge: '#b3dfea',
     accent: '#f3c653', screen: 'journey',
   });
-  mainCabinet(ctx, 352, 79, 130, 169, 'GAME', 'MAKING', {
+  compactCabinet(pixelGroup(ctx, 410, 247, 0.58, 0.58, 260), 374, 113, 'GAME', 'MAKING', {
     body: '#c1402d', shade: '#7c302e', light: '#eb6b3e', edge: '#ffd69b',
     accent: '#4eabd7', screen: 'making',
   });
-  // Tape labels are small enough to be world props, not UI controls.
-  R(ctx, 213, 253, 73, 3, '#c9bd94');
-  R(ctx, 380, 253, 73, 3, '#c9bd94');
 
   // A low memorabilia shelf above the two smaller classic machines.
   shelf(ctx, 514, 63, 175, 24);
@@ -61,14 +57,12 @@ export default function drawArcade(ctx: CanvasRenderingContext2D, assets: Interi
   handheld(ctx, 641, 72, '#bd4036');
   R(ctx, 667, 60, 12, 18, '#1b5676');
   R(ctx, 669, 62, 3, 13, '#8bd2d9');
-  text(ctx, 'THE COLLECTION', 601, 95, 6, '#6f5b3b', 'center');
-  smallCabinet(ctx, 523, 113, 72, 134, '#227a82', '#173f51', 'PIXEL RUN', 'runner');
-  smallCabinet(ctx, 617, 113, 72, 134, '#e8af45', '#926531', 'SPACE 88', 'space');
+  smallCabinet(pixelGroup(ctx, 559, 247, 0.58, 0.58, 260), 523, 113, 72, 134, '#227a82', '#173f51', 'PIXEL RUN', 'runner');
+  smallCabinet(pixelGroup(ctx, 653, 247, 0.58, 0.58, 260), 617, 113, 72, 134, '#e8af45', '#926531', 'SPACE 88', 'space');
 
   // Console nook: a CRT on a stand at left, a side-facing red sofa at right.
   // Its screen and controllers make the corner legible even at game scale.
   gamePoster(ctx, 829, 67, 66, 88, 'racing');
-  text(ctx, 'CONSOLE CORNER', 855, 166, 7, '#225780', 'center');
   shelf(ctx, 737, 75, 70, 13);
   R(ctx, 744, 55, 10, 21, '#ca7e40');
   R(ctx, 746, 58, 2, 13, '#ffe0a0');
@@ -78,33 +72,35 @@ export default function drawArcade(ctx: CanvasRenderingContext2D, assets: Interi
   R(ctx, 776, 57, 3, 16, '#77b6cc');
   R(ctx, 790, 58, 10, 18, '#b85342');
   R(ctx, 791, 62, 2, 11, '#ffc281');
-  crt(ctx, 733, 134, 75, 58);
-  cabinet(ctx, 724, 201, 91, 47, '#9f744e');
-  R(ctx, 721, 196, 97, 7, P.navy);
-  R(ctx, 724, 196, 91, 2, '#6391a0');
-  // Original 16-bit console with cartridge and two wired controllers.
-  R(ctx, 736, 191, 45, 7, '#bac0ad');
-  R(ctx, 739, 190, 40, 3, '#e0dfc6');
-  R(ctx, 748, 187, 17, 4, '#526a70');
-  R(ctx, 751, 186, 11, 3, '#becbbb');
-  R(ctx, 771, 193, 3, 2, '#e45037');
-  L(ctx, 743, 198, 738, 223, '#193847', 1);
-  L(ctx, 770, 198, 791, 224, '#193847', 1);
-  controller(ctx, 728, 222, '#b6c5b9');
-  controller(ctx, 783, 223, '#b6c5b9');
-  R(ctx, 738, 235, 15, 6, '#476279');
-  R(ctx, 756, 234, 17, 7, '#c55a3a');
-  R(ctx, 776, 235, 16, 6, '#d4b76d');
-  sofa(ctx, 825, 204, 100, 44);
-  R(ctx, 863, 226, 17, 8, '#e8d8ab');
-  R(ctx, 865, 226, 13, 2, '#fff0c6');
-  R(ctx, 866, 230, 11, 2, '#637c88');
-  plant(ctx, 911, 247, 0.73, P.navy);
+  {
+    const ctx = pixelGroup(roomContext, 824, 248, 0.55, 0.55, 260);
+    crt(ctx, 733, 134, 75, 58);
+    cabinet(ctx, 724, 201, 91, 47, '#9f744e');
+    R(ctx, 721, 196, 97, 7, P.navy);
+    R(ctx, 724, 196, 91, 2, '#6391a0');
+    // Original 16-bit console with cartridge and two wired controllers.
+    R(ctx, 736, 191, 45, 7, '#bac0ad');
+    R(ctx, 739, 190, 40, 3, '#e0dfc6');
+    R(ctx, 748, 187, 17, 4, '#526a70');
+    R(ctx, 751, 186, 11, 3, '#becbbb');
+    R(ctx, 771, 193, 3, 2, '#e45037');
+    L(ctx, 743, 198, 738, 223, '#193847', 1);
+    L(ctx, 770, 198, 791, 224, '#193847', 1);
+    controller(ctx, 728, 222, '#b6c5b9');
+    controller(ctx, 783, 223, '#b6c5b9');
+    R(ctx, 738, 235, 15, 6, '#476279');
+    R(ctx, 756, 234, 17, 7, '#c55a3a');
+    R(ctx, 776, 235, 16, 6, '#d4b76d');
+    sofa(ctx, 825, 204, 100, 44);
+    R(ctx, 863, 226, 17, 8, '#e8d8ab');
+    R(ctx, 865, 226, 13, 2, '#fff0c6');
+    R(ctx, 866, 230, 11, 2, '#637c88');
+    plant(ctx, 911, 247, 0.73, P.navy);
+  }
 
   // A few big wall motifs instead of a noisy texture field.
   frame(ctx, 733, 95, 72, 26, '#94734e');
   R(ctx, 737, 99, 64, 18, '#ecdfb7');
-  text(ctx, 'LEVEL UP!', 769, 109, 7, '#c04d32', 'center');
   pixelStar(ctx, 741, 109, '#d9a84a');
   stringLights(ctx, 558, 31, 133, '#f3c653');
   hangingPlant(ctx, 713, 40, 27, '#c47443');
@@ -113,16 +109,18 @@ export default function drawArcade(ctx: CanvasRenderingContext2D, assets: Interi
   pinnedNote(ctx, 492, 171, 20, 26, '#d6e0ce');
   R(ctx, 495, 180, 13, 2, P.blue);
   R(ctx, 496, 184, 9, 2, P.coral);
-  // Spare cartridges and a snack bowl stay tucked in the sofa nook.
-  R(ctx, 835, 233, 18, 7, P.navy);
-  R(ctx, 837, 231, 15, 4, '#a6b5aa');
-  R(ctx, 840, 232, 9, 2, P.coral);
-  ellipse(ctx, 891, 236, 10, 3, '#d5b47e');
-  R(ctx, 884, 235, 14, 5, '#9f6749');
-  R(ctx, 886, 233, 4, 3, P.gold);
-  R(ctx, 892, 234, 4, 2, P.creamShade);
-  R(ctx, 6, 50, 45, 9, '#2a695e');
-  text(ctx, 'EXIT', 29, 51, 7, '#e3edd4', 'center');
+  {
+    const ctx = pixelGroup(roomContext, 824, 248, 0.55, 0.55, 260);
+    // Spare cartridges and a snack bowl stay tucked in the sofa nook.
+    R(ctx, 835, 233, 18, 7, P.navy);
+    R(ctx, 837, 231, 15, 4, '#a6b5aa');
+    R(ctx, 840, 232, 9, 2, P.coral);
+    ellipse(ctx, 891, 236, 10, 3, '#d5b47e');
+    R(ctx, 884, 235, 14, 5, '#9f6749');
+    R(ctx, 886, 233, 4, 3, P.gold);
+    R(ctx, 892, 234, 4, 2, P.creamShade);
+  }
+    R(ctx, 6, 50, 45, 9, '#2a695e');
   // The foreground strip is uninterrupted for the player's feet.
   R(ctx, 41, 257, 878, 2, '#345d76');
   R(ctx, 43, 259, 874, 1, '#98b8b8');
@@ -141,6 +139,21 @@ function returnDoor(ctx: CanvasRenderingContext2D) {
   R(ctx, 4, 60, 49, 3, P.woodHi);
 }
 
+/** Remap only integer pixel rectangles, preserving crisp edges at the smaller size. */
+function compactCabinet(ctx: CanvasRenderingContext2D, x: number, y: number, line1: string, line2: string, palette: ArcadePalette) {
+  const sx = 72 / 130, sy = 134 / 169;
+  ellipse(ctx, x + 40, y + 137, 40, 4, '#506b76');
+  const scaled = {
+    get fillStyle() { return ctx.fillStyle; },
+    set fillStyle(value: string | CanvasGradient | CanvasPattern) { ctx.fillStyle = value; },
+    fillRect(px: number, py: number, width: number, height: number) {
+      const left = Math.round(px * sx), top = Math.round(py * sy);
+      ctx.fillRect(x + left, y + top, Math.round((px + width) * sx) - left, Math.round((py + height) * sy) - top);
+    },
+  } as CanvasRenderingContext2D;
+  mainCabinet(scaled, 0, 0, 130, 169, line1, line2, palette);
+}
+
 function mainCabinet(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, line1: string, line2: string, c: ArcadePalette) {
   const base = y + h;
   // Black silhouette with stepped profile; shaded sides suggest cabinet depth.
@@ -151,8 +164,6 @@ function mainCabinet(ctx: CanvasRenderingContext2D, x: number, y: number, w: num
   R(ctx, x + 18, y + 6, w - 38, 30, '#132d43');
   R(ctx, x + 20, y + 8, w - 42, 26, c.accent);
   R(ctx, x + 22, y + 10, w - 46, 22, '#204f71');
-  text(ctx, line1, x + w / 2 - 1, y + 12, 7, '#f9efd1', 'center');
-  text(ctx, line2, x + w / 2 - 1, y + 23, 7, '#f9efd1', 'center');
   R(ctx, x + 18, y + 40, w - 36, 57, '#162d35');
   R(ctx, x + 20, y + 42, w - 40, 52, '#435b65');
   R(ctx, x + 24, y + 46, w - 48, 43, '#132d3b');
@@ -190,7 +201,6 @@ function smallCabinet(ctx: CanvasRenderingContext2D, x: number, y: number, w: nu
   poly(ctx, [[x + 7, y + 3], [x + w - 8, y + 3], [x + w - 5, y + 10], [x + w - 11, y + 73], [x + w - 4, y + 87], [x + w - 8, y + h - 4], [x + 8, y + h - 4], [x + 4, y + 87], [x + 10, y + 72], [x + 5, y + 10]], color);
   R(ctx, x + w - 17, y + 10, 7, h - 16, shade);
   R(ctx, x + 11, y + 7, w - 27, 14, '#173847');
-  text(ctx, label, x + w / 2 - 2, y + 11, 7, '#f5e8b7', 'center');
   R(ctx, x + 12, y + 28, w - 28, 40, '#152c37');
   if (game === 'runner') runnerScreen(ctx, x + 16, y + 32, w - 36, 31);
   else spaceScreen(ctx, x + 16, y + 32, w - 36, 31);
@@ -214,7 +224,6 @@ function smallCabinet(ctx: CanvasRenderingContext2D, x: number, y: number, w: nu
 function journeyScreen(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) {
   R(ctx, x, y, w, h, '#86c0d5');
   R(ctx, x, y, w, 8, '#193a52');
-  text(ctx, 'STAGE 01', x + 3, y + 1, 7, '#eed89a');
   poly(ctx, [[x, y + 24], [x + 15, y + 12], [x + 28, y + 23], [x + 39, y + 16], [x + 53, y + 27], [x + w, y + 20], [x + w, y + h], [x, y + h]], '#528d6b');
   R(ctx, x, y + 30, w, h - 30, '#2b6b52');
   R(ctx, x, y + 31, w, 2, '#b1c476');
