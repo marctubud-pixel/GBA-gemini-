@@ -1,11 +1,12 @@
-/** Approved V1 room art, drawn at 960 x 320 logical pixels. */
+/** A small coastal cinema, drawn at 960 × 320 logical pixels. */
 import {
   R, L, poly, ellipse, text, room, plant, poster, table,
-  sign, cabinet, frame, P,
+  sign, cabinet, frame, hangingPlant, stringLights, paperStack, P,
 } from './kit';
+import type { InteriorDrawAssets } from './types';
 
 // A little coastal screening room: all large shapes sit behind the walk strip.
-export default function drawCinema(ctx: CanvasRenderingContext2D, assets: unknown) {
+export default function drawCinema(ctx: CanvasRenderingContext2D, assets: InteriorDrawAssets = {}) {
   room(ctx, {
     wall: '#f4ead7', wallShade: '#e8d8bc', trim: P.navy,
     trimHi: P.blue, floor: '#b38964', floorShade: '#8e664a',
@@ -113,6 +114,24 @@ export default function drawCinema(ctx: CanvasRenderingContext2D, assets: unknow
   R(ctx, 883, 187, 17, 3, '#fff0c2');
   R(ctx, 884, 194, 16, 2, '#bd782f');
   plant(ctx, 918, 245, 0.69, '#b56c3e');
+
+  stringLights(ctx, 62, 40, 141, '#f3c653');
+  stringLights(ctx, 760, 40, 142, '#f3c653');
+  hangingPlant(ctx, 738, 51, 26, '#b17c52');
+  // Ticket stubs and little reel tins belong to the projection booth.
+  frame(ctx, 758, 65, 45, 75, P.woodDark);
+  R(ctx, 763, 70, 35, 65, '#c6a174');
+  for (let row = 0; row < 3; row++) {
+    R(ctx, 767, 77 + row * 17, 26, 12, '#f1dfb7');
+    R(ctx, 769, 79 + row * 17, 3, 8, P.coral);
+    R(ctx, 775, 81 + row * 17, 14, 2, P.woodDark);
+    R(ctx, 775, 85 + row * 17, 10, 1, '#ae9876');
+  }
+  paperStack(ctx, 58, 189, 21);
+  R(ctx, 175, 185, 23, 5, '#657c80');
+  R(ctx, 174, 190, 25, 4, '#aab2a2');
+  R(ctx, 177, 190, 20, 1, '#e1debe');
+  R(ctx, 842, 243, 29, 3, '#7d5037');
 
   // Exit and small framed details complete the room without filling the walk strip.
   R(ctx, 6, 49, 45, 10, '#315d52');

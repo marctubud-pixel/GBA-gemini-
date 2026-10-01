@@ -1,6 +1,6 @@
-/** Native Canvas pixel primitives used to draw the approved V1 interiors. */
+/** Native Canvas pixel primitives for the walkable coastal interiors. */
 export type PosterKind = 'coast' | 'graphic' | 'film';
-export interface WindowPalette { trim?: string; trimHi?: string }
+export interface WindowPalette { trim?: string; trimHi?: string; time?: number }
 export interface RoomPalette extends WindowPalette {
   wall?: string; wallShade?: string; floor?: string; floorShade?: string;
   wainscot?: string; style?: 'wood' | 'tile';
@@ -18,15 +18,19 @@ const glyphs: Record<string, string[]>={
 export function text(c: CanvasRenderingContext2D, str: string, x: number, y: number, size: number = 7, col: string = P.ink, align: 'left' | 'center' | 'right' = 'left'){let s=Math.max(1,Math.round(size/7));str=str.toUpperCase();let ww=str.length*6*s-s;if(align==='center')x-=ww/2;else if(align==='right')x-=ww;for(const ch of str){let g=glyphs[ch]||glyphs[' '];for(let yy=0;yy<7;yy++)for(let xx=0;xx<5;xx++)if(g[yy][xx]==='1')R(c,x+xx*s,y+yy*s,s,s,col);x+=6*s;}}
 export function frame(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, col: string = P.wood){R(c,x+2,y+3,w,h,'#c4b89e');R(c,x,y,w,h,P.ink);R(c,x+1,y+1,w-2,h-2,col);R(c,x+3,y+3,w-6,h-6,P.cream);R(c,x+1,y+1,w-2,1,P.woodHi);R(c,x+1,y+1,1,h-2,P.woodHi);}
 export function cloud(c: CanvasRenderingContext2D, x: number, y: number, s: number = 1){R(c,x,y,25*s,5*s,'#d8f2f4');R(c,x+4*s,y-3*s,19*s,6*s,'#ffffff');R(c,x+8*s,y-6*s,10*s,7*s,'#ffffff');}
-export function vista(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number){
- R(c,x,y,w,h,'#78c8ec');R(c,x,y+h*.51,w,h*.49,'#2a8ea6');R(c,x,y+h*.62,w,h*.16,'#43b2bc');cloud(c,x+w*.13,y+h*.18,.7);cloud(c,x+w*.62,y+h*.23,.6);
+export function vista(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, time: number = 0){
+ const elapsed=Math.max(0,Number.isFinite(time)?time:0), drift=Math.floor(elapsed/1500), shimmer=Math.floor(elapsed/480)%4;
+ c.save();c.beginPath();c.rect(Math.round(x),Math.round(y),Math.round(w),Math.round(h));c.clip();
+ R(c,x,y,w,h,'#78c8ec');R(c,x,y+h*.51,w,h*.49,'#2a8ea6');R(c,x,y+h*.62,w,h*.16,'#43b2bc');
+ for(const [offset,yy,scale]of[[.13,.18,.7],[.62,.23,.6]]){const xx=x+((w*offset+drift)%(w+26));cloud(c,xx,y+h*yy,scale);cloud(c,xx-w-26,y+h*yy,scale);}
  poly(c,[[x+w*.57,y+h*.48],[x+w*.68,y+h*.34],[x+w*.81,y+h*.39],[x+w*.9,y+h*.27],[x+w,y+h*.3],[x+w,y+h*.61],[x+w*.53,y+h*.61]],'#609a94');
  poly(c,[[x+w*.66,y+h*.57],[x+w*.74,y+h*.43],[x+w*.81,y+h*.46],[x+w*.93,y+h*.34],[x+w,y+h*.38],[x+w,y+h]],'#568d68');
  for(let i=0;i<11;i++){let bx=x+w*(.71+(i%4)*.07),by=y+h*(.55+Math.floor(i/4)*.1);let bw=Math.max(6,Math.floor(w*.045)),bh=Math.max(7,Math.floor(h*.07));R(c,bx,by,bw,bh,P.cream);poly(c,[[bx-1,by],[bx+bw/2,by-3],[bx+bw+1,by]],i%2? '#bc6847':'#e8a064');R(c,bx+2,by+3,2,3,P.navy);}
- for(let i=0;i<18;i++){let yy=y+h*.58+((i*19)%Math.floor(h*.36));let xx=x+5+(i*29)%Math.floor(w*.6);R(c,xx,yy,3+i%9,1,i%3===0?'#d6f0e4':'#76c8c6');}
- const sx=x+w*.33,sy=y+h*.77;poly(c,[[sx,sy],[sx+10,sy],[sx+7,sy+3],[sx+2,sy+3]],P.navy);L(c,sx+5,sy-14,sx+5,sy,P.cream,1);poly(c,[[sx+4,sy-13],[sx-1,sy-2],[sx+4,sy-2]],P.cream);poly(c,[[sx+6,sy-10],[sx+11,sy-2],[sx+6,sy-2]],'#d8ece5');
+ for(let i=0;i<18;i++){const yy=y+h*.58+((i*19)%Math.max(1,Math.floor(h*.36)));const xx=x+5+((i*29+shimmer*2)%Math.max(1,Math.floor(w*.6)));R(c,xx,yy,3+(i+shimmer)%9,1,(i+shimmer)%3===0?'#d6f0e4':'#76c8c6');}
+ const sx=x+w*.08+((w*.25+Math.floor(elapsed/850))%Math.max(1,w*.42)),sy=y+h*.77+(shimmer===3?1:0);poly(c,[[sx,sy],[sx+10,sy],[sx+7,sy+3],[sx+2,sy+3]],P.navy);L(c,sx+5,sy-14,sx+5,sy,P.cream,1);poly(c,[[sx+4,sy-13],[sx-1,sy-2],[sx+4,sy-2]],P.cream);poly(c,[[sx+6,sy-10],[sx+11,sy-2],[sx+6,sy-2]],'#d8ece5');
+ c.restore();
 }
-export function window(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, opt: WindowPalette = {}){const a=opt.trim||P.blue,b=opt.trimHi||P.blueHi;R(c,x+3,y+4,w,h,'#d6c8ae');R(c,x,y,w,h,P.navy);R(c,x+2,y+2,w-4,h-4,a);vista(c,x+6,y+6,w-12,h-14);for(let z=x+w/3;z<x+w-3;z+=w/3){R(c,z,y+3,3,h-7,P.navy);R(c,z,y+3,1,h-7,b);}R(c,x+2,y+2,w-4,2,b);R(c,x-3,y+h-5,w+6,4,P.cream);R(c,x-3,y+h-1,w+6,3,'#c8baa0');}
+export function window(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, opt: WindowPalette = {}){const a=opt.trim||P.blue,b=opt.trimHi||P.blueHi;R(c,x+3,y+4,w,h,'#d6c8ae');R(c,x,y,w,h,P.navy);R(c,x+2,y+2,w-4,h-4,a);vista(c,x+6,y+6,w-12,h-14,opt.time);for(let z=x+w/3;z<x+w-3;z+=w/3){R(c,z,y+3,3,h-7,P.navy);R(c,z,y+3,1,h-7,b);}R(c,x+2,y+2,w-4,2,b);R(c,x-3,y+h-5,w+6,4,P.cream);R(c,x-3,y+h-1,w+6,3,'#c8baa0');}
 export function room(c: CanvasRenderingContext2D, o: RoomPalette = {}){let wall=o.wall||P.cream,shade=o.wallShade||P.creamShade,trim=o.trim||P.blue,hi=o.trimHi||P.blueHi,floor=o.floor||'#d9bc8d',fs=o.floorShade||'#ba966d';R(c,0,0,960,320,wall);R(c,0,28,960,9,shade);for(let y=48;y<224;y+=30){R(c,0,y,960,1,shade);for(let x=((y/30)%2)*50;x<960;x+=100)R(c,x,y,1,30,shade);}R(c,0,0,960,15,P.navy);R(c,0,2,960,3,trim);R(c,0,15,960,9,trim);R(c,0,15,960,2,hi);R(c,0,24,960,4,P.navy);for(let x=34;x<960;x+=112){R(c,x,0,8,25,trim);R(c,x,0,2,24,hi);R(c,x-3,19,14,5,P.navy);R(c,x+1,21,2,2,hi);}R(c,0,224,960,21,o.wainscot||trim);R(c,0,223,960,3,P.navy);R(c,0,227,960,2,hi);for(let x=0;x<960;x+=48){R(c,x,230,2,15,P.navy);R(c,x+3,233,38,8,o.wainscot||trim);}R(c,0,245,960,43,floor);if(o.style==='tile'){for(let y=245;y<288;y+=12){R(c,0,y,960,1,fs);for(let x=((y-245)/12%2)*24;x<960;x+=48)R(c,x,y,1,12,fs);}for(let x=0;x<960;x+=48)R(c,x+2,247,14,2,'#fff5da');}else{for(let y=246;y<288;y+=7){R(c,0,y,960,1,fs);for(let x=((y-246)/7%2)*60;x<960;x+=120)R(c,x,y,1,7,fs);}for(let x=20;x<960;x+=77)R(c,x,250+(x%26),12,1,'#e9cea0');}R(c,0,287,960,2,'#fff0cd');R(c,0,289,960,31,P.navy);R(c,0,290,960,3,trim);R(c,0,293,960,2,hi);for(let x=0;x<960;x+=32){R(c,x,296,1,24,'#082b42');R(c,x+2,298,27,1,trim);}R(c,0,316,960,4,P.ink);}
 export function plant(c: CanvasRenderingContext2D, x: number, y: number, s: number = 1, pot: string = P.wood){s=Math.max(.5,s);const pr=(xx: number, yy: number, w: number, h: number, col: string)=>R(c,x+xx*s,y+yy*s,w*s,h*s,col);ellipse(c,x,y+2,16*s,3*s,'#baa785');pr(-9,-17,18,16,P.ink);pr(-8,-15,16,13,pot);pr(-10,-19,20,4,pot);pr(-8,-18,16,1,P.woodHi);pr(-6,-14,3,10,'#deb587');L(c,x,y-17*s,x+1*s,y-47*s,P.greenDark,2*s);const leaves=[[-10,-32,11,7],[-6,-43,10,8],[1,-47,9,6],[5,-34,11,8],[-17,-43,9,6],[10,-45,8,6],[-4,-54,9,6],[1,-26,10,6],[-12,-24,10,6]];for(const [xx,yy,w,h]of leaves){pr(xx,yy,w,h,P.greenDark);pr(xx+1,yy,w-2,h-2,P.green);pr(xx+2,yy,Math.max(2,w-5),2,P.greenHi);}}
 export function books(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, seed: number = 1){let xx=x;let colors=[P.blue,P.coral,P.creamShade,P.greenDark,P.gold,'#7097a6'];let i=seed;while(xx<x+w-3){let bw=4+(i*3)%5,bh=h-(i*7)%6;if(xx+bw>x+w)break;R(c,xx,y+h-bh,bw,bh,P.ink);R(c,xx+1,y+h-bh+1,bw-2,bh-2,colors[i%colors.length]);R(c,xx+1,y+h-4,bw-2,1,'#f3ddb0');if(bw>5)R(c,xx+2,y+h-bh+3,1,bh-6,'#e8cea4');xx+=bw+1;i++;}}
@@ -38,3 +42,33 @@ export function cabinet(c: CanvasRenderingContext2D, x: number, y: number, w: nu
 export function sign(c: CanvasRenderingContext2D, label: string, x: number, y: number, w: number, accent: string = P.blue){R(c,x+2,y+3,w,21,'#c5b69a');R(c,x,y,w,21,P.navy);R(c,x+1,y+1,w-2,19,accent);R(c,x+2,y+2,w-4,1,P.blueHi);text(c,label,x+w/2,y+7,7,P.cream,'center');for(const xx of[x+3,x+w-5]){R(c,xx,y+3,2,2,P.gold);R(c,xx,y+16,2,2,P.gold);}}
 export function stool(c: CanvasRenderingContext2D, x: number, y: number, col: string = P.wood){ellipse(c,x+13,y+25,17,2,'#bba483');R(c,x+4,y+5,3,20,P.woodDark);R(c,x+21,y+5,3,20,P.woodDark);R(c,x+6,y+17,16,2,P.wood);R(c,x,y,28,6,P.ink);R(c,x+1,y+1,26,3,col);R(c,x+3,y+1,21,1,P.woodHi);}
 export function rug(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, col: string = P.blue){R(c,x,y,w,h,P.navy);R(c,x+1,y+1,w-2,h-2,P.creamShade);R(c,x+3,y+3,w-6,h-6,col);for(let xx=x+7;xx<x+w-7;xx+=12){R(c,xx,y+5,6,1,P.blueHi);R(c,xx+3,y+h-7,6,1,P.blueHi);}L(c,x+5,y+5,x+w-6,y+5,P.creamShade);L(c,x+5,y+h-6,x+w-6,y+h-6,P.creamShade);}
+
+/** Broad, readable props: no random noise and no subpixel lighting. */
+export function hangingPlant(c: CanvasRenderingContext2D, x: number, y: number, drop: number = 31, pot: string = P.wood) {
+  R(c,x-2,y,5,4,P.woodDark);L(c,x,y+4,x-10,y+drop,P.woodDark);L(c,x,y+4,x+10,y+drop,P.woodDark);
+  R(c,x-10,y+drop,21,4,P.ink);R(c,x-8,y+drop+4,17,9,pot);R(c,x-6,y+drop+4,3,7,P.woodHi);
+  for(const [dx,dy]of[[-11,-8],[-4,-12],[3,-10],[9,-5]]){R(c,x+dx,y+drop+dy,9,7,P.greenDark);R(c,x+dx+1,y+drop+dy,6,3,P.greenHi);}
+  for(const [side,length]of[[-1,28],[1,19]]){L(c,x+side*8,y+drop+1,x+side*10,y+drop+length,P.greenDark,2);for(let q=10;q<length;q+=8){R(c,x+side*10-3,y+drop+q,8,6,P.green);R(c,x+side*10-2,y+drop+q,4,2,P.greenHi);}}
+}
+
+export function pinnedNote(c: CanvasRenderingContext2D, x: number, y: number, w: number = 26, h: number = 30, color: string = P.cream) {
+  R(c,x+2,y+2,w,h,'#b9a785');R(c,x,y,w,h,color);R(c,x+2,y+2,w-4,1,'#fff8dd');
+  R(c,x+Math.floor(w/2)-2,y-2,4,4,P.coral);
+  for(let row=0;row<3;row++)R(c,x+5,y+8+row*5,w-10-(row%2)*5,1,'#8e917c');
+  poly(c,[[x+w-7,y+h],[x+w,y+h-7],[x+w,y+h]],'#d5c49c');
+}
+
+export function wallClock(c: CanvasRenderingContext2D, x: number, y: number, r: number = 15) {
+  ellipse(c,x+2,y+2,r,r,'#c3b396');ellipse(c,x,y,r,r,P.navy);ellipse(c,x,y,r-2,r-2,P.creamShade);ellipse(c,x,y,r-4,r-4,P.cream);
+  for(const [dx,dy]of[[0,-1],[1,0],[0,1],[-1,0]])R(c,x+dx*(r-5)-1,y+dy*(r-5)-1,2,2,P.woodDark);
+  L(c,x,y,x,y-r+7,P.navy,2);L(c,x,y,x+5,y+3,P.navy,2);R(c,x-1,y-1,3,3,P.gold);
+}
+
+export function stringLights(c: CanvasRenderingContext2D, x: number, y: number, w: number, accent: string = P.gold) {
+  const count=Math.max(2,Math.floor(w/25));
+  for(let i=0;i<count;i++){const a=x+i*w/count,b=x+(i+1)*w/count,mid=(a+b)/2;L(c,a,y,mid,y+6,P.woodDark);L(c,mid,y+6,b,y,P.woodDark);R(c,mid-1,y+6,3,3,P.navy);R(c,mid-2,y+9,5,5,accent);R(c,mid-1,y+9,3,2,P.cream);}
+}
+
+export function paperStack(c: CanvasRenderingContext2D, x: number, y: number, w: number = 32) {
+  R(c,x+2,y+5,w,5,'#b8b39f');R(c,x+1,y+3,w,5,P.creamShade);R(c,x,y,w,5,P.cream);R(c,x+4,y+1,w-10,1,'#c4c6b2');
+}

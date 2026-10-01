@@ -1,8 +1,10 @@
-/** Approved V1 room art, drawn at 960 x 320 logical pixels. */
+/** A lived-in coastal writing room, drawn at 960 × 320 logical pixels. */
 import {
   R, L, poly, ellipse, text, room, window, plant,
   shelf, books, lamp, poster, table, sign, stool, rug, cabinet, frame,
+  hangingPlant, pinnedNote, wallClock, paperStack,
 } from './kit';
+import type { InteriorDrawAssets } from './types';
 
 const P = {
   ink: '#172d3b', navy: '#0f3a5e', blue: '#2679bd', blueHi: '#5eb6ed',
@@ -56,7 +58,7 @@ function openBook(ctx: CanvasRenderingContext2D, x: number, y: number) {
   R(ctx, x + 57, y + 22, 5, 13, P.coral);
 }
 
-export default function drawWriting(ctx: CanvasRenderingContext2D, assets: unknown) {
+export default function drawWriting(ctx: CanvasRenderingContext2D, assets: InteriorDrawAssets = {}) {
   room(ctx, {
     wall: P.cream, wallShade: '#e5e4d3', trim: P.navy, trimHi: P.blue,
     floor: '#b39162', floorShade: '#98754e', wainscot: '#e9e5d6', style: 'wood',
@@ -121,7 +123,7 @@ export default function drawWriting(ctx: CanvasRenderingContext2D, assets: unkno
   stool(ctx, 265, 219, P.woodDark);
 
   // Middle: view of the sea, quiet daylight and an open manuscript.
-  window(ctx, 385, 50, 211, 118, { trim: P.navy, trimHi: P.blue });
+  window(ctx, 385, 50, 211, 118, { trim: P.navy, trimHi: P.blue, time: assets.time });
   R(ctx, 377, 168, 227, 7, P.woodDark);
   R(ctx, 379, 168, 223, 2, P.woodHi);
   R(ctx, 401, 158, 19, 9, '#f4eddb');
@@ -181,6 +183,22 @@ export default function drawWriting(ctx: CanvasRenderingContext2D, assets: unkno
   R(ctx, 878, 214, 9, 3, P.navy);
   paperPile(ctx, 864, 170, 36, 11);
   plant(ctx, 920, 243, 0.85, '#b78862');
+
+  // The everyday tools of writing occupy the back wall and worktops.
+  hangingPlant(ctx, 631, 38, 28, '#bd8055');
+  wallClock(ctx, 682, 94, 16);
+  pinnedNote(ctx, 625, 138, 25, 31, '#f4db8b');
+  pinnedNote(ctx, 660, 147, 28, 26, P.cream);
+  lamp(ctx, 196, 32, P.blue);
+  paperStack(ctx, 214, 179, 26);
+  R(ctx, 251, 186, 29, 2, '#ba4e37');
+  R(ctx, 276, 185, 5, 3, '#e2cba0');
+  R(ctx, 309, 229, 34, 10, '#d2bc8c');
+  R(ctx, 311, 230, 30, 2, P.cream);
+  text(ctx, 'DRAFT', 326, 232, 7, P.woodDark, 'center');
+  frame(ctx, 194, 99, 25, 32, P.woodDark);
+  R(ctx, 200, 105, 13, 15, '#779aa0');
+  R(ctx, 202, 108, 8, 3, P.gold);
 
   // The walking foreground stays uncluttered; only broad floorboard marks.
   L(ctx, 29, 272, 919, 272, '#caa578');

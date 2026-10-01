@@ -1,8 +1,9 @@
-/** Approved V1 room art, drawn at 960 x 320 logical pixels. */
+/** A collected, frequently played arcade, drawn at 960 × 320 logical pixels. */
 import {
   R, L, poly, ellipse, text, room, plant, poster, shelf,
-  sign, cabinet, frame, P,
+  sign, cabinet, frame, hangingPlant, pinnedNote, stringLights, wallClock, P,
 } from './kit';
+import type { InteriorDrawAssets } from './types';
 
 interface ArcadePalette {
   body: string; shade: string; light: string; edge: string;
@@ -10,7 +11,7 @@ interface ArcadePalette {
 }
 
 // Front-facing cabinets and an open foreground keep this a playable arcade.
-export default function drawArcade(ctx: CanvasRenderingContext2D, assets: unknown) {
+export default function drawArcade(ctx: CanvasRenderingContext2D, assets: InteriorDrawAssets = {}) {
   room(ctx, {
     wall: '#e9e0c9', wallShade: '#d4c4a9', trim: '#194d85',
     trimHi: P.blueHi, floor: '#76929b', floorShade: '#506b7b',
@@ -105,6 +106,21 @@ export default function drawArcade(ctx: CanvasRenderingContext2D, assets: unknow
   R(ctx, 737, 99, 64, 18, '#ecdfb7');
   text(ctx, 'LEVEL UP!', 769, 109, 7, '#c04d32', 'center');
   pixelStar(ctx, 741, 109, '#d9a84a');
+  stringLights(ctx, 558, 31, 133, '#f3c653');
+  hangingPlant(ctx, 713, 40, 27, '#c47443');
+  wallClock(ctx, 166, 65, 12);
+  pinnedNote(ctx, 490, 122, 23, 30, '#f3d88c');
+  pinnedNote(ctx, 492, 171, 20, 26, '#d6e0ce');
+  R(ctx, 495, 180, 13, 2, P.blue);
+  R(ctx, 496, 184, 9, 2, P.coral);
+  // Spare cartridges and a snack bowl stay tucked in the sofa nook.
+  R(ctx, 835, 233, 18, 7, P.navy);
+  R(ctx, 837, 231, 15, 4, '#a6b5aa');
+  R(ctx, 840, 232, 9, 2, P.coral);
+  ellipse(ctx, 891, 236, 10, 3, '#d5b47e');
+  R(ctx, 884, 235, 14, 5, '#9f6749');
+  R(ctx, 886, 233, 4, 3, P.gold);
+  R(ctx, 892, 234, 4, 2, P.creamShade);
   R(ctx, 6, 50, 45, 9, '#2a695e');
   text(ctx, 'EXIT', 29, 51, 7, '#e3edd4', 'center');
   // The foreground strip is uninterrupted for the player's feet.

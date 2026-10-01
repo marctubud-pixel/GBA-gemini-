@@ -22,6 +22,7 @@ interface DeviceShellProps {
 export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
   const {
     currentView,
+    isStarting,
     soundEnabled,
     toggleSound,
     currentSegment,
@@ -44,7 +45,6 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
     isPostcardOpen,
     closePostcard,
     isEndingModalOpen,
-    closeEndingModal
   } = useWorldStore();
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -101,10 +101,14 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
   // Determine bottom action prompt
   let actionPrompt: { key: string; text: string; color: string } | null = null;
 
-  if (activeLandmarkModal || isOverlayOpen) {
+  if (isStarting) {
+    actionPrompt = { key: 'LOADING', text: '正在准备海岛 · 即将出发', color: 'bg-[#245587] text-white' };
+  } else if (isEndingModalOpen) {
+    actionPrompt = { key: 'J / K', text: 'J 确认 · 方向键选择 · K 再次探索', color: 'bg-[#245587] text-white' };
+  } else if (activeLandmarkModal || isOverlayOpen) {
     actionPrompt = { key: 'J / K', text: 'J 确认 · K 返回 · 方向键选择', color: 'bg-slate-800 text-slate-200' };
   } else if (activeInterior) {
-    actionPrompt = { key: 'A / D', text: interiorPrompt || '在房间里走走 · 靠近物件按 J / E 查看 · ESC 出门', color: 'bg-[#245587] text-white' };
+    actionPrompt = { key: 'A / D', text: interiorPrompt || '发光物件可点击 · 靠近按 J / E 查看 · ESC 退出', color: 'bg-[#245587] text-white' };
   } else if (playerState === 'RIDING') {
     if (nearParkingZone) {
       actionPrompt = { key: 'K', text: `PARK · 停靠单车 (${nearParkingZone.name})`, color: 'bg-[#ea580c] text-white' };
@@ -131,8 +135,9 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
 
   // Shell controls use the same navigation as the physical keyboard in panels.
   const handleButtonJ = () => {
+    if (isStarting) return;
     pixelSound.playInteract();
-    if (currentView === 'welcome' || activeLandmarkModal || isOverlayOpen) {
+    if (currentView === 'welcome' || isEndingModalOpen || activeLandmarkModal || isOverlayOpen) {
       sendPanelKey('KeyJ', 'j');
       return;
     }
@@ -147,13 +152,10 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
 
   // Handle K Button Click (Brake / Action / Enter / Close)
   const handleButtonK = () => {
+    if (isStarting) return;
     pixelSound.playInteract();
-    if (currentView === 'welcome' || activeLandmarkModal || isOverlayOpen) {
+    if (currentView === 'welcome' || isEndingModalOpen || activeLandmarkModal || isOverlayOpen) {
       sendPanelKey('KeyK', 'k');
-      return;
-    }
-    if (isEndingModalOpen) {
-      closeEndingModal();
       return;
     }
     if (isPrintHouseBookOpen) {
@@ -179,10 +181,11 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
     j: ['KeyJ', 'j'], k: ['KeyK', 'k'],
   };
   const startControl = (control: ShellControl) => {
+    if (isStarting) return;
     setPressedKeys(p => ({ ...p, [control]: true }));
     if (control === 'j') handleButtonJ();
     else if (control === 'k') handleButtonK();
-    else if (activeLandmarkModal || isOverlayOpen) sendPanelKey(...controlKeys[control]);
+    else if (currentView === 'welcome' || isEndingModalOpen || activeLandmarkModal || isOverlayOpen) sendPanelKey(...controlKeys[control]);
     else setVirtualInput({ [control]: true });
   };
   const releaseControl = (control: ShellControl) => {
@@ -245,15 +248,15 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
 
         {/* Right Controls */}
         <div className="flex items-center gap-2">
-          {activeInterior && <button onClick={exitInterior} className="px-2.5 py-1 bg-slate-800 text-slate-200 font-pixel text-[10px] cursor-pointer" title="返回建筑外 · ESC">出门</button>}
+          {activeInterior && <button onClick={exitInterior} className="px-2.5 py-1 bg-slate-800 text-slate-200 font-pixel text-[10px] cursor-pointer" title="直接返回建筑门口 · ESC" aria-label="退出内景">退出内景</button>}
           <button
             onClick={() => {
               pixelSound.playConfirm();
-              setCurrentView('index');
+              if (!isStarting) setCurrentView('index');
             }}
             onMouseEnter={() => pixelSound.playSelect()}
             className="px-2.5 py-1 rounded-lg bg-blue-600/90 hover:bg-blue-600 text-white font-pixel flex items-center gap-1.5 transition text-[10px] sm:text-[11px] shadow-sm cursor-pointer"
-            title="招聘方全览索引"
+            disabled={isStarting} title="招聘方全览索引"
           >
             <Compass className="w-3.5 h-3.5" />
             <span>INDEX 索引</span>
@@ -262,11 +265,11 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
           <button
             onClick={() => {
               pixelSound.playConfirm();
-              setCurrentView('info');
+              if (!isStarting) setCurrentView('info');
             }}
             onMouseEnter={() => pixelSound.playSelect()}
             className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-pixel flex items-center gap-1.5 transition text-[10px] sm:text-[11px] cursor-pointer"
-            title="创作者简历与介绍"
+            disabled={isStarting} title="创作者简历与介绍"
           >
             <User className="w-3.5 h-3.5" />
             <span>INFO 介绍</span>
@@ -400,20 +403,20 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
             <button
               onClick={() => {
                 pixelSound.playConfirm();
-                setCurrentView('index');
+                if (!isStarting) setCurrentView('index');
               }}
               onMouseEnter={() => pixelSound.playSelect()}
               className="w-8 h-4 rotate-[-25deg] hover:bg-white/15 active:bg-white/30 rounded-full cursor-pointer"
-              title="SELECT: 打开索引"
+              disabled={isStarting} title="SELECT: 打开索引"
             />
             <button
               onClick={() => {
                 pixelSound.playConfirm();
-                setCurrentView('info');
+                if (!isStarting) setCurrentView('info');
               }}
               onMouseEnter={() => pixelSound.playSelect()}
               className="w-8 h-4 rotate-[-25deg] hover:bg-white/15 active:bg-white/30 rounded-full cursor-pointer"
-              title="START: 作者介绍"
+              disabled={isStarting} title="START: 作者介绍"
             />
           </div>
         </div>

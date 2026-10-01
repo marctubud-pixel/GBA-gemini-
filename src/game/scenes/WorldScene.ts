@@ -39,6 +39,14 @@ export class WorldScene extends Phaser.Scene {
   private landmarkTransition: Phaser.Time.TimerEvent | null = null;
   private pendingAction = false;
   private previousVirtualAction = false;
+  private pointerGlow!: Phaser.GameObjects.Graphics;
+  private objectGlow!: Phaser.GameObjects.Graphics;
+  private pointerObjectBounds: Array<{x:number;y:number;width:number;height:number}> = [];
+  private hoverTarget: { x:number; y:number; width:number; height:number } | null = null;
+  private endingTween: Phaser.Tweens.Tween | null = null;
+  private endingDelay: Phaser.Time.TimerEvent | null = null;
+  private endingGeneration = 0;
+  private endingStartPosition: {x:number;y:number} | null = null;
 
   // Keyboard controls
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
@@ -55,6 +63,9 @@ export class WorldScene extends Phaser.Scene {
   }
 
   create() {
+    this.seagulls=[];this.hoverTarget=null;this.pointerObjectBounds=[];this.isCatPurring=false;this.catAnimTimer=0;
+    this.isEndingRide=false;this.endingTween=null;this.endingDelay=null;this.endingStartPosition=null;
+    this.lastStoreUpdate=0;this.lastStoreX=0;this.lastStoreSpeed=0;
     // 1. Build World
     this.worldBuilder = new WorldBuilder(this);
     this.worldBuilder.buildWorld();
@@ -106,7 +117,7 @@ export class WorldScene extends Phaser.Scene {
     // 5. Window level direct key tracker for foolproof input
     const onKeyDown = (e: KeyboardEvent) => {
       const store = useWorldStore.getState();
-      if (!this.scene.isActive('WorldScene') || store.activeInterior || store.currentView !== 'game') return;
+      if (!this.scene.isActive('WorldScene') || store.activeInterior || store.currentView !== 'game' || store.isStarting || store.isEndingModalOpen || store.activeLandmarkModal || store.isOverlayOpen) return;
       if (e.target instanceof HTMLElement && e.target.closest('input, textarea, select, [contenteditable="true"]')) return;
       const code = e.code;
       if (code === 'KeyA' || code === 'ArrowLeft') this.rawKeys.left = true;
@@ -184,14 +195,16 @@ export class WorldScene extends Phaser.Scene {
     this.catSprite = this.add.sprite(catX, catY, 'cat_sheet', 0);
     this.catSprite.setOrigin(0.5, 1.0);
     this.catSprite.setDepth(16);
+    this.createPointerInteractions();
 
-
-
-    const onExitInterior = () => {
+    const onExitInterior = (event: Event) => {
       this.resetInputs(true);
       this.walker.setAlpha(1);
-      const position = this.interiorReturnPosition;
+      const id=(event as CustomEvent<{id?:unknown}>).detail?.id;
+      const location=WORLD_LOCATIONS.find(item=>item.id===id);
+      const position=location?{x:location.interactionX-12,y:WorldBuilder.getGroundY(location.interactionX-12)+1}:this.interiorReturnPosition;
       if (position) this.walker.setPosition(position.x, position.y);
+      if(position)useWorldStore.getState().updatePlayerPos(position.x,position.y,0);
       this.interiorReturnPosition = null;
       this.cameras.main.fadeIn(200, 0, 0, 0);
       this.cameraController.setTargetZoom(1.4);
@@ -209,9 +222,9 @@ export class WorldScene extends Phaser.Scene {
 
     // 6. Teleport event listener for INDEX fast-travel
     const onTeleport = (e: Event) => {
-      const customEvent = e as CustomEvent<{ x: number }>;
+      const customEvent = e as CustomEvent<{ x: number; state?: PlayerState }>;
       if (customEvent.detail && customEvent.detail.x !== undefined) {
-        this.handleTeleport(customEvent.detail.x);
+        this.handleTeleport(customEvent.detail.x, customEvent.detail.state);
       }
     };
     window.addEventListener('teleport-player', onTeleport);
@@ -226,6 +239,7 @@ export class WorldScene extends Phaser.Scene {
     const unsubscribeStore = useWorldStore.subscribe((state, prevState) => {
       if (state.currentView !== 'game' && state.currentView !== prevState.currentView) {
         this.cancelLandmarkTransition();
+        this.cancelEndingRide();
       }
       if ((prevState.isOverlayOpen && !state.isOverlayOpen) ||
           (prevState.isPrintHouseBookOpen && !state.isPrintHouseBookOpen) ||
@@ -233,8 +247,8 @@ export class WorldScene extends Phaser.Scene {
           (prevState.isPostcardOpen && !state.isPostcardOpen)) {
         this.cameraController.setTargetZoom(1.4);
       }
-      const locked = state.currentView !== 'game' || state.activeInterior || state.isOverlayOpen || state.activeLandmarkModal;
-      const previouslyLocked = prevState.currentView !== 'game' || prevState.activeInterior || prevState.isOverlayOpen || prevState.activeLandmarkModal;
+      const locked = state.currentView !== 'game' || state.isStarting || state.activeInterior || state.isOverlayOpen || state.activeLandmarkModal || state.isEndingModalOpen;
+      const previouslyLocked = prevState.currentView !== 'game' || prevState.isStarting || prevState.activeInterior || prevState.isOverlayOpen || prevState.activeLandmarkModal || prevState.isEndingModalOpen;
       if (locked && !previouslyLocked) this.resetInputs(true);
     });
 
@@ -253,6 +267,7 @@ export class WorldScene extends Phaser.Scene {
       window.removeEventListener('play-ending-ride-out', onPlayEndingRideOut);
       unsubscribeStore();
       this.cancelLandmarkTransition();
+      this.cancelEndingRide();
       this.resetInputs();
     };
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, cleanup);
@@ -261,6 +276,108 @@ export class WorldScene extends Phaser.Scene {
     // Support direct navigation before Phaser finishes booting.
     const activeInterior = useWorldStore.getState().activeInterior;
     if (activeInterior) this.enterInterior(activeInterior);
+    this.game.events.emit('journey-world-ready');
+  }
+
+  private canPointerInteract() {
+    const s=useWorldStore.getState();
+    return this.scene.isActive('WorldScene')&&s.currentView==='game'&&!s.isStarting&&!s.activeInterior&&
+      !s.activeLandmarkModal&&!s.isOverlayOpen&&!s.isPostcardOpen&&!s.isEndingModalOpen&&
+      !this.isEnteringLandmark&&!this.isEndingRide&&(s.playerState==='RIDING'||s.playerState==='WALKING');
+  }
+
+  private showPointerGlow(bounds:{x:number;y:number;width:number;height:number}|null) {
+    this.hoverTarget=bounds;this.pointerGlow.clear();
+    if(!bounds||!this.canPointerInteract())return;
+    const {x,y,width:w,height:h}=bounds;
+    this.pointerGlow.fillStyle(0x5eb6ed,.2);this.pointerGlow.fillRect(x,y,w,h);
+    this.pointerGlow.fillStyle(0xffedab,1);
+    for(const xx of [x,x+w-8])for(const yy of [y,y+h-2])this.pointerGlow.fillRect(xx,yy,8,2);
+    for(const xx of [x,x+w-2])for(const yy of [y,y+h-8])this.pointerGlow.fillRect(xx,yy,2,8);
+    this.pointerGlow.fillStyle(0xf3c653,1);
+    this.pointerGlow.fillRect(x+8,y,w-16,1);this.pointerGlow.fillRect(x+8,y+h-1,w-16,1);
+    this.pointerGlow.fillRect(x,y+8,1,h-16);this.pointerGlow.fillRect(x+w-1,y+8,1,h-16);
+  }
+
+  private createPointerInteractions() {
+    this.objectGlow=this.add.graphics().setDepth(43);
+    this.pointerGlow=this.add.graphics().setDepth(45);
+    for(const location of WORLD_LOCATIONS){
+      const width=location.id==='my-studio'?89:location.id==='central-plaza'?68:56;
+      const height=location.id==='entrance'?75:location.id==='my-studio'?113:95;
+      const bounds={x:location.interactionX-width/2,y:WorldBuilder.getGroundY(location.interactionX)-height,width,height};
+      this.pointerObjectBounds.push(bounds);
+      const zone=this.add.zone(bounds.x+bounds.width/2,bounds.y+bounds.height/2,width,height).setDepth(25).setName(`world-door-${location.id}`).setInteractive({useHandCursor:true});
+      zone.on('pointerover',()=>this.showPointerGlow(bounds));zone.on('pointerout',()=>this.showPointerGlow(null));
+      zone.on('pointerdown',()=>{
+        if(!this.canPointerInteract())return;
+        const s=useWorldStore.getState();
+        if(s.playerState==='RIDING'||this.activeParkedLocation?.id!==location.id)this.dismountBike(location);
+        this.tweens.killTweensOf(this.walker);
+        this.walker.setPosition(location.interactionX,WorldBuilder.getGroundY(location.interactionX)+1);this.walker.setAlpha(1);
+        s.updatePlayerPos(this.walker.x,this.walker.y,0);s.setNearParkedBike(false);s.setNearInteraction(location);
+        this.triggerLandmarkInteraction(location);
+      });
+    }
+    // Small objects share the same click/hover contract as every building door.
+    this.pointerObjectBounds.push({x:4596,y:WorldBuilder.getGroundY(4610)-23,width:29,height:24});
+    this.catSprite.setInteractive({useHandCursor:true});
+    this.catSprite.on('pointerover',()=>this.showPointerGlow({x:4596,y:WorldBuilder.getGroundY(4610)-23,width:29,height:24}));
+    this.catSprite.on('pointerout',()=>this.showPointerGlow(null));
+    this.catSprite.on('pointerdown',()=>{
+      if(!this.canPointerInteract()||this.isCatPurring)return;
+      this.prepareObjectWalk('my-studio',4610);this.petCat();
+    });
+    const ty=WorldBuilder.getGroundY(6060);
+    this.pointerObjectBounds.push({x:6038,y:ty-51,width:44,height:53});
+    const telescope=this.add.zone(6060,ty-24,43,53).setDepth(26).setName('world-telescope').setInteractive({useHandCursor:true});
+    telescope.on('pointerover',()=>this.showPointerGlow({x:6038,y:ty-51,width:44,height:53}));
+    telescope.on('pointerout',()=>this.showPointerGlow(null));
+    telescope.on('pointerdown',()=>{if(!this.canPointerInteract())return;this.prepareObjectWalk('observatory',6060);this.lookThroughTelescope();});
+    this.parkedBikeSprite.setInteractive({useHandCursor:true});
+    this.parkedBikeSprite.on('pointerover',()=>this.showPointerGlow({x:this.parkedBikeSprite.x-27,y:this.parkedBikeSprite.y-40,width:54,height:42}));
+    this.parkedBikeSprite.on('pointerout',()=>this.showPointerGlow(null));
+    this.parkedBikeSprite.on('pointerdown',()=>{if(this.canPointerInteract()&&useWorldStore.getState().playerState==='WALKING'){this.showPointerGlow(null);this.mountBike();}});
+  }
+
+  private updateObjectGlows(time:number) {
+    this.objectGlow.clear();
+    if(!this.canPointerInteract()){
+      this.pointerGlow.clear();this.hoverTarget=null;return;
+    }
+    const camera=this.cameras.main,view=camera.worldView;
+    const objects=this.parkedBikeSprite.visible?
+      [...this.pointerObjectBounds,{x:this.parkedBikeSprite.x-27,y:this.parkedBikeSprite.y-40,width:54,height:42}]:this.pointerObjectBounds;
+    this.objectGlow.setAlpha(.52+Math.sin(time*.004)*.13);
+    for(const {x,y,width:w,height:h} of objects){
+      if(x+w<view.left||x>view.right||y+h<view.top||y>view.bottom)continue;
+      // One-pixel cyan rails and stepped corners identify the actual clickable area.
+      this.objectGlow.fillStyle(0x5eb6ed,.75);
+      this.objectGlow.fillRect(x+5,y,w-10,1);this.objectGlow.fillRect(x+5,y+h-1,w-10,1);
+      this.objectGlow.fillRect(x,y+5,1,h-10);this.objectGlow.fillRect(x+w-1,y+5,1,h-10);
+      this.objectGlow.fillStyle(0xb8f0e6,1);
+      for(const xx of [x,x+w-6])for(const yy of [y,y+h-2])this.objectGlow.fillRect(xx,yy,6,2);
+      for(const xx of [x,x+w-2])for(const yy of [y,y+h-6])this.objectGlow.fillRect(xx,yy,2,6);
+      // A tiny pixel diamond is a quiet interaction marker above each object.
+      const cx=Math.round(x+w/2);this.objectGlow.fillRect(cx-2,y-7,5,1);this.objectGlow.fillRect(cx-3,y-6,7,1);this.objectGlow.fillRect(cx-2,y-5,5,1);this.objectGlow.fillRect(cx-1,y-4,3,1);
+    }
+    // The pointer can stay stationary while the camera moves beneath it.
+    if(this.hoverTarget){
+      const pointer=this.input.activePointer;
+      const point=camera.getWorldPoint(pointer.x,pointer.y);
+      const b=this.hoverTarget;
+      if(pointer.x<camera.x||pointer.x>camera.x+camera.width||pointer.y<camera.y||pointer.y>camera.y+camera.height||point.x<b.x||point.x>b.x+b.width||point.y<b.y||point.y>b.y+b.height)this.showPointerGlow(null);
+      else this.pointerGlow.setAlpha(.87+Math.sin(time*.006)*.1);
+    }
+  }
+
+  private prepareObjectWalk(locationId:string,x:number) {
+    const location=WORLD_LOCATIONS.find(item=>item.id===locationId);
+    if(!location)return;
+    if(useWorldStore.getState().playerState==='RIDING'||this.activeParkedLocation?.id!==locationId)this.dismountBike(location);
+    this.tweens.killTweensOf(this.walker);this.walker.setPosition(x,WorldBuilder.getGroundY(x)+1);
+    const s=useWorldStore.getState();s.updatePlayerPos(this.walker.x,this.walker.y,0);s.setNearParkedBike(false);s.setNearInteraction(null);
+    this.cameraController.initCenter(this.walker.x,this.walker.y);
   }
 
   private rawKeys = {
@@ -280,6 +397,7 @@ export class WorldScene extends Phaser.Scene {
   update(time: number, delta: number) {
     const store = useWorldStore.getState();
     const currentState = store.playerState;
+    this.updateObjectGlows(time);
 
     // If ending ride is active, camera stays fixed and player rides out of the frame!
     if (this.isEndingRide) {
@@ -336,8 +454,9 @@ export class WorldScene extends Phaser.Scene {
       return;
     }
 
-    if (store.currentView !== 'game' || store.activeInterior || currentState === 'INTERACTING') {
+    if (store.currentView !== 'game' || store.isStarting || store.activeInterior || currentState === 'INTERACTING') {
       this.resetInputs(true);
+      this.pointerGlow.clear();
       pixelSound.stopBikeRoll();
       this.updatePromptBubble(null, 0, 0, time);
       return;
@@ -744,6 +863,7 @@ export class WorldScene extends Phaser.Scene {
     const location = WORLD_LOCATIONS.find((item) => item.id === id);
     if (!location) return;
     this.cancelLandmarkTransition();
+    this.cancelEndingRide();
     this.resetInputs(true);
     this.isEnteringLandmark = false;
     // Direct navigation from the index must also establish the correct parked bike.
@@ -758,6 +878,7 @@ export class WorldScene extends Phaser.Scene {
     this.bike.velocityX = 0;
     pixelSound.stopBikeRoll();
     this.updatePromptBubble(null, 0, 0, this.time.now);
+    this.objectGlow.clear();this.showPointerGlow(null);
     const store = useWorldStore.getState();
     store.setNearParkingZone(null);
     store.setNearInteraction(null);
@@ -831,14 +952,23 @@ export class WorldScene extends Phaser.Scene {
   private isEndingRide = false;
 
   private playEndingRideOut() {
-    this.isEndingRide = true;
     const store = useWorldStore.getState();
+    if(this.isEndingRide||store.currentView!=='game'||store.activeInterior||store.isOverlayOpen||store.activeLandmarkModal||store.isEndingModalOpen)return;
+    const playerX=store.playerState==='WALKING'?this.walker.x:this.bike.x;
+    if(playerX<WorldBuilder.TOTAL_WORLD_WIDTH-240)return;
+    this.cancelEndingRide();
+    this.isEndingRide = true;
+    const generation=++this.endingGeneration;
 
     // If currently walking, mount bike first
     if (store.playerState === 'WALKING') {
       this.mountBike();
     }
+    this.endingStartPosition={x:this.bike.x,y:this.bike.y};
     store.setPlayerState('INTERACTING');
+    this.resetInputs(true);
+    this.pointerGlow.clear();
+    pixelSound.stopBikeRoll();
 
     // Ensure prompt bubble is hidden
     this.updatePromptBubble(null, 0, 0, 0);
@@ -851,14 +981,13 @@ export class WorldScene extends Phaser.Scene {
     this.bike.sprite.setFlipX(false);
     this.bike.sprite.play('bike_pedal');
 
-    const startX = this.bike.x;
-    // Ride 750px forward to guarantee riding completely off the right edge of the screen!
-    const targetX = startX + 750;
+    // Freeze the current camera and cross its actual right edge before showing UI.
+    const targetX = Math.max(this.bike.x+180,this.cameras.main.worldView.right+80);
 
-    this.tweens.add({
+    this.endingTween=this.tweens.add({
       targets: this.bike,
       x: targetX,
-      duration: 2500,
+      duration: 2100,
       ease: 'Quad.easeIn',
       onUpdate: () => {
         const currentY = WorldBuilder.getGroundY(this.bike.x) + 1;
@@ -868,27 +997,56 @@ export class WorldScene extends Phaser.Scene {
         }
       },
       onComplete: () => {
+        this.endingTween=null;
+        if(generation!==this.endingGeneration||!this.isEndingRide)return;
         // Rider has physically ridden completely off the screen!
         this.bike.setVisible(false);
 
         // Pause briefly in quiet scenic horizon, then pop up "谢谢参观" modal!
-        this.time.delayedCall(700, () => {
-          store.openEndingModal();
+        this.endingDelay=this.time.delayedCall(400, () => {
+          this.endingDelay=null;
+          const state=useWorldStore.getState();
+          if(generation!==this.endingGeneration||!this.isEndingRide||state.currentView!=='game'||state.activeInterior)return;
+          state.openEndingModal();
         });
       }
     });
   }
 
-  private handleTeleport(targetX: number) {
+  private cancelEndingRide() {
+    const wasRidingOut=this.isEndingRide;
+    this.endingGeneration++;
+    this.endingTween?.stop();this.endingTween=null;
+    this.endingDelay?.remove(false);this.endingDelay=null;
+    if(this.bike)this.tweens.killTweensOf(this.bike);
+    this.isEndingRide=false;
+    if(wasRidingOut&&this.endingStartPosition&&this.bike){
+      this.bike.setPosition(this.endingStartPosition.x,this.endingStartPosition.y);this.bike.setVisible(true);this.bike.velocityX=0;this.bike.sprite.stop();
+      const s=useWorldStore.getState();
+      if(s.playerState==='INTERACTING'&&!s.isEndingModalOpen&&!s.activeInterior&&!s.isOverlayOpen&&!s.activeLandmarkModal)s.setPlayerState('RIDING');
+    }
+    this.endingStartPosition=null;
+  }
+
+  private handleTeleport(targetX: number, desiredState?: PlayerState) {
     this.cancelLandmarkTransition();
+    this.cancelEndingRide();
     this.resetInputs(true);
-    this.isEndingRide = false;
-    this.bike.setVisible(true);
+    this.interiorReturnPosition=null;
+    this.tweens.killTweensOf(this.walker);
+    this.tweens.killTweensOf(this.bike.sprite);
+    const store=useWorldStore.getState();
+    const ride=desiredState==='RIDING'||(!desiredState&&store.playerState==='RIDING');
     const targetY = WorldBuilder.getGroundY(targetX);
-    // Find closest location
-    const closest = WORLD_LOCATIONS.find((loc) => Math.abs(loc.parkingX - targetX) < 150) || WORLD_LOCATIONS[0];
-    this.dismountBike(closest);
-    this.walker.setPosition(targetX, targetY + 1);
+    if(ride){
+      this.walker.setVisible(false);this.parkedBikeSprite.setVisible(false);this.activeParkedLocation=null;
+      this.bike.setPosition(targetX,targetY+1);this.bike.setVisible(true);this.bike.velocityX=0;this.bike.facing=1;this.bike.sprite.setFlipX(false);this.bike.setRotation(0);this.bike.sprite.setScale(1);
+      store.setPlayerState('RIDING');
+    }else{
+      const closest = WORLD_LOCATIONS.find((loc) => Math.abs(loc.parkingX - targetX) < 150) || WORLD_LOCATIONS[0];
+      this.dismountBike(closest);this.tweens.killTweensOf(this.walker);this.walker.setPosition(targetX, targetY + 1);this.walker.setAlpha(1);
+    }
+    store.setNearInteraction(null);store.setNearParkedBike(false);store.setNearParkingZone(null);store.updatePlayerPos(targetX,targetY+1,0);
     this.cameraController.setTargetZoom(1.4);
     this.cameraController.currentCamera.setZoom(1.4);
     this.cameraController.initCenter(targetX, targetY + 1);

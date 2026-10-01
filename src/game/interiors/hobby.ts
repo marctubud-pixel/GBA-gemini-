@@ -1,10 +1,11 @@
-/** Approved V1 room art, drawn at 960 x 320 logical pixels. */
-import { R, L, poly, ellipse, text, room, window, plant, shelf, books, lamp, poster, table, sign, stool, rug, cabinet, frame, vista, P } from './kit';
+/** A personal studio, drawn at 960 × 320 logical pixels. */
+import { R, L, poly, ellipse, text, room, window, plant, shelf, books, lamp, poster, table, sign, stool, rug, cabinet, frame, vista, hangingPlant, pinnedNote, stringLights, paperStack, P } from './kit';
+import type { InteriorDrawAssets } from './types';
 
 // Personal studio: four readable interests on one continuous back wall.
 // All freestanding furniture rests at y=244..250.  The y=250..270 strip
 // deliberately contains only floor; the shared player sprite is composited later.
-export default function drawHobby(ctx: CanvasRenderingContext2D, assets: unknown) {
+export default function drawHobby(ctx: CanvasRenderingContext2D, assets: InteriorDrawAssets = {}) {
   ctx.imageSmoothingEnabled = false;
   room(ctx, {
     wall: '#faf7e8', wallShade: '#e7dec8', trim: '#163e50',
@@ -110,7 +111,7 @@ export default function drawHobby(ctx: CanvasRenderingContext2D, assets: unknown
   L(ctx, 212, 181, 224, 244, P.ink, 2);
 
   // 02 / MUSIC — an open coastal window, soft chair, vinyl and warm speakers.
-  window(ctx, 369, 51, 176, 117, { trim: P.navy, trimHi: '#507e8c' });
+  window(ctx, 369, 51, 176, 117, { trim: P.navy, trimHi: '#507e8c', time: assets.time });
   // Pixel curtains stay at the sides; a wide, bright sea vista remains visible.
   for (const x of [349, 546]) {
     R(ctx, x, 47, 17, 127, '#d9dec4');
@@ -321,6 +322,22 @@ export default function drawHobby(ctx: CanvasRenderingContext2D, assets: unknown
   R(ctx, 904, 172, 3, 7, '#d4b578');
   R(ctx, 871, 241, 6, 7, '#213f50');
   R(ctx, 925, 241, 6, 7, '#213f50');
+
+  hangingPlant(ctx, 326, 36, 31, '#b98256');
+  stringLights(ctx, 654, 30, 153, '#efca73');
+  pinnedNote(ctx, 638, 112, 25, 30, '#ecdbac');
+  R(ctx, 643, 124, 14, 7, '#6a9599');
+  // Half-finished reading and listening rituals make the collection feel used.
+  paperStack(ctx, 274, 59, 28);
+  R(ctx, 242, 67, 13, 4, '#d7b279');
+  R(ctx, 244, 64, 9, 3, P.navy);
+  rug(ctx, 390, 242, 86, 16, '#aa8c62');
+  R(ctx, 573, 232, 22, 12, '#daae77');
+  R(ctx, 575, 233, 18, 9, P.creamShade);
+  R(ctx, 578, 235, 11, 5, '#688c85');
+  R(ctx, 813, 151, 30, 9, P.creamShade);
+  R(ctx, 816, 153, 23, 2, '#9c977e');
+  R(ctx, 816, 157, 15, 1, '#9c977e');
 
   // Foreground floor stays empty: readable horizontal stage for walking.
   // Few long joins, rather than speckled grain, reinforce the pixel scale.

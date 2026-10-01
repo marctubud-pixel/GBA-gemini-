@@ -98,5 +98,13 @@ const hobbies: ContentEntry[] = [
   media: [], tags: [subtitle], isSample: true
 }));
 
-const general = PORTFOLIO_PROJECTS.filter(p => !['print-house', 'brand-museum', 'marc-cinema'].includes(p.locationId)).map(projectToContentEntry);
-export const CONTENT_SEED: ContentEntry[] = [...words, ...writingNotes, ...brands, ...films, ...gameExperience, ...gameProjects, ...hobbies, ...general];
+const experiments: ContentEntry[] = [
+  { id: 'experiment-film', category: 'film', title: '海风片段 · 影像实验', subtitle: 'EXPERIMENT 01 / FILM', date: '2026.09.18', status: 'in-progress', description: '尝试用声音、光线与镜头节奏，把一段海边的日常写成影像。', body: '实验日志（示例）\n\n起点：同一片海面，在清晨和傍晚会呈现怎样不同的情绪？\n\n方法：先记录环境声，再根据声音选择镜头长度与转场。\n\n下一步：补充镜头测试与剪辑版本。实际影片和制作文档尚未添加。', tags: ['影像', '声音', '剪辑'] },
+  { id: 'experiment-game', category: 'game', title: '口袋小镇 · 游戏实验', subtitle: 'EXPERIMENT 02 / GAME', date: '2026.09.20', status: 'in-progress', description: '用像素小镇测试探索、交互提示和轻量叙事的连接。', body: '实验日志（示例）\n\n问题：玩家能否仅凭地标与短提示，找到想看的内容？\n\n方法：从一个可行走的街区开始，每次只加入一种交互。\n\n观察：空间中的停留节奏会影响内容的阅读顺序。实际可玩的 Demo 尚未添加。', tags: ['像素', '探索', '原型'] },
+  { id: 'experiment-interaction', category: 'interaction', title: '一封可探索的信 · 交互实验', subtitle: 'EXPERIMENT 03 / INTERACTION', date: '2026.09.22', status: 'completed', description: '把翻页、选择与反馈写进一封信，探索阅读的另一种节奏。', body: '实验日志（示例）\n\n假设：微小的选择可以让同一段文字拥有不同的阅读路径。\n\n方法：为三个关键句设置分支，并让反馈保持简短。\n\n归档：这条记录用于演示完成状态。真实交互原型与测试记录待补充。', tags: ['叙事', '阅读', '反馈'] },
+  { id: 'experiment-brand', category: 'brand', title: '海盐电台 · 品牌实验', subtitle: 'EXPERIMENT 04 / BRAND', date: '2026.09.24', status: 'planned', description: '从一句话、一种声音和一个符号，试着构建小型品牌的性格。', body: '实验日志（示例）\n\n主题：一个只在傍晚播出的海边电台，会有怎样的品牌声音？\n\n计划：整理品牌关键词，测试标志与片头的配合。\n\n状态：目前为计划示例，视觉稿、音频和品牌文档尚未添加。', tags: ['品牌', '声音', '识别'] },
+  { id: 'experiment-visual', category: 'visual', title: '潮汐色卡 · 视觉实验', subtitle: 'EXPERIMENT 05 / VISUAL', date: '2026.09.26', status: 'completed', description: '用有限色阶与清楚的形状，记录海岸从白天到夜晚的变化。', body: '实验日志（示例）\n\n约束：每组画面使用五种主要颜色。\n\n方法：先观察明暗关系，再用相同的色阶重新组织场景。\n\n归档：用于展示视觉实验的记录方式。真实图像、色卡与源文件待添加。', tags: ['色彩', '像素', '构图'] },
+].map(item => ({ ...item, kind: 'experiment', status: item.status as ContentEntry['status'], locationId: 'experiment-lab', media: [], attachments: [], isSample: true }));
+
+const general = PORTFOLIO_PROJECTS.filter(p => !['print-house', 'brand-museum', 'marc-cinema', 'experiment-lab'].includes(p.locationId)).map(projectToContentEntry);
+export const CONTENT_SEED: ContentEntry[] = [...words, ...writingNotes, ...brands, ...films, ...gameExperience, ...gameProjects, ...hobbies, ...experiments, ...general];

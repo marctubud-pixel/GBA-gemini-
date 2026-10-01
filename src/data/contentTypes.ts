@@ -1,4 +1,11 @@
-export type ContentKind = 'writing' | 'brand' | 'film' | 'game-experience' | 'game-project' | 'hobby' | 'general';
+export type ContentKind = 'writing' | 'brand' | 'film' | 'game-experience' | 'game-project' | 'hobby' | 'experiment' | 'general';
+export type ContentStatus = 'in-progress' | 'completed' | 'planned';
+
+export interface ContentAttachment {
+  id: string;
+  title: string;
+  url: string;
+}
 
 export interface MediaAsset {
   id: string;
@@ -29,6 +36,10 @@ export interface ContentEntry {
   section?: 'IDEA' | 'WORDS' | 'LIFE';
   caseStudy?: { heading: string; text: string }[];
   isSample?: boolean;
+  status?: ContentStatus;
+  fileSize?: string;
+  documentUrl?: string;
+  attachments?: ContentAttachment[];
 }
 
 export interface ContentDocument {

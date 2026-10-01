@@ -20,6 +20,7 @@ export const ContentDetail: React.FC<ContentDetailProps> = ({ entry, onBack }) =
           {entry.englishTitle && <p className="content-detail-english">{entry.englishTitle}</p>}
           {entry.subtitle && <p className="content-detail-subtitle">{entry.subtitle}</p>}
           <p>{entry.description}</p>
+          {(entry.status || entry.fileSize) && <p className="content-detail-subtitle">{[entry.status ? { 'in-progress': '进行中', completed: '已归档', planned: '计划中' }[entry.status] : '', entry.fileSize].filter(Boolean).join(' · ')}</p>}
           <div className="content-detail-tags">{entry.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
         </div>
       </div>
@@ -34,6 +35,14 @@ export const ContentDetail: React.FC<ContentDetailProps> = ({ entry, onBack }) =
         <figure key={asset.id}><ContentMedia asset={asset} kind={entry.kind} title={entry.title} fit="contain" />{asset.caption && <figcaption>{asset.caption}</figcaption>}</figure>
       ))}</div>}
       {isContentUrl(entry.demoUrl) && <a className="scene-button" href={entry.demoUrl} target="_blank" rel="noreferrer">打开作品 ↗</a>}
+      {(entry.kind === 'experiment' || entry.documentUrl || entry.attachments?.length) && <section className="content-detail-section">
+        <h4>文档与附件</h4>
+        <div className="content-detail-resources">
+          {isContentUrl(entry.documentUrl) ? <a className="scene-button" href={entry.documentUrl} target="_blank" rel="noopener noreferrer">打开原始文档 ↗</a> : <button className="scene-button scene-button-muted" disabled>原始文档待添加</button>}
+          {entry.attachments?.filter(item => isContentUrl(item.url)).map(item => <a className="scene-button scene-button-muted" key={item.id} href={item.url} target="_blank" rel="noopener noreferrer">{item.title} ↗</a>)}
+        </div>
+        {!entry.attachments?.length && <p>尚未添加附件。</p>}
+      </section>}
     </article>
   );
 };

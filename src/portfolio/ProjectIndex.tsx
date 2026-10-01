@@ -8,7 +8,7 @@ import './sceneModal.css';
 
 const KIND_LABELS: Record<ContentKind, string> = {
   writing: '文案与叙事', brand: '品牌与视觉', film: '电影与影像',
-  'game-experience': '游戏经历', 'game-project': '游戏制作', hobby: '个人爱好', general: '世界与探索',
+  'game-experience': '游戏经历', 'game-project': '游戏制作', hobby: '个人爱好', experiment: '创作实验', general: '世界与探索',
 };
 
 export const ProjectIndex: React.FC = () => {

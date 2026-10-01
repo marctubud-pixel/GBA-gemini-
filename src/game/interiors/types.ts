@@ -1,6 +1,18 @@
-export type InteriorId = 'print-house' | 'brand-museum' | 'marc-cinema' | 'arcade' | 'my-studio';
+export type InteriorId = 'print-house' | 'brand-museum' | 'marc-cinema' | 'arcade' | 'my-studio' | 'experiment-lab';
 
-export type InteriorModal = 'write-house' | 'brand-museum' | 'marc-cinema' | 'arcade' | 'my-hobby';
+export type InteriorModal = 'write-house' | 'brand-museum' | 'marc-cinema' | 'arcade' | 'my-hobby' | 'experiment-lab';
+
+export interface InteriorDrawAssets {
+  /** Shared elapsed milliseconds; the same time always produces the same pixels. */
+  time?: number;
+}
+
+export interface InteriorObjectBounds {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
 
 export interface InteriorInteraction {
   x: number;
@@ -8,11 +20,13 @@ export interface InteriorInteraction {
   prompt: string;
   modal: InteriorModal;
   context?: string;
+  /** The visible object, in the room's 960 × 320 canvas coordinates. */
+  bounds: InteriorObjectBounds;
 }
 
 export interface InteriorDefinition {
   name: string;
-  draw: (ctx: CanvasRenderingContext2D, assets: unknown) => void;
+  draw: (ctx: CanvasRenderingContext2D, assets?: InteriorDrawAssets) => void;
   interactions: readonly InteriorInteraction[];
 }
 
@@ -24,5 +38,5 @@ export const INTERIOR_EXIT_X = 32;
 
 export function isInteriorId(id: unknown): id is InteriorId {
   return id === 'print-house' || id === 'brand-museum' || id === 'marc-cinema' ||
-    id === 'arcade' || id === 'my-studio';
+    id === 'arcade' || id === 'my-studio' || id === 'experiment-lab';
 }

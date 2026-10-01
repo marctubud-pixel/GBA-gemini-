@@ -830,6 +830,106 @@
       "isSample": true
     },
     {
+      "id": "experiment-film",
+      "category": "film",
+      "title": "海风片段 · 影像实验",
+      "subtitle": "EXPERIMENT 01 / FILM",
+      "date": "2026.09.18",
+      "status": "in-progress",
+      "description": "尝试用声音、光线与镜头节奏，把一段海边的日常写成影像。",
+      "body": "实验日志（示例）\n\n起点：同一片海面，在清晨和傍晚会呈现怎样不同的情绪？\n\n方法：先记录环境声，再根据声音选择镜头长度与转场。\n\n下一步：补充镜头测试与剪辑版本。实际影片和制作文档尚未添加。",
+      "tags": [
+        "影像",
+        "声音",
+        "剪辑"
+      ],
+      "kind": "experiment",
+      "locationId": "experiment-lab",
+      "media": [],
+      "attachments": [],
+      "isSample": true
+    },
+    {
+      "id": "experiment-game",
+      "category": "game",
+      "title": "口袋小镇 · 游戏实验",
+      "subtitle": "EXPERIMENT 02 / GAME",
+      "date": "2026.09.20",
+      "status": "in-progress",
+      "description": "用像素小镇测试探索、交互提示和轻量叙事的连接。",
+      "body": "实验日志（示例）\n\n问题：玩家能否仅凭地标与短提示，找到想看的内容？\n\n方法：从一个可行走的街区开始，每次只加入一种交互。\n\n观察：空间中的停留节奏会影响内容的阅读顺序。实际可玩的 Demo 尚未添加。",
+      "tags": [
+        "像素",
+        "探索",
+        "原型"
+      ],
+      "kind": "experiment",
+      "locationId": "experiment-lab",
+      "media": [],
+      "attachments": [],
+      "isSample": true
+    },
+    {
+      "id": "experiment-interaction",
+      "category": "interaction",
+      "title": "一封可探索的信 · 交互实验",
+      "subtitle": "EXPERIMENT 03 / INTERACTION",
+      "date": "2026.09.22",
+      "status": "completed",
+      "description": "把翻页、选择与反馈写进一封信，探索阅读的另一种节奏。",
+      "body": "实验日志（示例）\n\n假设：微小的选择可以让同一段文字拥有不同的阅读路径。\n\n方法：为三个关键句设置分支，并让反馈保持简短。\n\n归档：这条记录用于演示完成状态。真实交互原型与测试记录待补充。",
+      "tags": [
+        "叙事",
+        "阅读",
+        "反馈"
+      ],
+      "kind": "experiment",
+      "locationId": "experiment-lab",
+      "media": [],
+      "attachments": [],
+      "isSample": true
+    },
+    {
+      "id": "experiment-brand",
+      "category": "brand",
+      "title": "海盐电台 · 品牌实验",
+      "subtitle": "EXPERIMENT 04 / BRAND",
+      "date": "2026.09.24",
+      "status": "planned",
+      "description": "从一句话、一种声音和一个符号，试着构建小型品牌的性格。",
+      "body": "实验日志（示例）\n\n主题：一个只在傍晚播出的海边电台，会有怎样的品牌声音？\n\n计划：整理品牌关键词，测试标志与片头的配合。\n\n状态：目前为计划示例，视觉稿、音频和品牌文档尚未添加。",
+      "tags": [
+        "品牌",
+        "声音",
+        "识别"
+      ],
+      "kind": "experiment",
+      "locationId": "experiment-lab",
+      "media": [],
+      "attachments": [],
+      "isSample": true
+    },
+    {
+      "id": "experiment-visual",
+      "category": "visual",
+      "title": "潮汐色卡 · 视觉实验",
+      "subtitle": "EXPERIMENT 05 / VISUAL",
+      "date": "2026.09.26",
+      "status": "completed",
+      "description": "用有限色阶与清楚的形状，记录海岸从白天到夜晚的变化。",
+      "body": "实验日志（示例）\n\n约束：每组画面使用五种主要颜色。\n\n方法：先观察明暗关系，再用相同的色阶重新组织场景。\n\n归档：用于展示视觉实验的记录方式。真实图像、色卡与源文件待添加。",
+      "tags": [
+        "色彩",
+        "像素",
+        "构图"
+      ],
+      "kind": "experiment",
+      "locationId": "experiment-lab",
+      "media": [],
+      "attachments": [],
+      "isSample": true
+    },
+    {
       "id": "entrance-manifesto",
       "kind": "general",
       "category": "Manifesto & Worldbuilding",
@@ -925,105 +1025,6 @@
         {
           "heading": "我的角色",
           "text": "Spatial Concept & Environmental Artist"
-        }
-      ]
-    },
-    {
-      "id": "game-01",
-      "kind": "general",
-      "category": "Game & Interaction Prototype",
-      "title": "GBA Pixel Town: 横版平台探索引擎原型",
-      "subtitle": "基于 Phaser 3 + TypeScript 的轻量复古物理探索框架",
-      "description": "在 640x360 逻辑分辨率下复刻 GBA 黄金时代的像素温润触感。",
-      "date": "2026.02",
-      "body": "实现像素级最近邻放大（Nearest Neighbor）、平滑侧滚跟随相机（Side-Scroll Look-ahead Camera）与分区懒加载。",
-      "locationId": "experiment-lab",
-      "tags": [
-        "Phaser 3",
-        "TypeScript",
-        "React",
-        "Zustand",
-        "Vite"
-      ],
-      "isSample": true,
-      "media": [],
-      "caseStudy": [
-        {
-          "heading": "背景",
-          "text": "如何用现代 Web 栈开发具备极致复古手感与轻盈体积的网页端微型游戏？"
-        },
-        {
-          "heading": "问题",
-          "text": "现代 Web 框架容易臃肿，过重的物理引擎导致手感松散且加载缓慢。"
-        },
-        {
-          "heading": "洞察",
-          "text": "像素游戏的核心魅力在于“精确而克制的像素簇”、“匀速与缓动的舒适平衡”。"
-        },
-        {
-          "heading": "策略",
-          "text": "自主封装 Arcade 自行车加速度/减速度控制器与上坡 Slope Speed Modifier。"
-        },
-        {
-          "heading": "创意",
-          "text": "把 Phaser 的高性能画布与 React 现代响应式 DOM 无缝桥接。"
-        },
-        {
-          "heading": "执行",
-          "text": "实现像素级最近邻放大（Nearest Neighbor）、平滑侧滚跟随相机（Side-Scroll Look-ahead Camera）与分区懒加载。"
-        },
-        {
-          "heading": "我的角色",
-          "text": "Lead Game Developer"
-        }
-      ]
-    },
-    {
-      "id": "ai-01",
-      "kind": "general",
-      "category": "Game & Interaction Prototype",
-      "title": "AI 像素资产工作流与自动切片工具",
-      "subtitle": "基于扩散模型与算法修边的一体化像素精灵图生产管线",
-      "description": "让独立创作者拥有一个小型像素美术工作室的生产力。",
-      "date": "2025.11",
-      "body": "成功批量化生产本主页中的上百个场景 Tile、建筑立面、海报与植被道具。",
-      "locationId": "experiment-lab",
-      "tags": [
-        "Python",
-        "ComfyUI",
-        "OpenCV",
-        "Aseprite Scripting"
-      ],
-      "isSample": true,
-      "media": [],
-      "caseStudy": [
-        {
-          "heading": "背景",
-          "text": "独立开发往往受制于庞大的场景资产绘制工作量。"
-        },
-        {
-          "heading": "问题",
-          "text": "纯 AI 生成像素图容易出现杂色点、色块不均、无网格对齐等“假像素”瑕疵。"
-        },
-        {
-          "heading": "洞察",
-          "text": "AI 负责造型与光影草图，算法负责调色板映射与像素网格量化，手工负责关键帧微调。"
-        },
-        {
-          "heading": "策略",
-          "text": "搭建 Python 脚本 + ComfyUI 节点，自动去除抗锯齿并限色至 16/32 色 GBA 调色板。"
-        },
-        {
-          "heading": "创意",
-          "text": "“AI as Apprentice, Human as Master.”"
-        },
-        {
-          "heading": "执行",
-          "text": "成功批量化生产本主页中的上百个场景 Tile、建筑立面、海报与植被道具。"
-        },
-        {
-          "heading": "我的角色",
-          "text": "Tools Engineer & Technical Artist"
         }
       ]
     },

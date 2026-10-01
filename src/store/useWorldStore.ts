@@ -9,11 +9,13 @@ import { useContentStore } from './useContentStore';
 export type PlayerState = 'RIDING' | 'PARKING' | 'WALKING' | 'INTERACTING';
 export type ViewMode = 'welcome' | 'game' | 'index' | 'info';
 export type ShellType = 'retro-tv' | 'gba' | 'none';
-export type LandmarkModalType = 'write-house' | 'brand-museum' | 'marc-cinema' | 'arcade' | 'my-hobby' | null;
+export type LandmarkModalType = 'write-house' | 'brand-museum' | 'marc-cinema' | 'arcade' | 'my-hobby' | 'experiment-lab' | null;
 
 interface WorldState {
   // Navigation & View
   currentView: ViewMode;
+  isStarting: boolean;
+  setStarting: (starting: boolean) => void;
   deviceShell: ShellType;
   soundEnabled: boolean;
   activeInterior: InteriorId | null;
@@ -23,7 +25,7 @@ interface WorldState {
   exitInterior: () => void;
   setInteriorPrompt: (prompt: string | null) => void;
 
-  // Active Landmark Modal (5 bespoke pixel UI experiences)
+  // Active Landmark Modal (6 bespoke pixel UI experiences)
   activeLandmarkModal: LandmarkModalType;
   openLandmarkModal: (modal: Exclude<LandmarkModalType, null>, context?: string) => void;
   closeLandmarkModal: () => void;
@@ -109,6 +111,8 @@ interface WorldState {
 
 export const useWorldStore = create<WorldState>((set, get) => ({
   currentView: 'welcome',
+  isStarting: false,
+  setStarting: (isStarting) => set({ isStarting, virtualInput: { left: false, right: false, action: false } }),
   deviceShell: 'gba',
   soundEnabled: true,
   activeInterior: null,
@@ -124,12 +128,13 @@ export const useWorldStore = create<WorldState>((set, get) => ({
     window.dispatchEvent(new CustomEvent('enter-interior', { detail: { id } }));
   },
   exitInterior: () => {
-    if (!get().activeInterior) return;
+    const id = get().activeInterior;
+    if (!id) return;
     set({ activeInterior: null, interiorPrompt: null, activeLandmarkModal: null,
       modalContext: null, isOverlayOpen: false, isPrintHouseBookOpen: false,
       activeContentId: null, activeProject: null,
       playerState: 'WALKING', virtualInput: { left: false, right: false, action: false } });
-    window.dispatchEvent(new CustomEvent('exit-interior'));
+    window.dispatchEvent(new CustomEvent('exit-interior', { detail: { id } }));
   },
   setInteriorPrompt: (prompt) => { if (get().interiorPrompt !== prompt) set({ interiorPrompt: prompt }); },
 
@@ -179,7 +184,10 @@ export const useWorldStore = create<WorldState>((set, get) => ({
     });
   },
 
-  setCurrentView: (view) => set({ currentView: view, virtualInput: { left: false, right: false, action: false } }),
+  setCurrentView: (view) => {
+    if (get().isStarting) return;
+    set({ currentView: view, virtualInput: { left: false, right: false, action: false } });
+  },
   setDeviceShell: (shell) => set({ deviceShell: shell }),
   toggleSound: () => set((state) => ({ soundEnabled: !state.soundEnabled })),
 
@@ -318,11 +326,15 @@ export const useWorldStore = create<WorldState>((set, get) => ({
   closeEndingModal: () => {
     pixelSound.playClose();
     set({
-      isEndingModalOpen: false,
-      playerState: 'RIDING'
+      isEndingModalOpen: false, currentView: 'game', playerState: 'RIDING',
+      playerX: 200, playerY: 270, bikeSpeed: 0, currentSegment: WORLD_SEGMENTS[0],
+      activeInterior: null, activeLandmarkModal: null, modalContext: null, interiorPrompt: null,
+      isOverlayOpen: false, isPrintHouseBookOpen: false, isPostcardOpen: false,
+      activeProject: null, activeContentId: null, activeLocation: null,
+      nearInteraction: null, nearParkingZone: null, nearParkedBike: false,
+      virtualInput: { left: false, right: false, action: false }
     });
-    // Teleport back to start or allow continuous ride
-    window.dispatchEvent(new CustomEvent('teleport-player', { detail: { x: 200 } }));
+    window.dispatchEvent(new CustomEvent('teleport-player', { detail: { x: 200, state: 'RIDING' } }));
   },
 
   teleportToLocation: (locationId: string) => {

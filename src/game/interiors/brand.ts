@@ -1,8 +1,10 @@
-/** Approved V1 room art, drawn at 960 x 320 logical pixels. */
+/** A coastal design gallery, drawn at 960 × 320 logical pixels. */
 import {
   R, L, poly, ellipse, text, room, window, plant,
   shelf, books, lamp, poster, table, sign, stool, rug, cabinet, frame,
+  hangingPlant, pinnedNote, paperStack,
 } from './kit';
+import type { InteriorDrawAssets } from './types';
 
 const P = {
   ink: '#172d3b', navy: '#0f3a5e', blue: '#2679bd', blueHi: '#5eb6ed',
@@ -60,7 +62,7 @@ function brandBook(ctx: CanvasRenderingContext2D, x: number, y: number, w: numbe
   R(ctx, x + 8, y + 14, w - 17, 2, P.cream);
 }
 
-export default function drawBrand(ctx: CanvasRenderingContext2D, assets: unknown) {
+export default function drawBrand(ctx: CanvasRenderingContext2D, assets: InteriorDrawAssets = {}) {
   room(ctx, {
     wall: '#e8dfc8', wallShade: '#d2c4a4', trim: P.navy, trimHi: '#487491',
     floor: '#d5c6a4', floorShade: '#b3a185', wainscot: '#dfd1b1', style: 'tile',
@@ -186,4 +188,21 @@ export default function drawBrand(ctx: CanvasRenderingContext2D, assets: unknown
   R(ctx, 905, 88, 14, 44, P.navy);
   R(ctx, 908, 103, 8, 15, P.gold);
   plant(ctx, 920, 244, 0.8, '#b79c72');
+
+  // Daylight, pinned colour studies and archive material keep the gallery personal.
+  window(ctx, 607, 66, 66, 86, { trim: P.navy, trimHi: '#789398', time: assets.time });
+  hangingPlant(ctx, 679, 35, 25, '#a78b5f');
+  pinnedNote(ctx, 347, 65, 26, 31, '#efe8d0');
+  pinnedNote(ctx, 349, 112, 24, 31, '#d2dfd1');
+  R(ctx, 350, 125, 8, 8, P.blue);
+  R(ctx, 359, 125, 8, 8, P.gold);
+  lamp(ctx, 301, 31, P.navy);
+  R(ctx, 420, 159, 134, 12, '#f6eedc');
+  text(ctx, 'STUDIO ARCHIVE', 487, 162, 7, P.navy, 'center');
+  paperStack(ctx, 611, 204, 36);
+  R(ctx, 614, 199, 29, 7, P.blue);
+  R(ctx, 619, 201, 19, 2, '#a3c5cc');
+  R(ctx, 318, 193, 11, 16, '#8c7860');
+  R(ctx, 320, 184, 2, 12, P.navy);
+  R(ctx, 325, 181, 2, 15, P.coral);
 };
