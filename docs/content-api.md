@@ -23,6 +23,7 @@
       "title": "我的影片",
       "description": "影片简介",
       "locationId": "marc-cinema",
+      "date": "2026.10.03",
       "duration": "3 分 24 秒",
       "cover": { "id": "poster-001", "type": "image", "url": "/uploads/poster.jpg", "alt": "影片海报" },
       "media": [{ "id": "video-001", "type": "video", "url": "/uploads/film.mp4", "poster": "/uploads/poster.jpg", "caption": "完整影片" }],
@@ -45,7 +46,7 @@
 | --- | --- | --- | --- |
 | writing | tvc / brand / ecommerce / audience | print-house | 四个固定分类、项目简介、竖图组合与原图放大；TVC 影片入口 |
 | brand | ip / art / brand / ecommerce | brand-museum | 四栏折页；轻文字入口直接打开完整案例大图与信息，左右切换项目 |
-| film | 自由文本，如短片、广告、MV | marc-cinema | 票根、影片信息与播放器 |
+| film | 自由文本，如短片、广告、MV | marc-cinema | 电影票、票根播放与完整项目大图 |
 | game-experience | journey | arcade | 游戏经历与 hours |
 | game-project | making | arcade | 游戏制作与 demoUrl |
 | hobby | photo / reading / vinyl / games / cycling / film / figures | my-studio | 七分类展柜、多媒体与收藏笔记 |
@@ -59,6 +60,8 @@
 图片从 `cover` 和 `media` 合并，按 URL 去重。依据首张图片的自然比例，非 TVC 竖图最多三张紧密并排；左右按钮、A / D 和触摸横滑连续移动组合，末尾环绕，横图单张显示。每张图仍可独立放大看原图，左下角只保留轻文字提示。`section` 可继续保留为数据元信息，当前文字工坊不据此过滤项目；资料出处 `source` 不在其详情中显示。W / S 切分类，A / D 切项目；进入详情后 A / D 切图，W / S 阅读右侧概述，J 放大，K / ESC 逐层返回。
 
 品牌馆封面和小字“查看案例”均直接进入同一层完整案例查看器，不经过通用详情页。查看器合并 `cover` 与 `media`、按 URL 去重，完整展示全部作品图片并保留原始比例；长图纵向滚动。右侧同步展示项目名称、简介与已有项目说明，不显示 `source` 页码或媒体的简历图说明。A / D、← / → 或外侧前后按钮按内容集合的顺序循环切换品牌案例，跨分类时同步更新四栏中的分类和项目；W / S 阅读完整图片，K / ESC 返回品牌折页，焦点回到入口。
+
+影院票面只显示 `title`、`category` 和作为上映日期的 `date`；未知日期留空，前台显示待补充。右侧独立票根包含播放入口，读取 `media` 内第一个视频；未上传时禁用并提示影片待上传。淡三角或 A / D 循环切换影片，J 播放。票面右下角“作品详情”直接打开完整项目大图与介绍，不再出现中间详情或子菜单。该层合并 `cover` 与全部 `media`，按 URL 去重、保留原图比例，右侧显示介绍、正文与 `caseStudy`；重复的简介不会再显示一遍。A / D 切换完整项目，W / S 阅读，K / ESC 返回当前电影票并恢复入口焦点。播放器中的 K 返回电影票，外侧关闭退出面板；票内不增加返回放映室或再看一部按钮。
 
 没有实际视频或 Demo URL 时，播放按钮会明确显示待添加并禁用。没有图片时，显示程序绘制的像素示意图。依据真实资料的作品请将 `isSample` 设为 `false`。`source` 可记录资料出处，例如 `"简历第5页"`；作品信息仍可有待补充项。上传后的大图可先由后台生成小封面，原图保留在 `media`。
 

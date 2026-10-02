@@ -1,0 +1,68 @@
+.cinema-base { display: contents; }
+.scene-modal-ticket .scene-modal-body {
+  background-color: #f4e8d4;
+  background-image: radial-gradient(#b5a08622 .6px, transparent .6px);
+  background-size: 5px 5px;
+}
+.scene-modal-backdrop .cinema-ticket-room { gap: 6px; padding: 2px 0 0; overflow: hidden; }
+.cinema-ticket-switcher { display: flex; align-items: center; gap: 4px; flex: 1; min-height: 0; }
+.cinema-ticket-arrow {
+  flex: 0 0 28px; width: 28px; height: 44px; padding: 0; border: 0; box-shadow: none;
+  background: transparent; color: #8a7864; opacity: .55; cursor: pointer;
+}
+.cinema-ticket-arrow span { font-size: 15px; }
+.cinema-ticket-arrow:hover { color: #ae352e; opacity: 1; }
+.cinema-ticket-arrow:disabled { opacity: .2; }
+.cinema-ticket {
+  position: relative; display: grid; grid-template-columns: 37% 43% 20%; align-items: center;
+  width: 100%; min-width: 0; height: 100%; max-height: 226px; min-height: 135px; margin: 0;
+  filter: drop-shadow(2px 4px 0 #7d573235); color: #153d5b;
+}
+.cinema-ticket-outline { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.cinema-ticket-art { position: relative; margin: 18px 0 18px 18px; height: calc(100% - 36px); min-height: 0; overflow: hidden; border: 1px solid #c7b393; background: #dfd2b9; }
+.cinema-ticket-art .content-media { min-height: 0; background: #e8ddc8; }
+.cinema-ticket-copy { position: relative; min-width: 0; align-self: stretch; padding: 18px 14px; display: flex; flex-direction: column; justify-content: center; gap: 8px; }
+.cinema-ticket-label { color: #9a7954; font-size: 9px; letter-spacing: 1px; }
+.scene-modal-backdrop .cinema-ticket-copy h3 { font-size: 21px; line-height: 1.35; color: #153d5b; overflow-wrap: anywhere; }
+.cinema-ticket-meta { display: flex; flex-direction: column; gap: 8px; margin: 1px 0 0; padding: 8px 0 0; border-top: 1px solid #d8c6a6; }
+.cinema-ticket-meta div { display: flex; align-items: baseline; gap: 8px; }
+.cinema-ticket-meta dt { flex: 0 0 auto; font-size: 10px; color: #9a7954; }
+.cinema-ticket-meta dd { margin: 0; font-size: 12px; color: #3c6073; overflow-wrap: anywhere; }
+.cinema-ticket-stub {
+  position: relative; align-self: stretch; margin: 15px 0; padding: 10px 9px;
+  border-left: 2px dashed #b9956d; background: #e9d7ad33;
+  display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 8px;
+}
+.cinema-stub-label { font-size: 9px; color: #a7875e; letter-spacing: 3px; }
+.cinema-ticket-play {
+  display: flex; align-items: center; justify-content: center; gap: 5px; width: 70px; max-width: 100%; min-height: 27px; padding: 3px 5px;
+  border: 1px solid #a75e46; background: #b44a36; color: #fff9e8; box-shadow: inset 0 2px #e17b58, 0 2px #754b38;
+  font-size: 11px; cursor: pointer;
+}
+.cinema-ticket-play:hover { background: #c55940; }
+.scene-modal-frame .cinema-ticket-play:disabled { background: #ddc9a6; color: #9f815c; border-color: #c7ad85; box-shadow: inset 0 1px #f7ebd4; opacity: 1; }
+.cinema-upload-note { font-size: 8px; color: #a0845f; white-space: nowrap; }
+.cinema-stub-barcode { width: 48px; max-width: 80%; height: 15px; margin-top: 2px; opacity: .38; background: repeating-linear-gradient(90deg, #68523a 0 1px, transparent 1px 3px, #68523a 3px 5px, transparent 5px 7px, #68523a 7px 8px, transparent 8px 11px); }
+.cinema-ticket-actions { display: flex; justify-content: flex-end; flex: 0 0 auto; padding: 0 22px 3px; }
+.cinema-detail-entry {
+  display: inline-flex; align-items: center; gap: 9px; min-height: 24px; padding: 2px 9px; color: #175a7d;
+  border: 1px solid #8fabba; background: #fcf8ec; box-shadow: inset 0 1px #fff, 1px 2px #bbc3bb;
+  font-size: 11px; cursor: pointer;
+}
+.cinema-detail-entry:hover { background: #e5f0ed; border-color: #3a829f; }
+.cinema-ticket-room .mm-player { padding: 3px; }
+.cinema-ticket-room .mm-player video { min-height: 0; max-height: none; flex: 1; height: 100%; }
+.cinema-ticket-room .mm-player-title { flex: 0 0 auto; }
+.cinema-ticket-room .mm-error { flex: 0 0 auto; margin: 0; }
+@media (max-width: 620px) {
+  .cinema-ticket { min-height: 110px; }
+  .cinema-ticket-art { margin: 12px 0 12px 12px; height: calc(100% - 24px); }
+  .cinema-ticket-copy { padding: 10px; gap: 6px; }
+  .scene-modal-backdrop .cinema-ticket-copy h3 { font-size: 17px; }
+  .cinema-ticket-meta { gap: 5px; }
+  .cinema-ticket-meta div { gap: 5px; }
+  .cinema-ticket-meta dt { font-size: 8px; }
+  .cinema-ticket-meta dd { font-size: 10px; }
+  .cinema-ticket-stub { padding: 5px; gap: 6px; }
+  .cinema-ticket-play { font-size: 10px; width: 60px; min-height: 24px; }
+}
