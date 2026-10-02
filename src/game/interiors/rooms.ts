@@ -28,7 +28,7 @@ export const INTERIORS: Record<InteriorId, InteriorDefinition> = {
     draw: drawArcade,
     interactions: [
       { x: 246, radius: 48, prompt: '查看我的游戏历程', modal: 'arcade', context: 'journey', bounds: { x: 185, y: 79, width: 130, height: 169 } },
-      { x: 410, radius: 48, prompt: '查看游戏制作', modal: 'arcade', context: 'making', bounds: { x: 352, y: 79, width: 130, height: 169 } },
+      { x: 410, radius: 48, prompt: '查看游戏互动', modal: 'arcade', context: 'making', bounds: { x: 352, y: 79, width: 130, height: 169 } },
     ],
   },
   'my-studio': {
