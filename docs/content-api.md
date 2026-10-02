@@ -43,7 +43,7 @@
 
 | kind | category | locationId | 呈现 |
 | --- | --- | --- | --- |
-| writing | tvc / brand / ecommerce / audience | print-house | 双页书册；section 为 IDEA / WORDS / LIFE，省略默认 WORDS |
+| writing | tvc / brand / ecommerce / audience | print-house | 四个固定分类，项目简介、单图系列和放大查看；不再按 section 分区 |
 | brand | ip / art / brand / ecommerce | brand-museum | 四栏折页与各自案例 |
 | film | 自由文本，如短片、广告、MV | marc-cinema | 票根、影片信息与播放器 |
 | game-experience | journey | arcade | 游戏经历与 hours |
@@ -53,6 +53,8 @@
 | general | 自由文本 | 其他有效地标 ID | 全览索引和通用详情 |
 
 可设置 `VITE_CONTENT_URL=/content/portfolio.resume.json` 验证简历占位集合。
+
+文字工坊预览只使用 `title`、`description`；详情展示项目名称、图片与 `body` 文案（未提供时使用 `description`）。图片从 `cover` 和 `media` 合并，按 URL 去重，一次一张，支持左右切换、触摸横滑和放大查看。`section` 可继续保留为数据元信息，当前文字工坊不据此过滤项目；资料出处 `source` 不在其详情中显示。W / S 切分类，A / D 切项目；进入详情后 A / D 切图，J 放大，K / ESC 逐层返回。
 
 没有实际视频或 Demo URL 时，播放按钮会明确显示待添加并禁用。没有图片时，显示程序绘制的像素示意图。依据真实资料的作品请将 `isSample` 设为 `false`。`source` 可记录资料出处，例如 `"简历第5页"`；作品信息仍可有待补充项。上传后的大图可先由后台生成小封面，原图保留在 `media`。
 

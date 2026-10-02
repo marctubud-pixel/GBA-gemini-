@@ -1,0 +1,20 @@
+/* Four permanent categories leave the project preview free of repeated labels. */
+.writing-house{height:100%;min-height:0;display:grid;grid-template-columns:37% minmax(0,1fr);border:2px solid #102e45;background:#fbf8ee;box-shadow:inset 0 -3px #d4c5a2}
+.writing-house-categories{display:grid;grid-template-rows:repeat(4,minmax(0,1fr));gap:7px;padding:10px;border-right:3px double #c6b99b;background:#f0e8d5;min-height:0;overflow:hidden}
+.writing-house-categories button{display:flex;align-items:center;gap:7px;padding:5px 8px;background:#fffdf5;border:1px solid #c6b99b;color:#284c63;font-size:15px;line-height:1.25;text-align:left;min-height:0;min-width:0;white-space:nowrap}
+.writing-house-categories button>span:first-child{font-size:9px;width:9px;flex-shrink:0}
+.writing-house-categories button svg{flex-shrink:0}
+.writing-house-categories button.is-active{border-color:#2679bd;box-shadow:inset 2px 0 #2679bd;background:#dcebf0;font-weight:700}
+.writing-house-preview{display:flex;flex-direction:column;justify-content:center;gap:18px;min-width:0;min-height:0;padding:18px 22px}
+.writing-house-summary{min-height:0;overflow:auto;scrollbar-width:thin}
+.writing-house-summary h3{font-size:21px;line-height:1.35;color:#102e45;margin-bottom:14px}
+.writing-house-summary p{font-size:14px;line-height:1.8;color:#50646b;white-space:pre-line;user-select:text}
+.writing-house-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-shrink:0;padding-top:12px;border-top:1px solid #d7ccb3}
+.writing-house-empty h3{font-size:18px;color:#284c63;margin-bottom:10px}
+.writing-house-empty p{font-size:14px;color:#6c7d7e}
+.writing-detail{display:flex;flex-direction:column;height:100%;min-height:0}
+.writing-detail-scroll{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#7cabb6 #e8e5d7}
+.writing-detail-actions{display:flex;justify-content:flex-end;flex-shrink:0;border-top:1px solid #d7ccb3;padding:6px 2px 2px;margin-top:4px}
+/* A phone's miniature console screen cannot fit readable fixed menu rows. */
+@media(max-width:620px){.scene-modal-backdrop:has(.writing-house,.writing-detail){position:fixed;inset:0;z-index:60;padding:34px 0 16px}.scene-modal-backdrop:has(.writing-house,.writing-detail) .scene-modal-frame{height:min(72vh,640px);max-width:680px}}
+@media(max-width:520px){.writing-house{grid-template-columns:41% minmax(0,1fr)}.writing-house-categories{gap:5px;padding:6px}.writing-house-categories button{font-size:12px;gap:4px;padding:4px}.writing-house-categories button svg{width:14px;height:14px}.writing-house-preview{padding:10px 12px;gap:10px}.writing-house-summary h3{font-size:18px;margin-bottom:8px}.writing-house-summary p{font-size:12px;line-height:1.6}.writing-house-actions{padding-top:8px;flex-wrap:wrap}}
