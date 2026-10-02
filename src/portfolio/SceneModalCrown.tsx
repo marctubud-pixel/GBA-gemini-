@@ -14,10 +14,12 @@ const crowns: Record<CrownKind, string> = {
 };
 
 export const SceneModalCrown: React.FC<{ kind: CrownKind }> = ({ kind }) => (
-  <svg className="scene-modal-crown" viewBox="0 0 600 62" preserveAspectRatio="none" aria-hidden="true">
-    <path d={crowns[kind]} fill="var(--header-accent)" stroke="#102e45" strokeWidth="4" strokeLinejoin="miter" />
-    <path d={crowns[kind]} fill="none" stroke="var(--header-light)" strokeWidth="2" transform="translate(0 4) scale(1 .88)" />
-    <path d="M150 54V28H176V20H224V14H278V8H322V14H376V20H424V28H450V54Z" fill="#fbf8ee" stroke="#102e45" strokeWidth="2" />
+  <svg className="scene-modal-crown" viewBox="0 -2 600 70" preserveAspectRatio="none" aria-hidden="true">
+    <path d={crowns[kind]} fill="#102e45" stroke="#061b2b" strokeWidth="6" transform="translate(0 6)" />
+    <path d={crowns[kind]} fill="var(--header-accent)" stroke="#102e45" strokeWidth="6" strokeLinejoin="miter" />
+    <path d={crowns[kind]} fill="none" stroke="var(--header-light)" strokeWidth="3" transform="translate(5 4) scale(.984 .88)" />
+    <path d="M150 54V28H176V20H224V14H278V8H322V14H376V20H424V28H450V54Z" fill="#dacbad" stroke="#102e45" strokeWidth="3" transform="translate(0 4)" />
+    <path d="M150 54V28H176V20H224V14H278V8H322V14H376V20H424V28H450V54Z" fill="#fbf8ee" stroke="#102e45" strokeWidth="3" />
     <path d="M22 52H56V48H72V52H88V48H104V52H120M480 52H504V48H520V52H536V48H552V52H578" fill="none" stroke="var(--header-light)" strokeWidth="2" />
   </svg>
 );

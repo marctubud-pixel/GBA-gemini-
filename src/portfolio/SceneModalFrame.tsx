@@ -36,7 +36,7 @@ export const SceneModalFrame: React.FC<SceneModalFrameProps> = ({
     <section
       className={`scene-modal-frame scene-modal-${variant}`}
       ref={frameRef} tabIndex={-1} onKeyDown={keepFocus}
-      role="dialog" aria-modal="true" aria-label={title}
+      role="dialog" aria-modal="true" aria-label={title} aria-description={subtitle}
       onClick={(event) => event.stopPropagation()}
       onPointerDown={(event) => event.stopPropagation()}
       onWheel={(event) => event.stopPropagation()}
@@ -48,7 +48,7 @@ export const SceneModalFrame: React.FC<SceneModalFrameProps> = ({
         </div>
         <div className="scene-header-plaque">
           <span className="scene-header-crest" aria-hidden="true"><Emblem size={20} /></span>
-          <div className="scene-modal-heading"><h2>{title}</h2>{subtitle && <p>{subtitle}</p>}</div>
+          <div className="scene-modal-heading"><h2>{title}</h2></div>
         </div>
         <div className="scene-header-coast scene-header-coast-right" aria-hidden="true">
           <PixelLighthouse size={22} /><PixelShell size={16} />

@@ -1,19 +1,19 @@
-/* A window inside the room: the lower third keeps the walking character visible. */
+/* A large floating window with a blurred, visible rim of the current room. */
 .scene-modal-backdrop {
-  position: absolute; inset: 0; z-index: 40; display: flex; align-items: flex-start; justify-content: center;
-  padding-top: 8px; background: rgb(9 24 35 / 18%); color: #172d3b;
-  font-family: 'DotGothic16', 'Cubic 11', monospace; font-size: 11px; line-height: 1.5;
+  position: absolute; inset: 0; z-index: 40; display: flex; align-items: center; justify-content: center;
+  padding: 0; background: rgb(9 24 35 / 30%); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); color: #172d3b;
+  font-family: 'DotGothic16', 'Cubic 11', monospace; font-size: 14px; line-height: 1.5;
 }
 .scene-modal-frame {
-  width: 86%; height: 62%; min-width: 0; min-height: 0; display: flex; flex-direction: column;
+  width: 94%; height: 90%; min-width: 0; min-height: 0; display: flex; flex-direction: column;
   position: relative; background: transparent; overflow: visible;
-  filter: drop-shadow(2px 4px 0 rgb(6 27 43 / 45%));
+  filter: drop-shadow(4px 7px 0 rgb(6 27 43 / 55%));
 }
 .scene-modal-frame:focus { outline: none; }
 .scene-modal-header {
   --header-accent: #2679bd; --header-light: #5eb6ed;
-  flex: 0 0 58px; min-height: 58px; display: flex; align-items: flex-end; justify-content: center;
-  padding: 0 0 6px; position: relative; color: #0f3a5e;
+  flex: 0 0 66px; min-height: 66px; display: flex; align-items: flex-end; justify-content: center;
+  padding: 0 0 16px; position: relative; color: #0f3a5e;
 }
 .scene-modal-crown { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .scene-modal-gallery .scene-modal-header { --header-accent: #245587; --header-light: #739aa4; }
@@ -22,11 +22,11 @@
 .scene-modal-collection .scene-modal-header { --header-accent: #287683; --header-light: #87bfc2; }
 .scene-header-plaque { z-index: 1; position: relative; width: 56%; padding: 0 2px; }
 .scene-header-crest {
-  display: flex; justify-content: center; position: absolute; left: calc(50% - 10px); top: -13px;
+  display: flex; justify-content: center; position: absolute; left: calc(50% - 10px); top: -17px;
 }
-.scene-header-crest > svg { width: 18px; height: 18px; }
+.scene-header-crest > svg { width: 22px; height: 22px; }
 .scene-modal-heading { min-width: 0; text-align: center; }
-.scene-modal-heading h2 { margin: 0; font-size: 15px; font-weight: 700; line-height: 1.4; letter-spacing: 1px; text-shadow: 1px 1px 0 #c6d7ce; }
+.scene-modal-heading h2 { margin: 0; font-size: 25px; font-weight: 700; line-height: 1.15; letter-spacing: 1px; text-shadow: 1px 1px 0 #c6d7ce; }
 .scene-modal-heading p { margin: 0; font-size: 7px; line-height: 1.3; color: #597b87; }
 .scene-header-coast { position: absolute; bottom: 10px; width: 45px; height: 40px; z-index: 1; pointer-events: none; }
 .scene-header-coast-left { left: 8%; }
@@ -34,18 +34,18 @@
 .scene-header-coast > :first-child { position: absolute; left: 0; bottom: 0; }
 .scene-header-coast > :last-child { position: absolute; right: -1px; top: 0; }
 .scene-modal-close {
-  position: absolute; right: 9px; bottom: 7px; width: 23px; height: 23px; border: 2px solid #102e45;
-  color: white; background: #d63a2a; font-size: 18px; line-height: 15px; box-shadow: inset 1px 1px 0 #ff9e79;
+  position: absolute; right: 11px; bottom: 12px; width: 28px; height: 28px; border: 2px solid #102e45;
+  color: white; background: #d63a2a; font-size: 22px; line-height: 20px; box-shadow: inset 1px 1px 0 #ff9e79;
 }
 .scene-modal-body {
-  flex: 1 1 auto; min-height: 0; min-width: 0; overflow: auto; padding: 5px;
-  border-inline: 3px solid #102e45; background: #fbf8ee; overscroll-behavior: contain;
+  flex: 1 1 auto; min-height: 0; min-width: 0; overflow: auto; padding: 8px;
+  border-inline: 6px solid #102e45; background: #fbf8ee; box-shadow: inset 3px 0 0 #92d0e8, inset -3px 0 0 #557d92, 4px 0 0 #061b2b; overscroll-behavior: contain;
   scrollbar-width: thin; scrollbar-color: #7cabb6 #e8e5d7;
 }
 .scene-modal-footer {
-  flex: 0 0 auto; min-height: 19px; display: flex; align-items: center; justify-content: space-between;
-  gap: 6px; padding: 2px 7px; color: #c7e8ef; background: #102e45; font-size: 8px;
-  border: 3px solid #102e45; border-top: 0;
+  flex: 0 0 auto; min-height: 25px; display: flex; align-items: center; justify-content: space-between;
+  gap: 6px; padding: 2px 7px; color: #c7e8ef; background: #102e45; font-size: 9px; box-shadow: inset 0 -3px 0 #061b2b, 4px 0 0 #061b2b;
+  border: 6px solid #102e45; border-top: 0;
 }
 .scene-modal-footer > span { display: flex; align-items: center; gap: 4px; }
 .scene-modal-body:last-child { border-bottom: 3px solid #102e45; }
@@ -213,70 +213,81 @@
 }
 
 
-/* Compact paper layouts leave the room visible; long work details scroll inside. */
+/* Readable content at near-full-screen size; lengthy records scroll inside. */
+.scene-modal-backdrop .scene-button { font-size: 13px; min-height: 29px; }
 .scene-modal-backdrop .writing-book { min-height: 0; }
-.scene-modal-backdrop .writing-book-tabs { padding-top: 5px; gap: 3px; }
-.scene-modal-backdrop .writing-book-tabs button { min-height: 40px; }
-.scene-modal-backdrop .writing-book-left { padding: 4px 6px; }
-.scene-modal-backdrop .writing-book-badge h3 { font-size: 12px; }
-.scene-modal-backdrop .writing-book-badge > svg { width: 18px; height: 18px; }
-.scene-modal-backdrop .writing-book-description { display: none; }
-.scene-modal-backdrop .writing-categories { gap: 3px; margin-top: 4px; }
-.scene-modal-backdrop .writing-categories button { min-height: 22px; padding: 2px; }
-.scene-modal-backdrop .writing-categories button > svg { width: 15px; height: 15px; }
-.scene-modal-backdrop .writing-book-note { display: none; }
-.scene-modal-backdrop .writing-book-right { padding: 4px 6px; gap: 2px; }
-.scene-modal-backdrop .writing-preview-art { height: 32px; min-height: 32px; }
-.scene-modal-backdrop .writing-work-excerpt { -webkit-line-clamp: 2; font-size: 10px; line-height: 1.2; margin: 1px 0; }
-.scene-modal-backdrop .writing-book-actions { padding-top: 3px; flex-shrink: 0; }
+.scene-modal-backdrop .writing-book-tabs button { font-size: 11px; }
+.scene-modal-backdrop .writing-book-badge h3 { font-size: 18px; }
+.scene-modal-backdrop .writing-book-badge span,
+.scene-modal-backdrop .writing-book-description,
+.scene-modal-backdrop .writing-book-note,
+.scene-modal-backdrop .writing-preview-stamp { display: none; }
+.scene-modal-backdrop .writing-categories { gap: 7px; margin-top: 12px; }
+.scene-modal-backdrop .writing-categories button { min-height: 35px; font-size: 15px; padding: 5px; }
+.scene-modal-backdrop .writing-categories small { font-size: 11px; }
+.scene-modal-backdrop .writing-preview-art { height: 65px; min-height: 55px; }
+.scene-modal-backdrop .writing-book-right > h3 { font-size: 18px; }
+.scene-modal-backdrop .writing-work-subtitle { font-size: 12px; }
+.scene-modal-backdrop .writing-work-excerpt { font-size: 14px; line-height: 1.5; -webkit-line-clamp: 2; min-height: 0; }
+.scene-modal-backdrop .writing-book-spread { min-height: 0; grid-template-rows: minmax(0, 1fr); }
+.scene-modal-backdrop .writing-book-right { min-height: 0; overflow: hidden; }
+.scene-modal-backdrop .writing-book-left { min-height: 0; overflow: auto; }
+.scene-modal-backdrop .writing-work-subtitle { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-shrink: 0; }
+.scene-modal-backdrop .writing-book-actions { flex-shrink: 0; }
+.scene-modal-backdrop .scene-pagination { font-size: 11px; }
+.scene-modal-backdrop .scene-pagination button { min-height: 26px; min-width: 24px; }
 .scene-modal-backdrop .brand-exhibition { min-height: 0; height: 100%; }
 .scene-modal-backdrop .brand-panels { min-height: 0; grid-template-rows: minmax(0, 1fr); }
-.brand-panel-content { min-height: 0; flex: 1; overflow: auto; display: flex; flex-direction: column; gap: 3px; scrollbar-width: thin; }
+.brand-panel-content { min-height: 0; flex: 1; overflow: auto; display: flex; flex-direction: column; gap: 5px; scrollbar-width: thin; }
 .brand-panel-content > * { flex-shrink: 0; }
-.brand-panel-content > p { font-size: 9px; line-height: 1.5; color: #6f634b; }
+.brand-panel-content > p { font-size: 12px; line-height: 1.5; color: #6f634b; }
 .brand-panel-label, .brand-case-button { flex-shrink: 0; }
-.scene-modal-backdrop .brand-panel { min-height: 0; overflow: hidden; padding: 4px; gap: 3px; }
-.scene-modal-backdrop .brand-panel-label { min-height: 20px; }
-.scene-modal-backdrop .brand-panel-label h3 { font-size: 13px; }
-.scene-modal-backdrop .brand-panel-label svg { width: 17px; height: 17px; }
-.scene-modal-backdrop .brand-panel-art { height: 38px; min-height: 38px; }
-.scene-modal-backdrop .brand-panel h4 { min-height: 15px; -webkit-line-clamp: 1; }
-.scene-modal-backdrop .brand-panel > p { -webkit-line-clamp: 2; }
-.scene-modal-backdrop .brand-seaside { flex-shrink: 0; height: 16px; min-height: 16px; font-size: 7px; overflow: hidden; }
+.scene-modal-backdrop .brand-panel { min-height: 0; overflow: hidden; padding: 6px; gap: 5px; }
+.scene-modal-backdrop .brand-panel-label h3 { font-size: 18px; }
+.scene-modal-backdrop .brand-panel-art { height: 65px; min-height: 65px; }
+.scene-modal-backdrop .brand-panel h4 { font-size: 13px; min-height: 18px; }
+.scene-modal-backdrop .brand-case-button { font-size: 11px; }
+.scene-modal-backdrop .brand-seaside { flex-shrink: 0; min-height: 18px; font-size: 9px; overflow: hidden; }
 .scene-modal-backdrop .lab-archive { min-height: 0; }
-.scene-modal-backdrop .lab-record { overflow: auto; gap: 3px; padding: 4px 6px; }
-.scene-modal-backdrop .lab-record-art { height: 38px; }
-.scene-modal-backdrop .lab-record h3 { font-size: 12px; }
-.scene-modal-backdrop .lab-record-description { -webkit-line-clamp: 1; flex-shrink: 0; }
-.scene-modal-backdrop .lab-record-meta { padding: 2px 0; flex-shrink: 0; }
+.scene-modal-backdrop .lab-record { overflow: auto; }
+.scene-modal-backdrop .lab-record h3 { font-size: 18px; }
+.scene-modal-backdrop .lab-record-description { font-size: 13px; flex-shrink: 0; }
+.scene-modal-backdrop .lab-record-art { height: 70px; }
+.scene-modal-backdrop .lab-record-meta { font-size: 10px; flex-shrink: 0; }
+.scene-modal-backdrop .lab-file-tab { min-height: 40px; }
+.scene-modal-backdrop .lab-file-tab strong { font-size: 13px; }
+.scene-modal-backdrop .lab-file-tab small { font-size: 9px; }
 .scene-modal-backdrop .lab-record-actions { flex-shrink: 0; }
-.scene-modal-backdrop .lab-file-tab { min-height: 30px; padding: 3px; }
-.mm-cinema-program { min-height: 0; flex: 1; overflow: auto; display: flex; flex-direction: column; gap: 6px; }
-.scene-modal-backdrop .mm-cinema { overflow: hidden; gap: 4px; }
-.scene-modal-backdrop .mm-cinema > .mm-actions { margin-top: auto; padding-bottom: 2px; gap: 5px; }
-.scene-modal-backdrop .mm-cinema > .mm-actions .mm-button { font-size: 10px!important; min-height: 24px; padding: 3px 6px; }
-.scene-modal-backdrop .mm-ticket-art { width: 110px; height: 58px; }
-.scene-modal-backdrop .mm-ticket { padding: 5px 7px; }
-.scene-modal-backdrop .mm-ticket-copy h3 { font-size: 14px; }
+.scene-modal-backdrop .content-detail { font-size: 14px; }
+.scene-modal-backdrop .content-detail-heading h3 { font-size: 19px; }
+.mm-cinema-program { min-height: 0; flex: 1; overflow: auto; display: flex; flex-direction: column; gap: 8px; }
+.scene-modal-backdrop .mm-cinema { overflow: hidden; }
+.scene-modal-backdrop .mm-cinema-banner { display: none; }
+.scene-modal-backdrop .mm-cinema > .mm-actions { margin-top: auto; }
+.scene-modal-backdrop .mm-button { font-size: 13px!important; min-height: 30px; }
+.scene-modal-backdrop .mm-ticket-copy h3 { font-size: 21px; }
+.scene-modal-backdrop .mm-ticket-meta,
+.scene-modal-backdrop .mm-film-facts dd { font-size: 14px; }
+.scene-modal-backdrop .mm-film-facts dt { font-size: 12px; }
 .scene-modal-backdrop .mm-stamp { display: none; }
-.scene-modal-backdrop .mm-film-facts { padding: 4px; gap: 3px; }
-.scene-modal-backdrop .mm-hobby-media-row { min-height: 52px; height: 62px; }
+.scene-modal-backdrop .mm-game-copy strong { font-size: 15px; }
+.scene-modal-backdrop .mm-game-copy > span { font-size: 12px; }
+.scene-modal-backdrop .mm-game-inspector h3 { font-size: 16px; }
+.scene-modal-backdrop .mm-game-inspector p { font-size: 13px; }
+.scene-modal-backdrop .mm-hobby-categories button { font-size: 13px; min-height: 32px; }
+.scene-modal-backdrop .mm-hobby-caption strong { font-size: 16px; }
+.scene-modal-backdrop .mm-hobby-caption p { font-size: 13px; }
 .scene-modal-backdrop .mm-hobby-shelf { display: none; }
-.scene-modal-backdrop .mm-hobby-caption p { -webkit-line-clamp: 1; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
-.scene-modal-backdrop .mm-hobby-actions { padding-top: 3px; }
-.scene-modal-backdrop .mm-hobby-actions .mm-button { min-height: 24px; padding: 3px 5px; font-size: 9px!important; }
+.scene-modal-backdrop .mm-hobby-heading h3 { font-size: 13px; }
 @media (max-width: 620px) {
-  .scene-modal-backdrop { padding-top: 4px; }
-  .scene-modal-frame { width: 90%; }
-  .scene-modal-header { min-height: 38px; flex-basis: 38px; padding-bottom: 3px; }
-  .scene-modal-heading h2 { font-size: 10px; letter-spacing: 0; }
-  .scene-modal-heading p { font-size: 5px; }
-  .scene-header-crest { top: -9px; left: calc(50% - 6px); }
-  .scene-header-crest > svg { width: 12px; height: 12px; }
-  .scene-header-coast { height: 28px; width: 26px; bottom: 5px; }
+  .scene-modal-header { min-height: 46px; flex-basis: 46px; padding-bottom: 9px; }
+  .scene-modal-heading h2 { font-size: 16px; letter-spacing: 0; }
+  .scene-header-crest { top: -12px; left: calc(50% - 7px); }
+  .scene-header-crest > svg { width: 14px; height: 14px; }
+  .scene-header-coast { height: 28px; width: 26px; bottom: 8px; }
   .scene-header-coast > :first-child { width: 20px; height: 20px; }
   .scene-header-coast > :last-child { width: 14px; height: 14px; }
-  .scene-modal-close { width: 19px; height: 19px; right: 5px; bottom: 3px; font-size: 14px; line-height: 12px; }
-  .scene-modal-footer { min-height: 13px; font-size: 6px; padding: 1px 4px; }
-  .scene-modal-footer .mm-footer { font-size: 6px; }
+  .scene-modal-close { width: 21px; height: 21px; right: 7px; bottom: 9px; font-size: 15px; line-height: 13px; }
+  .scene-modal-footer { min-height: 19px; font-size: 7px; padding: 2px 4px; }
+  .scene-modal-footer .mm-footer { font-size: 7px; }
 }
