@@ -4,8 +4,9 @@ import { useContentStore } from '../store/useContentStore';
 import { pixelSound } from '../game/audio/PixelSoundManager';
 import { PixelSeagull, PixelPalette, PixelTag, PixelCart, PixelShell } from '../shell/PixelIcons';
 import { SceneModalFrame, useModalKeys } from './SceneModalFrame';
-import { ContentDetail } from './ContentDetail';
+import { BrandCaseViewer } from './BrandCaseViewer';
 import { ContentMedia } from './ContentMedia';
+import './brandMuseum.css';
 
 const PANELS = [
   { id: 'ip', title: 'IP', icon: PixelSeagull, slogan: '让角色成为品牌的好朋友。' },
@@ -37,7 +38,17 @@ export const BrandMuseumModal: React.FC = () => {
     } else if (PANELS.some((panel) => panel.id === modalContext)) setSelected(modalContext as BrandCategory);
   }, [isOpen, modalContext]);
   const close = () => { pixelSound.playCancel(); setDetailId(null); closeLandmarkModal(); };
-  const openCase = (id: string) => { pixelSound.playConfirm(); setDetailId(id); };
+  const openCase = (id: string) => {
+    const entry = brands.find(item => item.id === id);
+    if (!entry) return;
+    if (PANELS.some(panel => panel.id === entry.category)) {
+      const category = entry.category as BrandCategory;
+      const categoryIndex = brands.filter(item => item.category === category).findIndex(item => item.id === id);
+      setSelected(category);
+      setPages(previous => ({ ...previous, [category]: categoryIndex }));
+    }
+    pixelSound.playConfirm(); setDetailId(id);
+  };
   const selectPanel = (direction: number) => {
     const index = PANELS.findIndex((panel) => panel.id === selected);
     setSelected(PANELS[(index + direction + PANELS.length) % PANELS.length].id);
@@ -50,18 +61,19 @@ export const BrandMuseumModal: React.FC = () => {
     setSelected(category); pixelSound.playSelect();
   };
   useModalKeys({
-    isOpen, onClose: () => detail ? setDetailId(null) : close(),
-    onPrev: detail ? undefined : () => selectPanel(-1), onNext: detail ? undefined : () => selectPanel(1),
-    onUp: detail ? undefined : () => turnPage(selected, -1), onDown: detail ? undefined : () => turnPage(selected, 1),
-    onConfirm: detail || !selectedWork ? undefined : () => openCase(selectedWork.id),
+    isOpen: isOpen && !detail, onClose: close,
+    onPrev: () => selectPanel(-1), onNext: () => selectPanel(1),
+    onUp: () => turnPage(selected, -1), onDown: () => turnPage(selected, 1),
+    onConfirm: !selectedWork ? undefined : () => openCase(selectedWork.id),
   });
 
   if (!isOpen) return null;
-  return (
+  return (<>
+    <div className="brand-museum-base" aria-hidden={detail ? true : undefined}>
     <SceneModalFrame title="BRAND & VISUAL" subtitle="让品牌具象化" variant="gallery" onClose={close}
       footer={<><span><PixelShell size={12} /> 视觉需要策略</span><span>←→ 选择 · ↑↓ 换件 · J 案例 · K 返回</span></>}
     >
-      {detail ? <ContentDetail entry={detail} onBack={() => setDetailId(null)} /> : <div className="brand-exhibition">
+      <div className="brand-exhibition">
         <div className="brand-panels">{PANELS.map(({ id, title, icon: Icon, slogan }, index) => {
           const works = brands.filter((entry) => entry.category === id);
           const visiblePage = works.length ? pages[id] % works.length : 0;
@@ -69,17 +81,21 @@ export const BrandMuseumModal: React.FC = () => {
           return <section key={id} className={`brand-panel ${selected === id ? 'is-active' : ''}`} onMouseEnter={() => setSelected(id)}>
             <button className="brand-panel-label" onClick={() => setSelected(id)} aria-pressed={selected === id}><Icon size={20} /><h3>{title}</h3><span>0{index + 1}</span></button>
             <div className="brand-panel-content">
-            <div className="brand-panel-art"><ContentMedia asset={entry?.cover} kind={`brand-${id}`} title={entry?.title ?? title} fit="contain" /></div>
+            <button className="brand-panel-art brand-art-entry" disabled={!entry} onClick={() => entry && openCase(entry.id)} aria-label={entry ? `打开${entry.title}完整案例` : `${title}作品待补充`}><ContentMedia asset={entry?.cover} kind={`brand-${id}`} title={entry?.title ?? title} fit="contain" /></button>
             <h4>{entry?.title ?? title}</h4>
             <p>{entry?.description ?? slogan}</p>
             {entry?.isSample && <small className="scene-sample-label">示例内容</small>}
-            {works.length > 1 && <div className="scene-pagination"><button onClick={() => turnPage(id, -1)} aria-label={`${title}上一个案例`}>◀</button><span>{visiblePage + 1} / {works.length}</span><button onClick={() => turnPage(id, 1)} aria-label={`${title}下一个案例`}>▶</button></div>}
             </div>
-            <button className="scene-button brand-case-button" disabled={!entry} onClick={() => entry && openCase(entry.id)}>{entry ? '查看案例 ▶' : '暂无案例'}</button>
+            <div className="brand-panel-actions">
+              {works.length > 1 && <div className="scene-pagination"><button onClick={() => turnPage(id, -1)} aria-label={`${title}上一个案例`}>◀</button><span>{visiblePage + 1} / {works.length}</span><button onClick={() => turnPage(id, 1)} aria-label={`${title}下一个案例`}>▶</button></div>}
+              <button className="brand-case-button" disabled={!entry} onClick={() => entry && openCase(entry.id)}>{entry ? '查看案例 ↗' : '暂无案例'}</button>
+            </div>
           </section>;
         })}</div>
         <div className="brand-seaside" aria-hidden="true"><PixelShell size={16} /><i /><span>SAME SKIES · BRIGHTER IDEAS</span><i /><PixelSeagull size={20} /></div>
-      </div>}
+      </div>
     </SceneModalFrame>
-  );
+    </div>
+    {detail && <BrandCaseViewer entries={brands} entryId={detail.id} onEntryChange={openCase} onClose={() => { pixelSound.playCancel(); setDetailId(null); }} />}
+  </>);
 };

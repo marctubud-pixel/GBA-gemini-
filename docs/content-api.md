@@ -44,7 +44,7 @@
 | kind | category | locationId | 呈现 |
 | --- | --- | --- | --- |
 | writing | tvc / brand / ecommerce / audience | print-house | 四个固定分类、项目简介、竖图组合与原图放大；TVC 影片入口 |
-| brand | ip / art / brand / ecommerce | brand-museum | 四栏折页与各自案例 |
+| brand | ip / art / brand / ecommerce | brand-museum | 四栏折页；轻文字入口直接打开完整案例大图与信息，左右切换项目 |
 | film | 自由文本，如短片、广告、MV | marc-cinema | 票根、影片信息与播放器 |
 | game-experience | journey | arcade | 游戏经历与 hours |
 | game-project | making | arcade | 游戏制作与 demoUrl |
@@ -57,6 +57,8 @@
 文字工坊预览只使用 `title`、`description`，右侧用带轻纸纹的底板。详情左侧展示图片，右上展示 `title` 与 `subtitle`，右下展示项目概述。非 TVC 优先读取 `caseStudy` 中“项目详情”或“项目概述”，其次读取真实 `body`；内容未补充时显示“项目详情待补充。”。TVC 使用 `description` 与“我的角色”的短概述，影片入口读取 `media` 内第一个有效视频；未提供视频则显示禁用的“影片待上传”，不将封面当成影片。
 
 图片从 `cover` 和 `media` 合并，按 URL 去重。依据首张图片的自然比例，非 TVC 竖图最多三张紧密并排；左右按钮、A / D 和触摸横滑连续移动组合，末尾环绕，横图单张显示。每张图仍可独立放大看原图，左下角只保留轻文字提示。`section` 可继续保留为数据元信息，当前文字工坊不据此过滤项目；资料出处 `source` 不在其详情中显示。W / S 切分类，A / D 切项目；进入详情后 A / D 切图，W / S 阅读右侧概述，J 放大，K / ESC 逐层返回。
+
+品牌馆封面和小字“查看案例”均直接进入同一层完整案例查看器，不经过通用详情页。查看器合并 `cover` 与 `media`、按 URL 去重，完整展示全部作品图片并保留原始比例；长图纵向滚动。右侧同步展示项目名称、简介与已有项目说明，不显示 `source` 页码或媒体的简历图说明。A / D、← / → 或外侧前后按钮按内容集合的顺序循环切换品牌案例，跨分类时同步更新四栏中的分类和项目；W / S 阅读完整图片，K / ESC 返回品牌折页，焦点回到入口。
 
 没有实际视频或 Demo URL 时，播放按钮会明确显示待添加并禁用。没有图片时，显示程序绘制的像素示意图。依据真实资料的作品请将 `isSample` 设为 `false`。`source` 可记录资料出处，例如 `"简历第5页"`；作品信息仍可有待补充项。上传后的大图可先由后台生成小封面，原图保留在 `media`。
 

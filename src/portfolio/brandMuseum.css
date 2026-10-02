@@ -1,0 +1,12 @@
+.brand-museum-base{display:contents}
+.brand-exhibition .brand-panel-content{overflow:hidden;gap:4px;min-height:0}
+.scene-modal-backdrop .brand-exhibition .brand-panel-art{flex:1 1 auto;height:auto;min-height:48px;margin:0;border:1px solid #8fb5c9;background:#e7f0ee;box-shadow:inset 1px 1px #fbfcf2;display:block;width:100%;padding:0;overflow:hidden}
+.brand-exhibition .brand-art-entry:hover{border-color:#2679bd;box-shadow:inset 0 0 0 1px #7cc9e8}
+.scene-modal-backdrop .brand-exhibition .brand-panel h4{font-size:12px;line-height:1.35;min-height:16px;flex-shrink:0;-webkit-line-clamp:2}
+.brand-exhibition .brand-panel-content>p{font-size:10px;line-height:1.4;color:#557182;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;flex-shrink:0}
+.brand-panel-actions{display:flex;align-items:center;justify-content:space-between;gap:4px;min-height:20px;flex-shrink:0}
+.scene-modal-backdrop .brand-panel-actions .scene-pagination{gap:3px;font-size:9px;line-height:1}
+.scene-modal-backdrop .brand-panel-actions .scene-pagination button{min-width:15px;min-height:18px;padding:0 2px;border:1px solid #9fbbc6;background:#f9fcf1;color:#2679bd;font-size:8px}
+.scene-modal-backdrop .brand-exhibition .brand-case-button{width:auto;min-height:20px;margin:0 0 0 auto;padding:2px 0 2px 4px;border:0;background:transparent;box-shadow:none;color:#126bb0;font-size:10px;line-height:1.3;white-space:nowrap;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#84b6d2}
+.scene-modal-backdrop .brand-exhibition .brand-case-button:hover:not(:disabled){color:#074b7e;text-decoration-color:currentColor}
+.scene-modal-backdrop .brand-exhibition .brand-case-button:disabled{text-decoration:none;color:#819298}
