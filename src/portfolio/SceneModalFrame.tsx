@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from 'react';
-import { PixelPalmTree, PixelSeagull, PixelShell, PixelBook, PixelFilm, PixelGamepad, PixelCamera, PixelRobot, PixelLighthouse } from '../shell/PixelIcons';
 import './sceneModal.css';
 import { SceneModalCrown } from './SceneModalCrown';
 
@@ -16,7 +15,7 @@ export const SceneModalFrame: React.FC<SceneModalFrameProps> = ({
   title, subtitle, children, onClose, variant = 'gallery', footer,
 }) => {
   const isLab = title === 'EXPERIMENT LAB';
-  const Emblem = isLab ? PixelRobot : variant === 'book' ? PixelBook : variant === 'ticket' ? PixelFilm : variant === 'console' ? PixelGamepad : variant === 'collection' ? PixelCamera : PixelShell;
+  const headerKind = isLab ? 'lab' : variant;
   const frameRef = useRef<HTMLElement>(null);
   useEffect(() => {
     const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -34,24 +33,17 @@ export const SceneModalFrame: React.FC<SceneModalFrameProps> = ({
   return (
   <div className="scene-modal-backdrop" onClick={onClose}>
     <section
-      className={`scene-modal-frame scene-modal-${variant}`}
+      className={`scene-modal-frame scene-modal-${variant}${isLab ? ' scene-modal-lab' : ''}`}
       ref={frameRef} tabIndex={-1} onKeyDown={keepFocus}
       role="dialog" aria-modal="true" aria-label={title} aria-description={subtitle}
       onClick={(event) => event.stopPropagation()}
       onPointerDown={(event) => event.stopPropagation()}
       onWheel={(event) => event.stopPropagation()}
     >
-      <header className="scene-modal-header">
-        <SceneModalCrown kind={isLab ? 'lab' : variant} />
-        <div className="scene-header-coast scene-header-coast-left" aria-hidden="true">
-          <PixelPalmTree size={28} /><PixelSeagull size={21} />
-        </div>
+      <header className="scene-modal-header" data-header-kind={headerKind}>
+        <SceneModalCrown kind={headerKind} />
         <div className="scene-header-plaque">
-          <span className="scene-header-crest" aria-hidden="true"><Emblem size={20} /></span>
           <div className="scene-modal-heading"><h2>{title}</h2></div>
-        </div>
-        <div className="scene-header-coast scene-header-coast-right" aria-hidden="true">
-          <PixelLighthouse size={22} /><PixelShell size={16} />
         </div>
         <button className="scene-modal-close" onClick={onClose} aria-label="关闭面板" title="关闭 · K / ESC">×</button>
       </header>
