@@ -6,16 +6,16 @@ export type SceneHeaderKind = 'book' | 'ticket' | 'gallery' | 'console' | 'colle
 // Broad, reference-specific edges replace the repeated stair-step silhouette.
 const frames: Record<SceneHeaderKind, { outline: string; plaque?: string }> = {
   book: {
-    outline: 'M4 60V30H116V12L126 4H474L484 12V30H596V60Z',
-    plaque: 'M130 54V16L138 10H462L470 16V54Z',
+    outline: 'M4 60V30H106V12L116 4H484L494 12V30H596V60Z',
+    plaque: 'M120 53V16L128 10H472L480 16V53Z',
   },
   gallery: {
-    outline: 'M4 60V34Q4 24 20 24H140Q168 6 266 6H334Q432 6 460 24H580Q596 24 596 34V60Z',
+    outline: 'M4 60V38Q4 28 20 28H140Q168 8 266 8H334Q432 8 460 28H580Q596 28 596 38V60Z',
     plaque: 'M146 54V32Q146 14 258 14H342Q454 14 454 32V54Z',
   },
   ticket: {
     outline: 'M4 60V24Q300 -6 596 24V60Z',
-    plaque: 'M94 54L108 24Q300 4 492 24L506 54Z',
+    plaque: 'M90 54L120 26Q300 4 480 26L510 54Z',
   },
   console: {
     outline: 'M4 60V28Q4 12 20 12H194L208 4H392L406 12H580Q596 12 596 28V60Z',
@@ -36,10 +36,15 @@ const HeaderDetails: React.FC<{ kind: SceneHeaderKind }> = ({ kind }) => {
       <g transform="translate(509 26)"><PixelPalmTree size={29} /></g>
       <path d="M498 52V37L508 28L518 37V52Z" fill="#fbf8ee" stroke="#102e45" strokeWidth="2" />
       <rect x="505" y="40" width="6" height="12" fill="#2679bd" />
-      <path d="M454 12V31L459 27L464 31V12Z" fill="#d78864" />
+      <path d="M458 10V35L464 31L470 35V10Z" fill="#d78864" />
+      <path d="M131 49H447M130 13H447" fill="none" stroke="#dacbad" strokeWidth="2" />
+      <path d="M125 54H475M128 56H472M131 58H469" fill="none" stroke="#e7dbc1" strokeWidth="1" />
+      <path d="M300 53V59" fill="none" stroke="#a78b65" strokeWidth="2" />
+      <path d="M18 53H100M496 56H580" fill="none" stroke="var(--header-light)" strokeWidth="2" />
     </>;
     case 'gallery': return <>
-      <g transform="translate(288 0)"><PixelShell size={24} color="#ffd8b2" /></g>
+      <circle cx="300" cy="12" r="12" fill="#527b91" stroke="#e3bf7e" strokeWidth="2" />
+      <g transform="translate(289 1)"><PixelShell size={22} color="#f5ce8c" /></g>
       <g transform="translate(40 16)"><PixelSeagull size={31} /></g>
       <g transform="translate(520 17)"><PixelLighthouse size={35} /></g>
       <path d="M25 54Q42 42 59 54T93 54M492 54Q509 42 526 54T560 54" fill="none" stroke="var(--header-light)" strokeWidth="3" />
@@ -54,8 +59,8 @@ const HeaderDetails: React.FC<{ kind: SceneHeaderKind }> = ({ kind }) => {
         <circle cx="60" cy="44" r="4" fill="#527f95" />
       </g>
       <g transform="translate(525 20)"><PixelLighthouse size={31} /></g>
-      <path d="M300 3L303 10L311 10L305 15L307 22L300 18L293 22L295 15L289 10L297 10Z" fill="#f3c653" stroke="#8b6232" strokeWidth="1" />
-      {[18, 78, 512, 572].map((x) => <rect key={x} x={x} y="28" width="8" height="6" fill="#fbf8ee" />)}
+      <path d="M300 1L304 9L313 9L306 15L309 23L300 18L291 23L294 15L287 9L296 9Z" fill="#f3c653" stroke="#8b6232" strokeWidth="1" />
+      {[25, 38, 51].map((y) => <g key={y} fill="#fbf8ee"><rect x="17" y={y} width="8" height="6" /><rect x="575" y={y} width="8" height="6" /></g>)}
     </>;
     case 'console': return <>
       <g transform="translate(77 12)"><PixelPalmTree size={34} /></g>
@@ -71,7 +76,7 @@ const HeaderDetails: React.FC<{ kind: SceneHeaderKind }> = ({ kind }) => {
       <path d="M132 30H158V24H146V20H138V24H132ZM434 28H461V22H450V18H442V22H434Z" fill="#d7edf2" />
     </>;
     case 'collection': return <>
-      <path d="M300 18V54" fill="none" stroke="var(--header-light)" strokeWidth="2" />
+      <path d="M300 16V22M300 53V58" fill="none" stroke="var(--header-light)" strokeWidth="2" />
       {[462, 488, 514].map((x) => <g key={x}>
         <rect x={x} y="31" width="13" height="13" fill="#102e45" />
         <rect x={x + 2} y="33" width="9" height="8" fill="#bce0e9" />
