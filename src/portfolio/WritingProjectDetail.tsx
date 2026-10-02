@@ -5,6 +5,8 @@ import type { ContentEntry, MediaAsset } from '../data/contentTypes';
 import { isContentUrl } from '../content/contentRepository';
 import './writingProjectDetail.css';
 
+const imageDimensions = new Map<string, { width: number; height: number }>();
+
 export function getWritingMedia(entry: ContentEntry): MediaAsset[] {
   const seen = new Set<string>();
   return [entry.cover, ...entry.media].filter((asset): asset is MediaAsset => {
@@ -12,6 +14,12 @@ export function getWritingMedia(entry: ContentEntry): MediaAsset[] {
     seen.add(asset.url);
     return true;
   });
+}
+
+function getWritingGroupSize(entry: ContentEntry): number {
+  const media = getWritingMedia(entry);
+  const size = media[0] ? imageDimensions.get(media[0].url) : undefined;
+  return entry.category !== 'tvc' && size && size.width / size.height < .85 ? Math.min(3, media.length) : 1;
 }
 
 export interface WritingProjectDetailProps {
@@ -26,7 +34,15 @@ export const WritingProjectDetail = ({ entry, mediaIndex, onMediaIndexChange, zo
   const media = getWritingMedia(entry);
   const currentIndex = media.length ? ((mediaIndex % media.length) + media.length) % media.length : 0;
   const currentImage = media[currentIndex];
+  const isTvc = entry.category === 'tvc';
+  const video = entry.media.find(asset => asset.type === 'video' && isContentUrl(asset.url));
+  const role = entry.caseStudy?.find(section => section.heading === '我的角色')?.text;
+  const futureDetail = entry.caseStudy?.find(section => section.heading === '项目详情' || section.heading === '项目概述')?.text?.trim();
+  const body = entry.body?.trim();
+  const projectDetails = futureDetail || (body && !/^(完整文案|项目详情|项目概述)待补充[。.!！]?$/.test(body) ? body : '项目详情待补充。');
   const zoomButton = useRef<HTMLButtonElement>(null);
+  const zoomOrigin = useRef<HTMLButtonElement | null>(null);
+  const videoPlayer = useRef<HTMLVideoElement>(null);
   const zoomDialog = useRef<HTMLElement>(null);
   const zoomClose = useRef<HTMLButtonElement>(null);
   const viewport = useRef<HTMLDivElement>(null);
@@ -35,9 +51,31 @@ export const WritingProjectDetail = ({ entry, mediaIndex, onMediaIndexChange, zo
   const [naturalSize, setNaturalSize] = useState({ width: 0, height: 0 });
   const [viewportSize, setViewportSize] = useState({ width: 0, height: 0 });
   const [failedImage, setFailedImage] = useState<string | null>(null);
+  const [failedImages, setFailedImages] = useState<Set<string>>(() => new Set());
+  const [dimensionVersion, setDimensionVersion] = useState(0);
+  const [playing, setPlaying] = useState(false);
+  const groupSize = getWritingGroupSize(entry);
+  const visibleImages = Array.from({ length: Math.min(groupSize, media.length) }, (_, offset) => {
+    const index = (currentIndex + offset) % media.length;
+    return { asset: media[index], index };
+  });
   const turnImage = (direction: number) => {
     if (media.length > 1) onMediaIndexChange((currentIndex + direction + media.length) % media.length);
   };
+  const openImage = (index: number, origin: HTMLButtonElement) => {
+    zoomOrigin.current = origin;
+    onMediaIndexChange(index);
+    onZoomChange(true);
+  };
+  const noteDimensions = (url: string, image: HTMLImageElement) => {
+    const old = imageDimensions.get(url);
+    if (old?.width === image.naturalWidth && old?.height === image.naturalHeight) return;
+    imageDimensions.set(url, { width: image.naturalWidth, height: image.naturalHeight });
+    setDimensionVersion(version => version + 1);
+  };
+
+  useEffect(() => { setPlaying(false); }, [entry.id]);
+  useEffect(() => { if (zoomed) videoPlayer.current?.pause(); }, [zoomed]);
 
   useEffect(() => {
     setNaturalSize({ width: 0, height: 0 });
@@ -61,7 +99,9 @@ export const WritingProjectDetail = ({ entry, mediaIndex, onMediaIndexChange, zo
     return () => {
       observer.disconnect();
       document.body.style.overflow = oldOverflow;
-      if (zoomButton.current?.isConnected) zoomButton.current.focus({ preventScroll: true });
+      const origin = zoomOrigin.current?.isConnected ? zoomOrigin.current : zoomButton.current;
+      origin?.focus({ preventScroll: true });
+      zoomOrigin.current = null;
     };
   }, [zoomed]);
 
@@ -103,24 +143,37 @@ export const WritingProjectDetail = ({ entry, mediaIndex, onMediaIndexChange, zo
   const imageFailed = failedImage === currentImage?.url;
   const titleId = `writing-project-${entry.id}`;
 
-  return <article className="writing-project-detail" aria-labelledby={titleId}>
-    <div className={`writing-project-intro${currentImage ? '' : ' writing-project-intro-text'}`}>
-      {currentImage && <div className="writing-project-gallery" aria-label="项目图片轮播">
-        <button className="writing-project-image" onClick={() => onZoomChange(true)} aria-label={`放大查看第 ${currentIndex + 1} 张图片`}
-          onTouchStart={startSwipe} onTouchEnd={finishSwipe} onTouchCancel={() => { touchStart.current = null; }}>
-          {imageFailed ? <span className="writing-project-image-error">图片暂时无法加载</span>
-            : <img key={currentImage.url} src={currentImage.url} alt={`${entry.title} · 第 ${currentIndex + 1} 张图片`} draggable={false} onError={() => setFailedImage(currentImage.url)} />}
-        </button>
-        <div className="writing-gallery-controls">
-          <button onClick={() => turnImage(-1)} disabled={media.length < 2} aria-label="上一张图片">◀</button>
-          <span className="writing-gallery-count" aria-live="polite">{currentIndex + 1} / {media.length}</span>
-          <button onClick={() => turnImage(1)} disabled={media.length < 2} aria-label="下一张图片">▶</button>
-          <button ref={zoomButton} className="writing-gallery-enlarge" onClick={() => onZoomChange(true)} aria-label="放大查看图片">放大查看</button>
+  return <article className={`writing-project-detail${groupSize > 1 ? ' writing-project-detail-portraits' : ''}`} aria-labelledby={titleId} data-gallery-size={groupSize} data-dimension-version={dimensionVersion}>
+    <div className="writing-project-gallery" aria-label="项目图片轮播">
+      <div className={`writing-gallery-stage${groupSize > 1 ? ' writing-gallery-stage-portraits' : ''}${isTvc ? ' writing-gallery-stage-tvc' : ''}`}
+        onTouchStart={startSwipe} onTouchEnd={finishSwipe} onTouchCancel={() => { touchStart.current = null; }}>
+        <div className="writing-gallery-images" style={groupSize > 1 ? undefined : { gridTemplateColumns: 'minmax(0, 1fr)' }}>
+          {visibleImages.map(({ asset, index }) => <button key={asset.url} className="writing-project-image"
+            style={groupSize > 1 ? { aspectRatio: (() => { const size = imageDimensions.get(asset.url) ?? imageDimensions.get(media[0].url); return size ? size.width / size.height : undefined; })() } : undefined}
+            onClick={event => openImage(index, event.currentTarget)} aria-label={`放大查看第 ${index + 1} 张图片`}>
+            {failedImages.has(asset.url) ? <span className="writing-project-image-error">图片暂时无法加载</span>
+              : <img src={asset.url} alt={`${entry.title} · 第 ${index + 1} 张图片`} draggable={false}
+                onLoad={event => noteDimensions(asset.url, event.currentTarget)}
+                onError={() => setFailedImages(previous => new Set(previous).add(asset.url))} />}
+          </button>)}
+          {!visibleImages.length && <div className="writing-gallery-empty">项目图片待补充</div>}
         </div>
-      </div>}
-      <div className="writing-project-title"><h3 id={titleId}>{entry.title}</h3></div>
+        {isTvc && (playing && video ? <video className="writing-project-video" ref={videoPlayer} src={video.url} poster={currentImage?.url}
+          controls autoPlay playsInline preload="metadata" aria-label={`${entry.title} · 影片`} />
+          : <button className={`writing-tvc-play${video ? '' : ' is-unavailable'}`} disabled={!video} onClick={() => setPlaying(true)}
+            aria-label={video ? '播放项目影片' : '影片待上传'}><span aria-hidden="true">▶</span><span>{video ? '播放影片' : '影片待上传'}</span></button>)}
+        {media.length > groupSize && <><button className="writing-gallery-arrow writing-gallery-arrow-prev" onClick={() => turnImage(-1)} aria-label="上一组图片">◀</button>
+          <button className="writing-gallery-arrow writing-gallery-arrow-next" onClick={() => turnImage(1)} aria-label="下一组图片">▶</button></>}
+      </div>
+      <div className="writing-gallery-caption">
+        <button ref={zoomButton} className="writing-gallery-enlarge" disabled={!currentImage} onClick={event => openImage(currentIndex, event.currentTarget)} aria-label="放大查看图片">点击图片放大</button>
+        {!!media.length && <span className="writing-gallery-count" aria-live="polite">{currentIndex + 1} / {media.length}</span>}
+      </div>
     </div>
-    <div className="writing-project-prose">{entry.body || entry.description}</div>
+    <div className="writing-project-summary">
+      <div className="writing-project-title"><h3 id={titleId}>{entry.title}</h3>{entry.subtitle && <p className="writing-project-subtitle">{entry.subtitle}</p>}</div>
+      <div className="writing-project-prose">{isTvc ? <><p>{entry.description}</p>{role && <p>{role}</p>}</> : <p>{projectDetails}</p>}</div>
+    </div>
     {zoomed && currentImage && createPortal(<div className="writing-zoom-backdrop" onClick={event => event.stopPropagation()}
       onPointerDown={event => event.stopPropagation()} onWheel={event => event.stopPropagation()}>
       <section className="writing-zoom-dialog" ref={zoomDialog} role="dialog" aria-modal="true" aria-label={`${entry.title} · 放大查看`}

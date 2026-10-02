@@ -15,6 +15,13 @@ const CATEGORIES = [
 ] as const;
 type WritingCategory = typeof CATEGORIES[number]['id'];
 
+const WritingPageTrim = () => <svg className="writing-page-trim" viewBox="0 0 600 220" preserveAspectRatio="none" shapeRendering="crispEdges" aria-hidden="true">
+  <path d="M5 18V5H20M580 5H595V18M5 202V215H20M580 215H595V202" fill="none" stroke="#76bcea" strokeWidth="2" />
+  <path d="M12 12H24M12 12V24M576 12H588V24M12 196V208H24M576 208H588V196" fill="none" stroke="#bfd9e5" strokeWidth="1" />
+  <path d="M24 214H32V212H40V214H48V212H56V214H64M536 214H544V212H552V214H560V212H568V214H576" fill="none" stroke="#4f9dcc" strokeWidth="2" />
+  <path d="M26 5H30V1H34V5H38V9H34V13H30V9H26ZM562 5H566V1H570V5H574V9H570V13H566V9H562Z" fill="#d5a457" />
+</svg>;
+
 export const WriteHouseModal = () => {
   const { activeLandmarkModal, modalContext, currentView, isOverlayOpen, closeLandmarkModal } = useWorldStore();
   const entries = useContentStore(state => state.entries);
@@ -70,7 +77,8 @@ export const WriteHouseModal = () => {
     else closeLandmarkModal();
   };
   const scrollDetail = (direction: number) => {
-    const area = document.querySelector<HTMLElement>(zoomed ? '.writing-zoom-viewport' : '.writing-detail-scroll');
+    const area = document.querySelector<HTMLElement>(zoomed ? '.writing-zoom-viewport' : '.writing-project-prose')
+      ?? document.querySelector<HTMLElement>('.writing-detail-scroll');
     area?.scrollBy({ top: direction * 75, behavior: 'auto' });
   };
   useModalKeys({
@@ -85,7 +93,7 @@ export const WriteHouseModal = () => {
   if (!isOpen) return null;
   return <SceneModalFrame title="WRITE HOUSE" variant="book" onClose={close}
     footer={<><span><PixelBook size={12} /> 文案工坊</span><span>{detail ? 'A / D 切图 · W / S 阅读 · J 放大 · K 返回' : 'W / S 分类 · A / D 项目 · J 查看 · K 返回'}</span></>}>
-    {detail ? <div className="writing-detail">
+    <div className="writing-surface"><WritingPageTrim />{detail ? <div className="writing-detail">
       <div className="writing-detail-scroll"><WritingProjectDetail entry={detail} mediaIndex={mediaIndex} onMediaIndexChange={setMediaIndex} zoomed={zoomed} onZoomChange={setZoomed} /></div>
       <div className="writing-detail-actions"><button className="scene-button scene-button-muted" onClick={() => { setZoomed(false); setDetailId(null); }}>◀ 返回项目</button></div>
     </div> : <div className="writing-house">
@@ -95,6 +103,6 @@ export const WriteHouseModal = () => {
           <div className="writing-house-actions"><button className="scene-button" onClick={openSeries}>查看系列 ▶</button>{works.length > 1 && <div className="scene-pagination"><button onClick={() => turnProject(-1)} aria-label="上一个项目">◀</button><span>{visiblePage + 1} / {works.length}</span><button onClick={() => turnProject(1)} aria-label="下一个项目">▶</button></div>}</div>
         </> : <div className="writing-house-empty"><h3>暂未添加项目</h3><p>请选择其他文案分类。</p></div>}
       </section>
-    </div>}
+    </div>}</div>
   </SceneModalFrame>;
 };

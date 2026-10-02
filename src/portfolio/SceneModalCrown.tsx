@@ -41,6 +41,9 @@ const HeaderDetails: React.FC<{ kind: SceneHeaderKind }> = ({ kind }) => {
       <path d="M125 54H475M128 56H472M131 58H469" fill="none" stroke="#e7dbc1" strokeWidth="1" />
       <path d="M300 53V59" fill="none" stroke="#a78b65" strokeWidth="2" />
       <path d="M18 53H100M496 56H580" fill="none" stroke="var(--header-light)" strokeWidth="2" />
+      <path d="M20 57H29V55H38V57H47V55H56V57H65V55H74V57H95M535 55H544V53H553V55H562V53H571V55H580" fill="none" stroke="#a8ddf4" strokeWidth="2" />
+      <path d="M86 36H89V32H93V36H97V40H93V44H89V40H86ZM559 34H562V31H565V34H568V37H565V40H562V37H559Z" fill="#f5d48c" />
+      <path d="M121 10V17H128M480 17H473V10" fill="none" stroke="#b0d8e7" strokeWidth="2" />
     </>;
     case 'gallery': return <>
       <circle cx="300" cy="12" r="12" fill="#527b91" stroke="#e3bf7e" strokeWidth="2" />
