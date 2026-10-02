@@ -2,7 +2,7 @@
 import {
   R, L, poly, ellipse, text, room, plant, poster, table,
   sign, cabinet, frame, hangingPlant, stringLights, paperStack, P,
-pixelGroup, } from './kit';
+} from './kit';
 import type { InteriorDrawAssets } from './types';
 
 // A little coastal screening room: all large shapes sit behind the walk strip.

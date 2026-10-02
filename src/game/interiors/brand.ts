@@ -3,7 +3,6 @@ import {
   R, L, poly, ellipse, room, window, plant,
   shelf, books, lamp, poster, table, rug, cabinet, frame,
   hangingPlant, pinnedNote, paperStack,
-  pixelGroup,
 } from './kit';
 import type { InteriorDrawAssets } from './types';
 
@@ -73,7 +72,6 @@ function brandBook(ctx: CanvasRenderingContext2D, x: number, y: number, w: numbe
 }
 
 export default function drawBrand(ctx: CanvasRenderingContext2D, assets: InteriorDrawAssets = {}) {
-  const roomContext = ctx;
   room(ctx, {
     wall: '#e8dfc8', wallShade: '#d2c4a4', trim: P.navy, trimHi: '#487491',
     floor: '#d5c6a4', floorShade: '#b3a185', wainscot: '#dfd1b1', style: 'tile',
@@ -109,35 +107,32 @@ export default function drawBrand(ctx: CanvasRenderingContext2D, assets: Interio
   poly(ctx, [[102, 95], [117, 82], [131, 95], [146, 82], [154, 113], [93, 113]], P.gold);
   R(ctx, 66, 159, 114, 10, P.cream);
 
-  {
-    const ctx = pixelGroup(roomContext, 195, 247, 0.82, 0.65, 260);
-    // Wall cast shadows sit behind the glass and plinth; short floor shadows anchor both.
-    R(ctx, 219, 113, 88, 89, '#b4a88d');
-    R(ctx, 305, 119, 3, 80, '#c5b79c');
-    ellipse(ctx, 259, 248, 54, 5, '#a18f70');
-    ellipse(ctx, 119, 247, 38, 4, '#a18f70');
-    // Glass sides are a few opaque highlight strokes, preserving crisp pixels.
-    R(ctx, 212, 106, 88, 90, '#c7d6ce');
-    R(ctx, 215, 108, 82, 87, '#d6dfd1');
-    R(ctx, 218, 110, 2, 71, '#f5f6e2');
-    R(ctx, 286, 110, 2, 71, '#eaf2e0');
-    R(ctx, 218, 193, 75, 3, '#92a7a7');
-    mascot(ctx, 237, 132);
-    R(ctx, 205, 196, 102, 6, P.navy);
-    R(ctx, 209, 202, 94, 43, '#c2af88');
-    R(ctx, 214, 206, 84, 35, '#dbc8a0');
-    R(ctx, 215, 207, 3, 33, '#f1dfb8');
-    R(ctx, 294, 204, 8, 39, '#9a8462');
-    R(ctx, 210, 203, 84, 2, '#f8ebc9');
-    R(ctx, 233, 216, 44, 12, P.cream);
+  // Wall cast shadows sit behind the glass and plinth; short floor shadows anchor both.
+  R(ctx, 219, 113, 88, 89, '#b4a88d');
+  R(ctx, 305, 119, 3, 80, '#c5b79c');
+  ellipse(ctx, 259, 248, 54, 5, '#a18f70');
+  ellipse(ctx, 119, 247, 38, 4, '#a18f70');
+  // Glass sides are a few opaque highlight strokes, preserving crisp pixels.
+  R(ctx, 212, 106, 88, 90, '#c7d6ce');
+  R(ctx, 215, 108, 82, 87, '#d6dfd1');
+  R(ctx, 218, 110, 2, 71, '#f5f6e2');
+  R(ctx, 286, 110, 2, 71, '#eaf2e0');
+  R(ctx, 218, 193, 75, 3, '#92a7a7');
+  mascot(ctx, 237, 132);
+  R(ctx, 205, 196, 102, 6, P.navy);
+  R(ctx, 209, 202, 94, 43, '#c2af88');
+  R(ctx, 214, 206, 84, 35, '#dbc8a0');
+  R(ctx, 215, 207, 3, 33, '#f1dfb8');
+  R(ctx, 294, 204, 8, 39, '#9a8462');
+  R(ctx, 210, 203, 84, 2, '#f8ebc9');
+  R(ctx, 233, 216, 44, 12, P.cream);
 
-    R(ctx, 85, 199, 63, 45, '#c4b18b');
-    R(ctx, 81, 192, 70, 8, P.navy);
-    R(ctx, 86, 194, 59, 2, '#4f6d7d');
-    brandBook(ctx, 91, 163, 26, 31, P.blue);
-    brandBook(ctx, 120, 170, 23, 23, P.creamShade);
-    plant(ctx, 66, 244, 0.65, P.navy);
-  }
+  R(ctx, 85, 199, 63, 45, '#c4b18b');
+  R(ctx, 81, 192, 70, 8, P.navy);
+  R(ctx, 86, 194, 59, 2, '#4f6d7d');
+  brandBook(ctx, 91, 163, 26, 31, P.blue);
+  brandBook(ctx, 120, 170, 23, 23, P.creamShade);
+  plant(ctx, 66, 244, 0.65, P.navy);
 
   // A projected wall shadow gives the framed guide physical depth.
   R(ctx, 393, 59, 201, 104, '#ab9a7d');
@@ -151,27 +146,23 @@ export default function drawBrand(ctx: CanvasRenderingContext2D, assets: Interio
     R(ctx, 414 + i * 30, 103, 21, 2, i === 4 ? '#ffe19a' : '#e6e7d3');
   });
 
-  {
-    const ctx = pixelGroup(roomContext, 480, 246, 0.5, 0.5, 260);
-    rug(ctx, 374, 229, 225, 20, '#baa889');
-    ellipse(ctx, 486, 248, 91, 5, '#948368');
-    R(ctx, 395, 207, 176, 39, P.navy);
-    R(ctx, 405, 214, 155, 29, '#1a4861');
-    R(ctx, 409, 217, 4, 25, '#386b81');
-    R(ctx, 476, 219, 17, 5, P.gold);
-    poly(ctx, [[394, 178], [565, 178], [590, 205], [372, 205]], '#142f43');
-    poly(ctx, [[398, 180], [561, 180], [582, 199], [381, 199]], '#42648a');
-    poly(ctx, [[405, 183], [553, 183], [568, 196], [393, 196]], P.creamShade);
-    poly(ctx, [[410, 183], [458, 183], [452, 196], [398, 196]], '#87b6c2');
-    poly(ctx, [[433, 184], [457, 184], [454, 191], [447, 191], [445, 195], [420, 195]], '#cab688');
-    R(ctx, 443, 186, 7, 3, P.coral);
-    L(ctx, 465, 185, 544, 185, '#8a8d7a');
-    L(ctx, 469, 189, 551, 189, '#8a8d7a');
-    L(ctx, 473, 193, 538, 193, '#8a8d7a');
-    R(ctx, 388, 201, 190, 4, '#597687');
+  rug(ctx, 374, 229, 225, 20, '#baa889');
+  ellipse(ctx, 486, 248, 91, 5, '#948368');
+  R(ctx, 395, 207, 176, 39, P.navy);
+  R(ctx, 405, 214, 155, 29, '#1a4861');
+  R(ctx, 409, 217, 4, 25, '#386b81');
+  R(ctx, 476, 219, 17, 5, P.gold);
+  poly(ctx, [[394, 178], [565, 178], [590, 205], [372, 205]], '#142f43');
+  poly(ctx, [[398, 180], [561, 180], [582, 199], [381, 199]], '#42648a');
+  poly(ctx, [[405, 183], [553, 183], [568, 196], [393, 196]], P.creamShade);
+  poly(ctx, [[410, 183], [458, 183], [452, 196], [398, 196]], '#87b6c2');
+  poly(ctx, [[433, 184], [457, 184], [454, 191], [447, 191], [445, 195], [420, 195]], '#cab688');
+  R(ctx, 443, 186, 7, 3, P.coral);
+  L(ctx, 465, 185, 544, 185, '#8a8d7a');
+  L(ctx, 469, 189, 551, 189, '#8a8d7a');
+  L(ctx, 473, 193, 538, 193, '#8a8d7a');
+  R(ctx, 388, 201, 190, 4, '#597687');
 
-  }
-  { const ctx = pixelGroup(roomContext, 635, 245, 0.65, 0.65, 260);
   // A simple bench bridges guide table and brand objects without blocking path.
   R(ctx, 601, 213, 64, 9, P.woodDark);
   R(ctx, 602, 213, 62, 3, P.woodHi);
@@ -179,7 +170,6 @@ export default function drawBrand(ctx: CanvasRenderingContext2D, assets: Interio
   R(ctx, 652, 222, 6, 23, P.navy);
   R(ctx, 609, 228, 45, 4, '#42647a');
 
-}
   // Right: the display projects away from the wall, with a dark reveal on its right.
   R(ctx, 702, 73, 191, 177, '#ad9d82');
   R(ctx, 890, 80, 5, 160, '#c2b294');
@@ -233,12 +223,11 @@ export default function drawBrand(ctx: CanvasRenderingContext2D, assets: Interio
   R(ctx, 359, 125, 8, 8, P.gold);
   lamp(ctx, 301, 31, P.navy);
   R(ctx, 420, 159, 134, 12, '#f6eedc');
-  {
-    const ctx = pixelGroup(roomContext, 635, 245, 0.65, 0.65, 260);
-    paperStack(ctx, 611, 204, 36);
-    R(ctx, 614, 199, 29, 7, P.blue);
-    R(ctx, 619, 201, 19, 2, '#a3c5cc');
-  }
+
+  paperStack(ctx, 611, 204, 36);
+  R(ctx, 614, 199, 29, 7, P.blue);
+  R(ctx, 619, 201, 19, 2, '#a3c5cc');
+
     R(ctx, 318, 193, 11, 16, '#8c7860');
   R(ctx, 320, 184, 2, 12, P.navy);
   R(ctx, 325, 181, 2, 15, P.coral);

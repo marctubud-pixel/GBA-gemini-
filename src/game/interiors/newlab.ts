@@ -1,6 +1,5 @@
 import {
   R, L, poly, ellipse, room, window, vista, plant, lamp, cabinet, table, shelf, books, frame, hangingPlant, pinnedNote, paperStack, rug, P,
-  pixelGroup,
 } from './kit';
 import type { InteriorDrawAssets } from './types';
 
@@ -13,7 +12,6 @@ const C = {
 /** Tools, tangible prototypes and a journal computer, on one continuous stage. */
 export default function drawLab(ctx: CanvasRenderingContext2D, assets: InteriorDrawAssets = {}) {
   ctx.imageSmoothingEnabled = false;
-  const roomContext = ctx;
   room(ctx, {
     wall: C.wall, wallShade: C.wallShade, trim: C.steel, trimHi: C.steelHi,
     wainscot: '#b8c6bc', floor: '#aeb9ac', floorShade: '#879890', style: 'tile',
@@ -36,24 +34,23 @@ export default function drawLab(ctx: CanvasRenderingContext2D, assets: InteriorD
 
   // FABRICATION / a tool board above a compact desktop 3D printer.
   toolBoard(ctx, 82, 78, 209, 64);
-  {
-    const ctx = pixelGroup(roomContext, 186, 247, 0.5, 0.5, 260);
-    cabinet(ctx, 79, 209, 213, 38, '#648d87');
-    R(ctx, 75, 202, 221, 9, C.darkWood);
-    R(ctx, 76, 202, 219, 3, C.woodHi);
-    printer(ctx, 140, 147);
-    R(ctx, 92, 174, 25, 28, C.steel);
-    R(ctx, 94, 176, 21, 2, C.metalHi);
-    ellipse(ctx, 104, 185, 7, 7, C.metal);
-    ellipse(ctx, 104, 185, 3, 3, C.steel);
-    R(ctx, 94, 195, 20, 3, '#548276');
-    R(ctx, 272, 179, 15, 22, '#c4aa74');
-    R(ctx, 274, 170, 3, 13, C.steel);
-    R(ctx, 281, 166, 3, 16, P.coral);
-    R(ctx, 276, 184, 8, 3, P.cream);
-    R(ctx, 90, 220, 59, 14, '#40645e');
-    R(ctx, 225, 220, 48, 14, '#40645e');
-  }
+
+  cabinet(ctx, 79, 209, 213, 38, '#648d87');
+  R(ctx, 75, 202, 221, 9, C.darkWood);
+  R(ctx, 76, 202, 219, 3, C.woodHi);
+  printer(ctx, 140, 147);
+  R(ctx, 92, 174, 25, 28, C.steel);
+  R(ctx, 94, 176, 21, 2, C.metalHi);
+  ellipse(ctx, 104, 185, 7, 7, C.metal);
+  ellipse(ctx, 104, 185, 3, 3, C.steel);
+  R(ctx, 94, 195, 20, 3, '#548276');
+  R(ctx, 272, 179, 15, 22, '#c4aa74');
+  R(ctx, 274, 170, 3, 13, C.steel);
+  R(ctx, 281, 166, 3, 16, P.coral);
+  R(ctx, 276, 184, 8, 3, P.cream);
+  R(ctx, 90, 220, 59, 14, '#40645e');
+  R(ctx, 225, 220, 48, 14, '#40645e');
+
   plant(ctx, 300, 244, 0.62, '#a47c58');
 
   // JOURNAL / the monitor is the clear main interaction, directly above the desk.
@@ -66,37 +63,35 @@ export default function drawLab(ctx: CanvasRenderingContext2D, assets: InteriorD
   R(ctx, 541, 137, 18, 8, P.cream);
   R(ctx, 544, 128, 12, 10, '#c8d5c3');
   R(ctx, 547, 127, 6, 6, '#86af7d');
-  {
-    const ctx = pixelGroup(roomContext, 480, 247, 0.5, 0.5, 260);
-    table(ctx, 344, 206, 282, 41, C.wood);
-    R(ctx, 345, 206, 280, 2, C.woodHi);
-    R(ctx, 357, 216, 52, 27, '#79948b');
-    R(ctx, 359, 218, 48, 11, '#afc1b1');
-    R(ctx, 359, 231, 48, 10, '#8aa798');
-    R(ctx, 377, 222, 12, 2, C.steel);
-    R(ctx, 377, 235, 12, 2, C.steel);
-    journalComputer(ctx, 439, 151);
-    paperStack(ctx, 369, 194, 44);
-    R(ctx, 372, 187, 36, 8, '#587f76');
-    R(ctx, 378, 189, 24, 2, '#d2dac3');
-    R(ctx, 558, 194, 15, 12, P.creamShade);
-    R(ctx, 559, 193, 13, 3, '#fcf6df');
-    R(ctx, 570, 196, 6, 7, '#d5c4a6');
-    R(ctx, 573, 198, 2, 3, C.wall);
-    R(ctx, 586, 199, 19, 5, '#577d74');
-    R(ctx, 589, 197, 13, 3, '#8baa97');
-    R(ctx, 591, 198, 3, 2, P.gold);
-    // Cables are kept under the table, out of the foreground walk strip.
-    L(ctx, 477, 211, 477, 232, C.steel, 2);
-    L(ctx, 477, 232, 519, 232, C.steel, 2);
-    L(ctx, 519, 232, 519, 239, C.steel, 2);
-    R(ctx, 514, 237, 15, 5, '#859b91');
-    rug(ctx, 423, 245, 132, 12, '#829e91');
-    R(ctx, 565, 222, 43, 25, C.steel);
-    R(ctx, 567, 224, 39, 19, '#688d87');
-    R(ctx, 572, 228, 28, 2, '#a4c4ad');
 
-  }
+  table(ctx, 344, 206, 282, 41, C.wood);
+  R(ctx, 345, 206, 280, 2, C.woodHi);
+  R(ctx, 357, 216, 52, 27, '#79948b');
+  R(ctx, 359, 218, 48, 11, '#afc1b1');
+  R(ctx, 359, 231, 48, 10, '#8aa798');
+  R(ctx, 377, 222, 12, 2, C.steel);
+  R(ctx, 377, 235, 12, 2, C.steel);
+  journalComputer(ctx, 439, 151);
+  paperStack(ctx, 369, 194, 44);
+  R(ctx, 372, 187, 36, 8, '#587f76');
+  R(ctx, 378, 189, 24, 2, '#d2dac3');
+  R(ctx, 558, 194, 15, 12, P.creamShade);
+  R(ctx, 559, 193, 13, 3, '#fcf6df');
+  R(ctx, 570, 196, 6, 7, '#d5c4a6');
+  R(ctx, 573, 198, 2, 3, C.wall);
+  R(ctx, 586, 199, 19, 5, '#577d74');
+  R(ctx, 589, 197, 13, 3, '#8baa97');
+  R(ctx, 591, 198, 3, 2, P.gold);
+  // Cables are kept under the table, out of the foreground walk strip.
+  L(ctx, 477, 211, 477, 232, C.steel, 2);
+  L(ctx, 477, 232, 519, 232, C.steel, 2);
+  L(ctx, 519, 232, 519, 239, C.steel, 2);
+  R(ctx, 514, 237, 15, 5, '#859b91');
+  rug(ctx, 423, 245, 132, 12, '#829e91');
+  R(ctx, 565, 222, 43, 25, C.steel);
+  R(ctx, 567, 224, 39, 19, '#688d87');
+  R(ctx, 572, 228, 28, 2, '#a4c4ad');
+
     pinnedNote(ctx, 331, 111, 26, 32, '#f1d78e');
   pinnedNote(ctx, 603, 120, 26, 31, '#d5e6d5');
   R(ctx, 609, 132, 14, 6, C.blue);
@@ -111,19 +106,17 @@ export default function drawLab(ctx: CanvasRenderingContext2D, assets: InteriorD
   R(ctx, 881, 104, 28, 2, '#c4d5bb');
   R(ctx, 890, 110, 11, 4, P.creamShade);
   hangingPlant(ctx, 649, 41, 30, '#bb8c5c');
-  {
-    const ctx = pixelGroup(roomContext, 735, 246, 0.45, 0.45, 260);
-    robot(ctx, 689, 145);
-  }
+
+  robot(ctx, 689, 145);
+
   // A low cart with a tangible looping installation, rather than a wallpaper icon.
-  {
-    const ctx = pixelGroup(roomContext, 875, 247, 0.5, 0.5, 260);
-    cabinet(ctx, 824, 212, 103, 35, '#647f83');
-    R(ctx, 821, 207, 109, 8, C.steel);
-    R(ctx, 823, 207, 105, 2, C.metalHi);
-    kineticRig(ctx, 846, 156);
-    R(ctx, 833, 229, 83, 12, '#3b5e65');
-  }
+
+  cabinet(ctx, 824, 212, 103, 35, '#647f83');
+  R(ctx, 821, 207, 109, 8, C.steel);
+  R(ctx, 823, 207, 105, 2, C.metalHi);
+  kineticRig(ctx, 846, 156);
+  R(ctx, 833, 229, 83, 12, '#3b5e65');
+
   plant(ctx, 937, 244, 0.72, C.blue);
   R(ctx, 791, 238, 29, 8, '#b0966c');
   R(ctx, 793, 238, 25, 2, '#e1c391');

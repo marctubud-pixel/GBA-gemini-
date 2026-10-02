@@ -72,20 +72,3 @@ export function stringLights(c: CanvasRenderingContext2D, x: number, y: number, 
 export function paperStack(c: CanvasRenderingContext2D, x: number, y: number, w: number = 32) {
   R(c,x+2,y+5,w,5,'#b8b39f');R(c,x+1,y+3,w,5,P.creamShade);R(c,x,y,w,5,P.cream);R(c,x+4,y+1,w-10,1,'#c4c6b2');
 }
-
-/** Scale pixel primitives around a furniture baseline without blurring the native grid.
- * Only use for groups drawn with R/L/poly/ellipse, not clipped windows or image textures.
- */
-export function pixelGroup(c: CanvasRenderingContext2D, centerX: number, baseY: number, scaleX: number, scaleY: number = scaleX, targetBaseY: number = baseY) {
-  return {
-    get fillStyle() { return c.fillStyle; },
-    set fillStyle(value: string | CanvasGradient | CanvasPattern) { c.fillStyle = value; },
-    fillRect(x: number, y: number, width: number, height: number) {
-      const left = Math.round(centerX + (x - centerX) * scaleX);
-      const top = Math.round(targetBaseY + (y - baseY) * scaleY);
-      const right = Math.round(centerX + (x + width - centerX) * scaleX);
-      const bottom = Math.round(targetBaseY + (y + height - baseY) * scaleY);
-      c.fillRect(left, top, Math.max(1, right - left), Math.max(1, bottom - top));
-    },
-  } as CanvasRenderingContext2D;
-}

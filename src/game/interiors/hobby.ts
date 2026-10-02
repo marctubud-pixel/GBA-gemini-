@@ -1,12 +1,12 @@
 /** A personal studio, drawn at 960 × 320 logical pixels. */
-import { R, L, poly, ellipse, room, window, plant, shelf, books, lamp, poster, table, rug, cabinet, frame, vista, hangingPlant, pinnedNote, stringLights, paperStack, P, pixelGroup } from './kit';
+import { R, L, poly, ellipse, room, window, plant, shelf, books, lamp, poster, table, rug, cabinet, frame, vista, hangingPlant, pinnedNote, stringLights, paperStack, P,
+} from './kit';
 import type { InteriorDrawAssets } from './types';
 
 // Personal studio: four readable interests on one continuous back wall.
-// Smaller furniture shares a rear floor baseline near y=260; the visitor walks at y=270.
+// Furniture returns to its previous rear baseline at y=244..250; the visitor walks at y=270.
 export default function drawHobby(ctx: CanvasRenderingContext2D, assets: InteriorDrawAssets = {}) {
   ctx.imageSmoothingEnabled = false;
-  const roomContext = ctx;
   room(ctx, {
     wall: '#faf7e8', wallShade: '#e7dec8', trim: '#163e50',
     trimHi: '#366276', floor: '#b68c61', floorShade: '#97704d',
@@ -50,45 +50,44 @@ export default function drawHobby(ctx: CanvasRenderingContext2D, assets: Interio
   }
   L(ctx, 64, 161, 199, 161, '#b8ac8d');
   L(ctx, 64, 163, 199, 163, P.cream);
-  {
-    const ctx = pixelGroup(roomContext, 132, 244, 0.5, 0.5, 260);
-    table(ctx, 64, 178, 139, 66, P.wood);
-    // Worktop edge, two wide drawers, shelf of large paper sheets.
-    R(ctx, 62, 177, 143, 5, '#d9af7b');
-    R(ctx, 69, 188, 129, 24, '#8e6949');
-    R(ctx, 72, 189, 59, 20, '#bc9160');
-    R(ctx, 134, 189, 61, 20, '#bc9160');
-    L(ctx, 73, 190, 128, 190, '#dfb984');
-    L(ctx, 135, 190, 192, 190, '#dfb984');
-    R(ctx, 96, 198, 11, 3, '#493d34');
-    R(ctx, 158, 198, 11, 3, '#493d34');
-    R(ctx, 75, 221, 62, 5, '#d2caba');
-    R(ctx, 77, 216, 59, 5, '#fcf4df');
-    R(ctx, 79, 217, 49, 1, '#e0d8c7');
-    R(ctx, 146, 216, 31, 14, '#2e5770');
-    R(ctx, 151, 217, 2, 12, '#6997aa');
-    // SLR body: optical viewfinder, lens rim and cool glass highlights.
-    R(ctx, 68, 164, 41, 13, '#253842');
-    R(ctx, 70, 162, 10, 3, '#3c5560');
-    R(ctx, 82, 159, 15, 7, '#374c57');
-    R(ctx, 86, 160, 7, 3, '#7b99a5');
-    R(ctx, 70, 165, 35, 2, '#71868e');
-    ellipse(ctx, 91, 170, 9, 9, '#142f3f');
-    ellipse(ctx, 91, 170, 6, 6, '#486a7b');
-    ellipse(ctx, 91, 170, 4, 4, '#163e50');
-    R(ctx, 88, 167, 3, 2, '#94cdd0');
-    R(ctx, 104, 166, 3, 2, P.gold);
-    // Open album and a desk light.
-    poly(ctx, [[113,168],[139,166],[141,178],[114,178]], '#e8dfcb');
-    poly(ctx, [[141,166],[166,168],[166,178],[141,178]], '#fbf6e6');
-    L(ctx, 141, 167, 141, 177, '#bda882');
-    R(ctx, 118, 170, 17, 5, '#4f8a8a');
-    R(ctx, 146, 170, 14, 5, '#719b74');
-    L(ctx, 175, 174, 183, 174, P.ink, 2);
-    L(ctx, 179, 174, 179, 152, '#366276', 2);
-    poly(ctx, [[167,151],[189,151],[184,142],[172,142]], '#446e79');
-    R(ctx, 169, 150, 18, 2, '#7aa3aa');
-  }
+
+  table(ctx, 64, 178, 139, 66, P.wood);
+  // Worktop edge, two wide drawers, shelf of large paper sheets.
+  R(ctx, 62, 177, 143, 5, '#d9af7b');
+  R(ctx, 69, 188, 129, 24, '#8e6949');
+  R(ctx, 72, 189, 59, 20, '#bc9160');
+  R(ctx, 134, 189, 61, 20, '#bc9160');
+  L(ctx, 73, 190, 128, 190, '#dfb984');
+  L(ctx, 135, 190, 192, 190, '#dfb984');
+  R(ctx, 96, 198, 11, 3, '#493d34');
+  R(ctx, 158, 198, 11, 3, '#493d34');
+  R(ctx, 75, 221, 62, 5, '#d2caba');
+  R(ctx, 77, 216, 59, 5, '#fcf4df');
+  R(ctx, 79, 217, 49, 1, '#e0d8c7');
+  R(ctx, 146, 216, 31, 14, '#2e5770');
+  R(ctx, 151, 217, 2, 12, '#6997aa');
+  // SLR body: optical viewfinder, lens rim and cool glass highlights.
+  R(ctx, 68, 164, 41, 13, '#253842');
+  R(ctx, 70, 162, 10, 3, '#3c5560');
+  R(ctx, 82, 159, 15, 7, '#374c57');
+  R(ctx, 86, 160, 7, 3, '#7b99a5');
+  R(ctx, 70, 165, 35, 2, '#71868e');
+  ellipse(ctx, 91, 170, 9, 9, '#142f3f');
+  ellipse(ctx, 91, 170, 6, 6, '#486a7b');
+  ellipse(ctx, 91, 170, 4, 4, '#163e50');
+  R(ctx, 88, 167, 3, 2, '#94cdd0');
+  R(ctx, 104, 166, 3, 2, P.gold);
+  // Open album and a desk light.
+  poly(ctx, [[113,168],[139,166],[141,178],[114,178]], '#e8dfcb');
+  poly(ctx, [[141,166],[166,168],[166,178],[141,178]], '#fbf6e6');
+  L(ctx, 141, 167, 141, 177, '#bda882');
+  R(ctx, 118, 170, 17, 5, '#4f8a8a');
+  R(ctx, 146, 170, 14, 5, '#719b74');
+  L(ctx, 175, 174, 183, 174, P.ink, 2);
+  L(ctx, 179, 174, 179, 152, '#366276', 2);
+  poly(ctx, [[167,151],[189,151],[184,142],[172,142]], '#446e79');
+  R(ctx, 169, 150, 18, 2, '#7aa3aa');
+
   // Deep wooden reading shelves echo the facade's planted home studio.
   shelf(ctx, 218, 67, 99, 177);
   books(ctx, 224, 80, 83, 29, 11);
@@ -104,15 +103,13 @@ export default function drawHobby(ctx: CanvasRenderingContext2D, assets: Interio
   R(ctx, 224, 217, 82, 3, '#c0c9af');
   R(ctx, 258, 223, 16, 4, P.cream);
   plant(ctx, 302, 65, 0.65, '#346e7c');
-  {
-    const ctx = pixelGroup(roomContext, 211, 244, 0.55, 0.55, 259);
-    // Tripod remains behind the visitor lane.
-    R(ctx, 204, 149, 14, 8, '#213f50');
-    ellipse(ctx, 213, 153, 5, 5, '#547684');
-    L(ctx, 211, 160, 211, 238, '#56727c', 2);
-    L(ctx, 211, 181, 197, 244, P.ink, 2);
-    L(ctx, 212, 181, 224, 244, P.ink, 2);
-  }
+
+  // Tripod remains behind the visitor lane.
+  R(ctx, 204, 149, 14, 8, '#213f50');
+  ellipse(ctx, 213, 153, 5, 5, '#547684');
+  L(ctx, 211, 160, 211, 238, '#56727c', 2);
+  L(ctx, 211, 181, 197, 244, P.ink, 2);
+  L(ctx, 212, 181, 224, 244, P.ink, 2);
 
   // 02 / MUSIC — an open coastal window, soft chair, vinyl and warm speakers.
   window(ctx, 369, 51, 176, 117, { trim: P.navy, trimHi: '#507e8c', time: assets.time });
@@ -135,70 +132,69 @@ export default function drawHobby(ctx: CanvasRenderingContext2D, assets: Interio
   ellipse(ctx, 600, 111, 18, 18, '#203b48');
   ellipse(ctx, 600, 111, 7, 7, '#d4ad62');
   R(ctx, 598, 109, 3, 3, P.cream);
-  {
-    const ctx = pixelGroup(roomContext, 510, 246, 0.55, 0.55, 260);
-    // Chair silhouette and upholstery: four chunky green tones.
-    R(ctx, 405, 181, 57, 51, '#2d5f49');
-    R(ctx, 409, 177, 49, 43, '#468c58');
-    R(ctx, 413, 179, 41, 4, '#7aaf69');
-    R(ctx, 413, 184, 39, 32, '#61a166');
-    R(ctx, 414, 211, 36, 3, '#3f8153');
-    R(ctx, 398, 210, 13, 23, '#39724e');
-    R(ctx, 397, 208, 14, 5, '#699d60');
-    R(ctx, 456, 210, 13, 23, '#39724e');
-    R(ctx, 456, 208, 14, 5, '#699d60');
-    R(ctx, 410, 218, 47, 12, '#579560');
-    R(ctx, 412, 219, 43, 3, '#80b272');
-    R(ctx, 403, 232, 61, 7, '#285540');
-    R(ctx, 407, 238, 5, 8, '#6d523b');
-    R(ctx, 455, 238, 5, 8, '#6d523b');
-    // Coral cushion is a single focal accent against the fern-green chair.
-    R(ctx, 432, 188, 16, 24, '#ae6850');
-    R(ctx, 431, 187, 15, 21, '#d29873');
-    L(ctx, 433, 188, 443, 188, '#ecc0a0');
-    // Low side table and cup (legs end at y=246).
-    table(ctx, 476, 214, 36, 31, '#8c694a');
-    R(ctx, 480, 212, 29, 3, '#d6b284');
-    R(ctx, 487, 203, 10, 9, P.cream);
-    R(ctx, 496, 205, 4, 5, '#e3d5bc');
-    R(ctx, 498, 206, 2, 3, '#9a7f5d');
-    R(ctx, 488, 203, 8, 2, '#7e573e');
-    // Music console has three open cubbies, two speakers and a turntable.
-    cabinet(ctx, 521, 191, 110, 54, '#a57d52');
-    R(ctx, 519, 189, 114, 5, '#d4ab79');
-    R(ctx, 526, 199, 100, 30, '#624d3b');
-    R(ctx, 557, 199, 3, 30, '#a57d52');
-    R(ctx, 592, 199, 3, 30, '#a57d52');
-    for (let i = 0; i < 8; i++) {
-      R(ctx, 529 + i * 3, 203 + (i % 3), 2, 24 - (i % 3),
-        ['#d6ba85','#668985','#c9816b','#e3d6b9'][i % 4]);
-    }
-    // Upright album covers read as a curated record library.
-    R(ctx, 564, 205, 22, 22, '#e0cfab');
-    R(ctx, 567, 208, 16, 15, '#4e7782');
-    ellipse(ctx, 575, 216, 6, 6, '#f0c278');
-    R(ctx, 600, 204, 18, 23, '#b37d57');
-    R(ctx, 603, 207, 12, 15, '#dbb37a');
-    L(ctx, 606, 207, 612, 220, '#795745', 2);
-    // Turntable deck and lid.
-    R(ctx, 548, 175, 53, 13, '#514b40');
-    R(ctx, 549, 175, 51, 2, '#b99e71');
-    ellipse(ctx, 570, 180, 17, 5, '#1e3541');
-    ellipse(ctx, 570, 180, 6, 2, '#c99152');
-    R(ctx, 569, 179, 2, 2, P.cream);
-    L(ctx, 593, 178, 590, 183, '#c6c5ac');
-    L(ctx, 590, 183, 580, 182, '#c6c5ac');
-    R(ctx, 547, 169, 55, 4, '#779c9f');
-    L(ctx, 548, 169, 548, 175, '#64838a');
-    L(ctx, 601, 169, 601, 175, '#64838a');
-    for (const x of [524, 605]) {
-      R(ctx, x, 161, 22, 28, '#3b4240');
-      R(ctx, x + 1, 162, 20, 3, '#6c7161');
-      ellipse(ctx, x + 11, 179, 7, 7, '#182f37');
-      ellipse(ctx, x + 11, 179, 4, 4, '#697875');
-      ellipse(ctx, x + 11, 168, 3, 3, '#b3b292');
-    }
+
+  // Chair silhouette and upholstery: four chunky green tones.
+  R(ctx, 405, 181, 57, 51, '#2d5f49');
+  R(ctx, 409, 177, 49, 43, '#468c58');
+  R(ctx, 413, 179, 41, 4, '#7aaf69');
+  R(ctx, 413, 184, 39, 32, '#61a166');
+  R(ctx, 414, 211, 36, 3, '#3f8153');
+  R(ctx, 398, 210, 13, 23, '#39724e');
+  R(ctx, 397, 208, 14, 5, '#699d60');
+  R(ctx, 456, 210, 13, 23, '#39724e');
+  R(ctx, 456, 208, 14, 5, '#699d60');
+  R(ctx, 410, 218, 47, 12, '#579560');
+  R(ctx, 412, 219, 43, 3, '#80b272');
+  R(ctx, 403, 232, 61, 7, '#285540');
+  R(ctx, 407, 238, 5, 8, '#6d523b');
+  R(ctx, 455, 238, 5, 8, '#6d523b');
+  // Coral cushion is a single focal accent against the fern-green chair.
+  R(ctx, 432, 188, 16, 24, '#ae6850');
+  R(ctx, 431, 187, 15, 21, '#d29873');
+  L(ctx, 433, 188, 443, 188, '#ecc0a0');
+  // Low side table and cup (legs end at y=246).
+  table(ctx, 476, 214, 36, 31, '#8c694a');
+  R(ctx, 480, 212, 29, 3, '#d6b284');
+  R(ctx, 487, 203, 10, 9, P.cream);
+  R(ctx, 496, 205, 4, 5, '#e3d5bc');
+  R(ctx, 498, 206, 2, 3, '#9a7f5d');
+  R(ctx, 488, 203, 8, 2, '#7e573e');
+  // Music console has three open cubbies, two speakers and a turntable.
+  cabinet(ctx, 521, 191, 110, 54, '#a57d52');
+  R(ctx, 519, 189, 114, 5, '#d4ab79');
+  R(ctx, 526, 199, 100, 30, '#624d3b');
+  R(ctx, 557, 199, 3, 30, '#a57d52');
+  R(ctx, 592, 199, 3, 30, '#a57d52');
+  for (let i = 0; i < 8; i++) {
+    R(ctx, 529 + i * 3, 203 + (i % 3), 2, 24 - (i % 3),
+      ['#d6ba85','#668985','#c9816b','#e3d6b9'][i % 4]);
   }
+  // Upright album covers read as a curated record library.
+  R(ctx, 564, 205, 22, 22, '#e0cfab');
+  R(ctx, 567, 208, 16, 15, '#4e7782');
+  ellipse(ctx, 575, 216, 6, 6, '#f0c278');
+  R(ctx, 600, 204, 18, 23, '#b37d57');
+  R(ctx, 603, 207, 12, 15, '#dbb37a');
+  L(ctx, 606, 207, 612, 220, '#795745', 2);
+  // Turntable deck and lid.
+  R(ctx, 548, 175, 53, 13, '#514b40');
+  R(ctx, 549, 175, 51, 2, '#b99e71');
+  ellipse(ctx, 570, 180, 17, 5, '#1e3541');
+  ellipse(ctx, 570, 180, 6, 2, '#c99152');
+  R(ctx, 569, 179, 2, 2, P.cream);
+  L(ctx, 593, 178, 590, 183, '#c6c5ac');
+  L(ctx, 590, 183, 580, 182, '#c6c5ac');
+  R(ctx, 547, 169, 55, 4, '#779c9f');
+  L(ctx, 548, 169, 548, 175, '#64838a');
+  L(ctx, 601, 169, 601, 175, '#64838a');
+  for (const x of [524, 605]) {
+    R(ctx, x, 161, 22, 28, '#3b4240');
+    R(ctx, x + 1, 162, 20, 3, '#6c7161');
+    ellipse(ctx, x + 11, 179, 7, 7, '#182f37');
+    ellipse(ctx, x + 11, 179, 4, 4, '#697875');
+    ellipse(ctx, x + 11, 168, 3, 3, '#b3b292');
+  }
+
   // Standing lamp belongs to the listening corner, not the front walk path.
   L(ctx, 348, 167, 348, 242, P.navy, 2);
   R(ctx, 339, 242, 19, 4, P.navy);
@@ -233,56 +229,53 @@ export default function drawHobby(ctx: CanvasRenderingContext2D, assets: Interio
   R(ctx, 848, 120, 5, 7, '#244c64');
   R(ctx, 859, 120, 5, 7, '#244c64');
   R(ctx, 867, 130, 8, 3, '#193c53');
-  {
-    const ctx = pixelGroup(roomContext, 745, 247, 0.57, 0.57, 260);
-    // Bicycle frame and two large pixel wheels.  The spoke geometry is sparse.
-    const wheel = (cx: number, cy: number) => {
-      ellipse(ctx, cx, cy, 31, 31, '#213746');
-      ellipse(ctx, cx, cy, 26, 26, '#b9a17c');
-      ellipse(ctx, cx, cy, 24, 24, '#dcc39b');
-      for (const [dx,dy] of [[0,23],[23,0],[17,17],[17,-17]]) {
-        L(ctx, cx-dx, cy-dy, cx+dx, cy+dy, '#8b9290');
-      }
-      ellipse(ctx, cx, cy, 3, 3, '#395268');
-      L(ctx, cx - 15, cy - 25, cx + 6, cy - 29, '#62717a', 2);
-    };
-    wheel(687, 216); wheel(772, 216);
-    L(ctx, 688, 216, 714, 177, '#173d55', 4);
-    L(ctx, 714, 177, 735, 216, '#173d55', 4);
-    L(ctx, 735, 216, 688, 216, '#173d55', 4);
-    L(ctx, 714, 177, 757, 177, '#173d55', 4);
-    L(ctx, 735, 216, 757, 177, '#173d55', 4);
-    L(ctx, 757, 177, 772, 216, '#173d55', 4);
-    // Selective teal highlights describe steel tubing, not glossy gradients.
-    L(ctx, 714, 177, 754, 177, '#7cafb6', 1);
-    L(ctx, 690, 214, 732, 214, '#51929e', 1);
-    L(ctx, 735, 213, 755, 178, '#51929e', 1);
-    L(ctx, 713, 175, 711, 167, '#4a6572', 3);
-    R(ctx, 702, 164, 22, 5, '#343d41');
-    R(ctx, 704, 164, 16, 1, '#939a92');
-    L(ctx, 757, 178, 754, 157, '#4d6b78', 3);
-    L(ctx, 755, 157, 765, 156, '#4d6b78', 3);
-    L(ctx, 765, 156, 768, 162, '#4d6b78', 3);
-    R(ctx, 764, 158, 8, 3, '#253d46');
-    ellipse(ctx, 735, 216, 7, 7, '#667779');
-    ellipse(ctx, 735, 216, 4, 4, '#314b59');
-    L(ctx, 735, 216, 741, 226, '#c0bfa5', 2);
-    R(ctx, 738, 225, 10, 3, '#233d4b');
-    R(ctx, 734, 185, 5, 15, '#e6e4d7');
-    R(ctx, 733, 187, 7, 3, '#579b9f');
-  }
+
+  // Bicycle frame and two large pixel wheels.  The spoke geometry is sparse.
+  const wheel = (cx: number, cy: number) => {
+    ellipse(ctx, cx, cy, 31, 31, '#213746');
+    ellipse(ctx, cx, cy, 26, 26, '#b9a17c');
+    ellipse(ctx, cx, cy, 24, 24, '#dcc39b');
+    for (const [dx,dy] of [[0,23],[23,0],[17,17],[17,-17]]) {
+      L(ctx, cx-dx, cy-dy, cx+dx, cy+dy, '#8b9290');
+    }
+    ellipse(ctx, cx, cy, 3, 3, '#395268');
+    L(ctx, cx - 15, cy - 25, cx + 6, cy - 29, '#62717a', 2);
+  };
+  wheel(687, 216); wheel(772, 216);
+  L(ctx, 688, 216, 714, 177, '#173d55', 4);
+  L(ctx, 714, 177, 735, 216, '#173d55', 4);
+  L(ctx, 735, 216, 688, 216, '#173d55', 4);
+  L(ctx, 714, 177, 757, 177, '#173d55', 4);
+  L(ctx, 735, 216, 757, 177, '#173d55', 4);
+  L(ctx, 757, 177, 772, 216, '#173d55', 4);
+  // Selective teal highlights describe steel tubing, not glossy gradients.
+  L(ctx, 714, 177, 754, 177, '#7cafb6', 1);
+  L(ctx, 690, 214, 732, 214, '#51929e', 1);
+  L(ctx, 735, 213, 755, 178, '#51929e', 1);
+  L(ctx, 713, 175, 711, 167, '#4a6572', 3);
+  R(ctx, 702, 164, 22, 5, '#343d41');
+  R(ctx, 704, 164, 16, 1, '#939a92');
+  L(ctx, 757, 178, 754, 157, '#4d6b78', 3);
+  L(ctx, 755, 157, 765, 156, '#4d6b78', 3);
+  L(ctx, 765, 156, 768, 162, '#4d6b78', 3);
+  R(ctx, 764, 158, 8, 3, '#253d46');
+  ellipse(ctx, 735, 216, 7, 7, '#667779');
+  ellipse(ctx, 735, 216, 4, 4, '#314b59');
+  L(ctx, 735, 216, 741, 226, '#c0bfa5', 2);
+  R(ctx, 738, 225, 10, 3, '#233d4b');
+  R(ctx, 734, 185, 5, 15, '#e6e4d7');
+  R(ctx, 733, 187, 7, 3, '#579b9f');
+
   // A low equipment chest grounds the hanging gear without crossing the lane.
-  {
-    const ctx = pixelGroup(roomContext, 831, 244, 0.55, 0.55, 260);
-    cabinet(ctx, 808, 180, 46, 64, '#405e63');
-    R(ctx, 810, 182, 42, 4, '#6f8e85');
-    R(ctx, 814, 190, 34, 22, '#577a74');
-    R(ctx, 826, 200, 9, 3, '#d5bd7d');
-    R(ctx, 814, 219, 34, 18, '#446a63');
-    R(ctx, 826, 226, 9, 3, '#d5bd7d');
-    R(ctx, 814, 173, 26, 7, '#ad8762');
-    R(ctx, 819, 171, 15, 2, '#70553e');
-  }
+
+  cabinet(ctx, 808, 180, 46, 64, '#405e63');
+  R(ctx, 810, 182, 42, 4, '#6f8e85');
+  R(ctx, 814, 190, 34, 22, '#577a74');
+  R(ctx, 826, 200, 9, 3, '#d5bd7d');
+  R(ctx, 814, 219, 34, 18, '#446a63');
+  R(ctx, 826, 226, 9, 3, '#d5bd7d');
+  R(ctx, 814, 173, 26, 7, '#ad8762');
+  R(ctx, 819, 171, 15, 2, '#70553e');
 
   // 04 / COLLECTION — a glass-fronted display of objects, with clear silhouettes.
   R(ctx, 867, 91, 68, 155, '#263f4c');
@@ -342,12 +335,11 @@ export default function drawHobby(ctx: CanvasRenderingContext2D, assets: Interio
   R(ctx, 242, 67, 13, 4, '#d7b279');
   R(ctx, 244, 64, 9, 3, P.navy);
   rug(ctx, 390, 242, 86, 16, '#aa8c62');
-  {
-    const ctx = pixelGroup(roomContext, 510, 246, 0.55, 0.55, 260);
-    R(ctx, 573, 232, 22, 12, '#daae77');
-    R(ctx, 575, 233, 18, 9, P.creamShade);
-    R(ctx, 578, 235, 11, 5, '#688c85');
-  }
+
+  R(ctx, 573, 232, 22, 12, '#daae77');
+  R(ctx, 575, 233, 18, 9, P.creamShade);
+  R(ctx, 578, 235, 11, 5, '#688c85');
+
     R(ctx, 813, 151, 30, 9, P.creamShade);
   R(ctx, 816, 153, 23, 2, '#9c977e');
   R(ctx, 816, 157, 15, 1, '#9c977e');

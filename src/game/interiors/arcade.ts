@@ -2,7 +2,6 @@
 import {
   R, L, poly, ellipse, text, room, plant, poster, shelf,
   cabinet, frame, hangingPlant, pinnedNote, stringLights, wallClock, P,
-  pixelGroup,
 } from './kit';
 import type { InteriorDrawAssets } from './types';
 
@@ -13,7 +12,6 @@ interface ArcadePalette {
 
 // Front-facing cabinets and an open foreground keep this a playable arcade.
 export default function drawArcade(ctx: CanvasRenderingContext2D, assets: InteriorDrawAssets = {}) {
-  const roomContext = ctx;
   room(ctx, {
     wall: '#e9e0c9', wallShade: '#d4c4a9', trim: '#194d85',
     trimHi: P.blueHi, floor: '#76929b', floorShade: '#506b7b',
@@ -39,12 +37,12 @@ export default function drawArcade(ctx: CanvasRenderingContext2D, assets: Interi
   collectionCabinet(ctx, 67, 190, 77, 57);
   plant(ctx, 150, 248, 0.65, '#d27142');
 
-  // Four cabinets retain their tall silhouettes at a common, smaller scale.
-  compactCabinet(pixelGroup(ctx, 246, 247, 0.58, 0.58, 260), 210, 113, 'GAME', 'JOURNEY', {
+  // Cabinet silhouettes and dimensions follow the previous interior composition.
+  mainCabinet(ctx, 185, 79, 130, 169, 'GAME', 'JOURNEY', {
     body: '#245c9c', shade: '#173b68', light: '#4d9ada', edge: '#b3dfea',
     accent: '#f3c653', screen: 'journey',
   });
-  compactCabinet(pixelGroup(ctx, 410, 247, 0.58, 0.58, 260), 374, 113, 'GAME', 'MAKING', {
+  mainCabinet(ctx, 352, 79, 130, 169, 'GAME', 'MAKING', {
     body: '#c1402d', shade: '#7c302e', light: '#eb6b3e', edge: '#ffd69b',
     accent: '#4eabd7', screen: 'making',
   });
@@ -57,8 +55,8 @@ export default function drawArcade(ctx: CanvasRenderingContext2D, assets: Interi
   handheld(ctx, 641, 72, '#bd4036');
   R(ctx, 667, 60, 12, 18, '#1b5676');
   R(ctx, 669, 62, 3, 13, '#8bd2d9');
-  smallCabinet(pixelGroup(ctx, 559, 247, 0.58, 0.58, 260), 523, 113, 72, 134, '#227a82', '#173f51', 'PIXEL RUN', 'runner');
-  smallCabinet(pixelGroup(ctx, 653, 247, 0.58, 0.58, 260), 617, 113, 72, 134, '#e8af45', '#926531', 'SPACE 88', 'space');
+  smallCabinet(ctx, 523, 113, 72, 134, '#227a82', '#173f51', 'PIXEL RUN', 'runner');
+  smallCabinet(ctx, 617, 113, 72, 134, '#e8af45', '#926531', 'SPACE 88', 'space');
 
   // Console nook: a CRT on a stand at left, a side-facing red sofa at right.
   // Its screen and controllers make the corner legible even at game scale.
@@ -72,31 +70,29 @@ export default function drawArcade(ctx: CanvasRenderingContext2D, assets: Interi
   R(ctx, 776, 57, 3, 16, '#77b6cc');
   R(ctx, 790, 58, 10, 18, '#b85342');
   R(ctx, 791, 62, 2, 11, '#ffc281');
-  {
-    const ctx = pixelGroup(roomContext, 824, 248, 0.55, 0.55, 260);
-    crt(ctx, 733, 134, 75, 58);
-    cabinet(ctx, 724, 201, 91, 47, '#9f744e');
-    R(ctx, 721, 196, 97, 7, P.navy);
-    R(ctx, 724, 196, 91, 2, '#6391a0');
-    // Original 16-bit console with cartridge and two wired controllers.
-    R(ctx, 736, 191, 45, 7, '#bac0ad');
-    R(ctx, 739, 190, 40, 3, '#e0dfc6');
-    R(ctx, 748, 187, 17, 4, '#526a70');
-    R(ctx, 751, 186, 11, 3, '#becbbb');
-    R(ctx, 771, 193, 3, 2, '#e45037');
-    L(ctx, 743, 198, 738, 223, '#193847', 1);
-    L(ctx, 770, 198, 791, 224, '#193847', 1);
-    controller(ctx, 728, 222, '#b6c5b9');
-    controller(ctx, 783, 223, '#b6c5b9');
-    R(ctx, 738, 235, 15, 6, '#476279');
-    R(ctx, 756, 234, 17, 7, '#c55a3a');
-    R(ctx, 776, 235, 16, 6, '#d4b76d');
-    sofa(ctx, 825, 204, 100, 44);
-    R(ctx, 863, 226, 17, 8, '#e8d8ab');
-    R(ctx, 865, 226, 13, 2, '#fff0c6');
-    R(ctx, 866, 230, 11, 2, '#637c88');
-    plant(ctx, 911, 247, 0.73, P.navy);
-  }
+
+  crt(ctx, 733, 134, 75, 58);
+  cabinet(ctx, 724, 201, 91, 47, '#9f744e');
+  R(ctx, 721, 196, 97, 7, P.navy);
+  R(ctx, 724, 196, 91, 2, '#6391a0');
+  // Original 16-bit console with cartridge and two wired controllers.
+  R(ctx, 736, 191, 45, 7, '#bac0ad');
+  R(ctx, 739, 190, 40, 3, '#e0dfc6');
+  R(ctx, 748, 187, 17, 4, '#526a70');
+  R(ctx, 751, 186, 11, 3, '#becbbb');
+  R(ctx, 771, 193, 3, 2, '#e45037');
+  L(ctx, 743, 198, 738, 223, '#193847', 1);
+  L(ctx, 770, 198, 791, 224, '#193847', 1);
+  controller(ctx, 728, 222, '#b6c5b9');
+  controller(ctx, 783, 223, '#b6c5b9');
+  R(ctx, 738, 235, 15, 6, '#476279');
+  R(ctx, 756, 234, 17, 7, '#c55a3a');
+  R(ctx, 776, 235, 16, 6, '#d4b76d');
+  sofa(ctx, 825, 204, 100, 44);
+  R(ctx, 863, 226, 17, 8, '#e8d8ab');
+  R(ctx, 865, 226, 13, 2, '#fff0c6');
+  R(ctx, 866, 230, 11, 2, '#637c88');
+  plant(ctx, 911, 247, 0.73, P.navy);
 
   // A few big wall motifs instead of a noisy texture field.
   frame(ctx, 733, 95, 72, 26, '#94734e');
@@ -109,17 +105,16 @@ export default function drawArcade(ctx: CanvasRenderingContext2D, assets: Interi
   pinnedNote(ctx, 492, 171, 20, 26, '#d6e0ce');
   R(ctx, 495, 180, 13, 2, P.blue);
   R(ctx, 496, 184, 9, 2, P.coral);
-  {
-    const ctx = pixelGroup(roomContext, 824, 248, 0.55, 0.55, 260);
-    // Spare cartridges and a snack bowl stay tucked in the sofa nook.
-    R(ctx, 835, 233, 18, 7, P.navy);
-    R(ctx, 837, 231, 15, 4, '#a6b5aa');
-    R(ctx, 840, 232, 9, 2, P.coral);
-    ellipse(ctx, 891, 236, 10, 3, '#d5b47e');
-    R(ctx, 884, 235, 14, 5, '#9f6749');
-    R(ctx, 886, 233, 4, 3, P.gold);
-    R(ctx, 892, 234, 4, 2, P.creamShade);
-  }
+
+  // Spare cartridges and a snack bowl stay tucked in the sofa nook.
+  R(ctx, 835, 233, 18, 7, P.navy);
+  R(ctx, 837, 231, 15, 4, '#a6b5aa');
+  R(ctx, 840, 232, 9, 2, P.coral);
+  ellipse(ctx, 891, 236, 10, 3, '#d5b47e');
+  R(ctx, 884, 235, 14, 5, '#9f6749');
+  R(ctx, 886, 233, 4, 3, P.gold);
+  R(ctx, 892, 234, 4, 2, P.creamShade);
+
     R(ctx, 6, 50, 45, 9, '#2a695e');
   // The foreground strip is uninterrupted for the player's feet.
   R(ctx, 41, 257, 878, 2, '#345d76');
@@ -137,21 +132,6 @@ function returnDoor(ctx: CanvasRenderingContext2D) {
   R(ctx, 14, 204, 29, 28, '#19475e');
   R(ctx, 38, 186, 5, 3, P.gold);
   R(ctx, 4, 60, 49, 3, P.woodHi);
-}
-
-/** Remap only integer pixel rectangles, preserving crisp edges at the smaller size. */
-function compactCabinet(ctx: CanvasRenderingContext2D, x: number, y: number, line1: string, line2: string, palette: ArcadePalette) {
-  const sx = 72 / 130, sy = 134 / 169;
-  ellipse(ctx, x + 40, y + 137, 40, 4, '#506b76');
-  const scaled = {
-    get fillStyle() { return ctx.fillStyle; },
-    set fillStyle(value: string | CanvasGradient | CanvasPattern) { ctx.fillStyle = value; },
-    fillRect(px: number, py: number, width: number, height: number) {
-      const left = Math.round(px * sx), top = Math.round(py * sy);
-      ctx.fillRect(x + left, y + top, Math.round((px + width) * sx) - left, Math.round((py + height) * sy) - top);
-    },
-  } as CanvasRenderingContext2D;
-  mainCabinet(scaled, 0, 0, 130, 169, line1, line2, palette);
 }
 
 function mainCabinet(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, line1: string, line2: string, c: ArcadePalette) {
