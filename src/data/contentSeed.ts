@@ -1,6 +1,8 @@
 import { COPYWRITING_WORKS } from './copywritingProjects';
 import { PORTFOLIO_PROJECTS, type PortfolioProject } from './projects';
 import type { ContentEntry, ContentKind } from './contentTypes';
+import resumeDocument from './resumeEntries.json';
+import { parseContentDocument } from '../content/contentRepository';
 
 export function projectToContentEntry(project: PortfolioProject): ContentEntry {
   const kind: ContentKind = project.locationId === 'marc-cinema' ? 'film'
@@ -107,4 +109,5 @@ const experiments: ContentEntry[] = [
 ].map(item => ({ ...item, kind: 'experiment', status: item.status as ContentEntry['status'], locationId: 'experiment-lab', media: [], attachments: [], isSample: true }));
 
 const general = PORTFOLIO_PROJECTS.filter(p => !['print-house', 'brand-museum', 'marc-cinema', 'experiment-lab'].includes(p.locationId)).map(projectToContentEntry);
-export const CONTENT_SEED: ContentEntry[] = [...words, ...writingNotes, ...brands, ...films, ...gameExperience, ...gameProjects, ...hobbies, ...experiments, ...general];
+export const CONTENT_EXAMPLE: ContentEntry[] = [...words, ...writingNotes, ...brands, ...films, ...gameExperience, ...gameProjects, ...hobbies, ...experiments, ...general];
+export const CONTENT_SEED: ContentEntry[] = parseContentDocument(resumeDocument).entries;

@@ -45,12 +45,12 @@ export const ProjectIndex: React.FC = () => {
     <div className="portfolio-index-status" aria-live="polite">
       {status === 'loading' && '正在载入作品内容…'}
       {status === 'error' && '内容暂未更新，继续显示已有作品。'}
-      {status === 'sample' && '当前展示示例内容，后续可替换为真实作品。'}
+      {status === 'local' && '当前按简历内容占位。作品图来自简历，影片、Demo 与详细项目说明待补充。'}
     </div>
     <div className="portfolio-index-grid">{filtered.map((entry) => {
       const location = WORLD_LOCATIONS.find((item) => item.id === entry.locationId);
       return <article className="portfolio-index-card" key={entry.id}>
-        <div className="portfolio-index-card-meta"><span>{KIND_LABELS[entry.kind]}</span><span>{entry.isSample ? '示例内容' : entry.date}</span></div>
+        <div className="portfolio-index-card-meta"><span>{KIND_LABELS[entry.kind]}</span><span>{entry.isSample ? '示例内容' : entry.source || entry.date}</span></div>
         <h2>{entry.title}</h2>
         {entry.subtitle && <p className="portfolio-index-card-subtitle">{entry.subtitle}</p>}
         <p className="portfolio-index-card-description">{entry.description}</p>

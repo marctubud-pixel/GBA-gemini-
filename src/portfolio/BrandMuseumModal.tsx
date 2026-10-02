@@ -9,7 +9,7 @@ import { ContentMedia } from './ContentMedia';
 
 const PANELS = [
   { id: 'ip', title: 'IP', icon: PixelSeagull, slogan: '让角色成为品牌的好朋友。' },
-  { id: 'art', title: '艺术', icon: PixelPalette, slogan: '用视觉表达更大的想象。' },
+  { id: 'art', title: '视觉', icon: PixelPalette, slogan: '用视觉表达更大的想象。' },
   { id: 'brand', title: '品牌', icon: PixelTag, slogan: '从策略到视觉，塑造品牌价值。' },
   { id: 'ecommerce', title: '电商', icon: PixelCart, slogan: '把好设计放进真实生活。' },
 ] as const;
@@ -69,7 +69,7 @@ export const BrandMuseumModal: React.FC = () => {
           return <section key={id} className={`brand-panel ${selected === id ? 'is-active' : ''}`} onMouseEnter={() => setSelected(id)}>
             <button className="brand-panel-label" onClick={() => setSelected(id)} aria-pressed={selected === id}><Icon size={20} /><h3>{title}</h3><span>0{index + 1}</span></button>
             <div className="brand-panel-content">
-            <div className="brand-panel-art"><ContentMedia asset={entry?.cover} kind={`brand-${id}`} title={entry?.title ?? title} fit="cover" /></div>
+            <div className="brand-panel-art"><ContentMedia asset={entry?.cover} kind={`brand-${id}`} title={entry?.title ?? title} fit="contain" /></div>
             <h4>{entry?.title ?? title}</h4>
             <p>{entry?.description ?? slogan}</p>
             {entry?.isSample && <small className="scene-sample-label">示例内容</small>}

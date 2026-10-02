@@ -11,7 +11,7 @@ export const ContentDetail: React.FC<ContentDetailProps> = ({ entry, onBack }) =
     <article className="content-detail" key={entry.id}>
       <div className="content-detail-topline">
         <button className="scene-button scene-button-muted" onClick={onBack}>◀ 返回</button>
-        <span>{[entry.category, entry.date, entry.isSample ? '示例内容' : ''].filter(Boolean).join(' · ')}</span>
+        <span>{[entry.category, entry.date, entry.isSample ? '示例内容' : entry.source].filter(Boolean).join(' · ')}</span>
       </div>
       <div className="content-detail-intro">
         <div className="content-detail-cover"><ContentMedia asset={entry.cover} kind={entry.kind} title={entry.title} fit="contain" /></div>

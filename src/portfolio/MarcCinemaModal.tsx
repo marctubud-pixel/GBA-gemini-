@@ -78,7 +78,7 @@ export const MarcCinemaModal = () => {
           <div className="mm-ticket-switcher">
             <button className="mm-arrow" aria-label="上一部影片" disabled={films.length < 2} onClick={() => changeFilm(-1)}>◀</button>
             <article className="mm-ticket">
-              <div className="mm-ticket-art"><ContentMedia asset={cover} kind="film" title={film.title} fit="cover" /></div>
+              <div className="mm-ticket-art"><ContentMedia asset={cover} kind="film" title={film.title} fit="contain" /></div>
               <div className="mm-ticket-copy"><span className="mm-eyebrow">ADMIT ONE · NO. {String(filmIndex + 1).padStart(2, '0')} {film.isSample && <span className="mm-sample">示例内容</span>}</span><h3>{film.title}</h3>{film.englishTitle && <p className="mm-english-title">{film.englishTitle}</p>}<div className="mm-ticket-meta"><span>{film.category}</span><span>{film.date || '日期待补充'}</span></div><span className="mm-stamp">MARC CINEMA</span></div>
             </article>
             <button className="mm-arrow" aria-label="下一部影片" disabled={films.length < 2} onClick={() => changeFilm(1)}>▶</button>

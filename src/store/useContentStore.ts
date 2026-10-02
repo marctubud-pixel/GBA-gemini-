@@ -5,7 +5,7 @@ import { HttpContentRepository } from '../content/contentRepository';
 
 interface ContentState {
   entries: ContentEntry[];
-  status: 'sample' | 'loading' | 'ready' | 'error';
+  status: 'local' | 'loading' | 'ready' | 'error';
   error: string | null;
   load: () => Promise<void>;
 }
@@ -15,7 +15,7 @@ const repository = endpoint ? new HttpContentRepository(endpoint) : null;
 
 export const useContentStore = create<ContentState>((set, get) => ({
   entries: CONTENT_SEED,
-  status: 'sample',
+  status: 'local',
   error: null,
   load: async () => {
     if (!repository || get().status === 'loading' || get().status === 'ready') return;

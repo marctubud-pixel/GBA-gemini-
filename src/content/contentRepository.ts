@@ -55,7 +55,7 @@ export function parseContentDocument(value: unknown): ContentDocument {
       || !entry.media.every(mediaIsValid) || !Array.isArray(entry.tags)
       || !entry.tags.every(tag => typeof tag === 'string')) throw new Error('作品字段不完整或 ID 重复');
     if (entry.cover !== undefined && !mediaIsValid(entry.cover)) throw new Error('作品封面格式不正确');
-    if (!optionalStringsAreValid(entry, ['subtitle', 'body', 'date', 'duration', 'englishTitle', 'locationId', 'fileSize'])
+    if (!optionalStringsAreValid(entry, ['subtitle', 'body', 'date', 'duration', 'englishTitle', 'locationId', 'fileSize', 'source'])
       || (entry.hours !== undefined && (typeof entry.hours !== 'number' || !Number.isFinite(entry.hours) || entry.hours < 0))
       || (entry.demoUrl !== undefined && !isContentUrl(entry.demoUrl))
       || (entry.documentUrl !== undefined && !isContentUrl(entry.documentUrl))

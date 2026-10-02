@@ -111,7 +111,7 @@ export const WriteHouseModal: React.FC = () => {
             </section>
             <section className="writing-book-right">
               {currentWork ? <>
-                <div className="writing-preview-art"><ContentMedia asset={currentWork.cover} kind={currentWork.kind} title={currentWork.title} fit="cover" /><span className="writing-preview-stamp">A BRIGHTER YOU</span></div>
+                <div className="writing-preview-art"><ContentMedia asset={currentWork.cover} kind={currentWork.kind} title={currentWork.title} fit="contain" /><span className="writing-preview-stamp">A BRIGHTER YOU</span></div>
                 <h3>{currentWork.title}</h3>
                 {(currentWork.subtitle || currentWork.isSample) && <p className="writing-work-subtitle">{[currentWork.subtitle, currentWork.isSample ? '示例内容' : ''].filter(Boolean).join(' · ')}</p>}
                 <div className="writing-work-excerpt">{currentWork.body ?? currentWork.description}</div>

@@ -36,6 +36,7 @@ export interface ContentEntry {
   section?: 'IDEA' | 'WORDS' | 'LIFE';
   caseStudy?: { heading: string; text: string }[];
   isSample?: boolean;
+  source?: string;
   status?: ContentStatus;
   fileSize?: string;
   documentUrl?: string;
