@@ -1,58 +1,54 @@
+/* A window inside the room: the lower third keeps the walking character visible. */
 .scene-modal-backdrop {
-  position: absolute; inset: 0; z-index: 40; display: flex; align-items: center; justify-content: center;
-  background: rgb(9 24 35 / 64%); color: #172d3b;
+  position: absolute; inset: 0; z-index: 40; display: flex; align-items: flex-start; justify-content: center;
+  padding-top: 8px; background: rgb(9 24 35 / 18%); color: #172d3b;
   font-family: 'DotGothic16', 'Cubic 11', monospace; font-size: 11px; line-height: 1.5;
 }
 .scene-modal-frame {
-  width: 96%; height: 94%; min-width: 0; min-height: 0; display: flex; flex-direction: column;
-  border: 3px solid #102e45; box-shadow: 2px 3px 0 #061b2b, inset 1px 1px 0 #92d0e8;
-  background: #fbf8ee; overflow: hidden;
+  width: 86%; height: 62%; min-width: 0; min-height: 0; display: flex; flex-direction: column;
+  position: relative; background: transparent; overflow: visible;
+  filter: drop-shadow(2px 4px 0 rgb(6 27 43 / 45%));
 }
+.scene-modal-frame:focus { outline: none; }
 .scene-modal-header {
   --header-accent: #2679bd; --header-light: #5eb6ed;
-  flex: 0 0 auto; min-height: 62px; display: flex; align-items: center; justify-content: center;
-  padding: 4px 40px 4px 20px; position: relative; border-bottom: 3px solid #102e45;
-  color: #0f3a5e; background: var(--header-accent); box-shadow: inset 0 2px 0 var(--header-light);
+  flex: 0 0 58px; min-height: 58px; display: flex; align-items: flex-end; justify-content: center;
+  padding: 0 0 6px; position: relative; color: #0f3a5e;
 }
-.scene-modal-header::after {
-  content: ''; position: absolute; left: 0; right: 0; bottom: 2px; height: 6px; pointer-events: none;
-  background: repeating-linear-gradient(90deg, transparent 0 8px, #92d0e8 8px 16px, transparent 16px 24px);
-  opacity: .55;
-}
+.scene-modal-crown { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .scene-modal-gallery .scene-modal-header { --header-accent: #245587; --header-light: #739aa4; }
 .scene-modal-ticket .scene-modal-header { --header-accent: #ae352e; --header-light: #ee8060; }
 .scene-modal-console .scene-modal-header { --header-accent: #214d67; --header-light: #609aa8; }
 .scene-modal-collection .scene-modal-header { --header-accent: #287683; --header-light: #87bfc2; }
-.scene-header-plaque {
-  z-index: 1; position: relative; min-width: 220px; max-width: calc(100% - 92px); padding: 14px 22px 5px;
-  border: 2px solid #102e45; background: #fbf8ee;
-  box-shadow: inset 0 -3px 0 #d9cbaa, inset 0 2px 0 #fffdf5, 3px 3px 0 #102e45;
-  clip-path: polygon(0 8px, 8px 8px, 8px 0, calc(100% - 8px) 0, calc(100% - 8px) 8px, 100% 8px, 100% calc(100% - 8px), calc(100% - 8px) calc(100% - 8px), calc(100% - 8px) 100%, 8px 100%, 8px calc(100% - 8px), 0 calc(100% - 8px));
-}
+.scene-header-plaque { z-index: 1; position: relative; width: 56%; padding: 0 2px; }
 .scene-header-crest {
-  display: flex; position: absolute; left: calc(50% - 14px); top: -3px;
-  padding: 2px 4px; border: 2px solid #102e45; background: var(--header-light);
+  display: flex; justify-content: center; position: absolute; left: calc(50% - 10px); top: -13px;
 }
+.scene-header-crest > svg { width: 18px; height: 18px; }
 .scene-modal-heading { min-width: 0; text-align: center; }
-.scene-modal-heading h2 { margin: 8px 0 0; font-size: 16px; font-weight: 700; line-height: 1.35; letter-spacing: 2px; text-shadow: 1px 1px 0 #c6d7ce; }
-.scene-modal-heading p { margin: 0; font-size: 8px; line-height: 1.3; color: #597b87; }
-.scene-header-coast { position: absolute; bottom: 5px; width: 50px; height: 47px; z-index: 1; pointer-events: none; }
-.scene-header-coast::after { content: ''; position: absolute; bottom: 0; left: 0; width: 45px; height: 5px; background: #d9cbaa; border-bottom: 2px solid #102e45; }
-.scene-header-coast-left { left: 13px; }
-.scene-header-coast-right { right: 38px; }
-.scene-header-coast > :first-child { position: absolute; left: 5px; bottom: 4px; }
-.scene-header-coast > :last-child { position: absolute; right: -3px; top: 0; }
-.scene-modal-header-art { flex-shrink: 0; display: flex; }
+.scene-modal-heading h2 { margin: 0; font-size: 15px; font-weight: 700; line-height: 1.4; letter-spacing: 1px; text-shadow: 1px 1px 0 #c6d7ce; }
+.scene-modal-heading p { margin: 0; font-size: 7px; line-height: 1.3; color: #597b87; }
+.scene-header-coast { position: absolute; bottom: 10px; width: 45px; height: 40px; z-index: 1; pointer-events: none; }
+.scene-header-coast-left { left: 8%; }
+.scene-header-coast-right { right: 9%; }
+.scene-header-coast > :first-child { position: absolute; left: 0; bottom: 0; }
+.scene-header-coast > :last-child { position: absolute; right: -1px; top: 0; }
 .scene-modal-close {
-  position: absolute; right: 7px; top: 8px; width: 23px; height: 23px; border: 2px solid #102e45;
+  position: absolute; right: 9px; bottom: 7px; width: 23px; height: 23px; border: 2px solid #102e45;
   color: white; background: #d63a2a; font-size: 18px; line-height: 15px; box-shadow: inset 1px 1px 0 #ff9e79;
 }
-.scene-modal-body { flex: 1 1 auto; min-height: 0; min-width: 0; overflow: auto; padding: 6px; overscroll-behavior: contain; }
+.scene-modal-body {
+  flex: 1 1 auto; min-height: 0; min-width: 0; overflow: auto; padding: 5px;
+  border-inline: 3px solid #102e45; background: #fbf8ee; overscroll-behavior: contain;
+  scrollbar-width: thin; scrollbar-color: #7cabb6 #e8e5d7;
+}
 .scene-modal-footer {
-  flex: 0 0 auto; min-height: 22px; display: flex; align-items: center; justify-content: space-between;
+  flex: 0 0 auto; min-height: 19px; display: flex; align-items: center; justify-content: space-between;
   gap: 6px; padding: 2px 7px; color: #c7e8ef; background: #102e45; font-size: 8px;
+  border: 3px solid #102e45; border-top: 0;
 }
 .scene-modal-footer > span { display: flex; align-items: center; gap: 4px; }
+.scene-modal-body:last-child { border-bottom: 3px solid #102e45; }
 .scene-button {
   display: inline-flex; align-items: center; justify-content: center; gap: 4px; min-height: 24px;
   padding: 3px 8px; border: 2px solid #102e45; background: #2679bd; color: #fffdf5;
@@ -167,8 +163,9 @@
 .portfolio-index-card-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding-top: 10px; border-top: 1px solid #d9d4bd; }
 .portfolio-index-location { font-size: 9px; color: #869077; }
 .portfolio-content-overlay { position: fixed; inset: 0; z-index: 50; }
-.portfolio-content-overlay .scene-modal-frame { max-width: 900px; height: min(94%, 730px); }
-.portfolio-content-overlay .scene-modal-header { min-height: 72px; }
+.portfolio-content-overlay .scene-modal-backdrop { align-items: center; padding-top: 0; background: rgb(9 24 35 / 64%); }
+.portfolio-content-overlay .scene-modal-frame { width: 92%; max-width: 900px; height: min(90%, 730px); }
+.portfolio-content-overlay .scene-modal-header { flex-basis: 80px; min-height: 80px; padding-bottom: 10px; }
 .portfolio-content-overlay .scene-modal-heading h2 { font-size: 18px; }
 .portfolio-content-overlay .scene-modal-heading p { font-size: 11px; }
 .portfolio-content-overlay .scene-modal-body { padding: 13px; }
@@ -215,9 +212,71 @@
   .content-detail-intro { grid-template-columns: 35% 1fr; gap: 7px; }
 }
 
-/* Scene-specific paper and hardware details echo each reference's header. */
-.scene-modal-book .scene-header-plaque::before { content: ''; position: absolute; left: 12px; top: 0; width: 5px; height: 12px; background: #2679bd; border-bottom: 3px solid #5eb6ed; }
-.scene-modal-ticket .scene-header-plaque { border-color: #652c30; box-shadow: inset 0 -3px 0 #e5b5a2; }
-.scene-modal-ticket .scene-modal-header::before { content: ''; position: absolute; top: 4px; left: 0; right: 0; height: 4px; background: repeating-linear-gradient(90deg, #f0e8d5 0 5px, transparent 5px 12px); opacity: .5; }
-.scene-modal-console .scene-header-plaque { background: #dcecf0; box-shadow: inset 0 -3px 0 #8fbbcb; }
-.scene-modal-collection .scene-header-plaque { border-bottom-color: #a57a4e; }
+
+/* Compact paper layouts leave the room visible; long work details scroll inside. */
+.scene-modal-backdrop .writing-book { min-height: 0; }
+.scene-modal-backdrop .writing-book-tabs { padding-top: 5px; gap: 3px; }
+.scene-modal-backdrop .writing-book-tabs button { min-height: 40px; }
+.scene-modal-backdrop .writing-book-left { padding: 4px 6px; }
+.scene-modal-backdrop .writing-book-badge h3 { font-size: 12px; }
+.scene-modal-backdrop .writing-book-badge > svg { width: 18px; height: 18px; }
+.scene-modal-backdrop .writing-book-description { display: none; }
+.scene-modal-backdrop .writing-categories { gap: 3px; margin-top: 4px; }
+.scene-modal-backdrop .writing-categories button { min-height: 22px; padding: 2px; }
+.scene-modal-backdrop .writing-categories button > svg { width: 15px; height: 15px; }
+.scene-modal-backdrop .writing-book-note { display: none; }
+.scene-modal-backdrop .writing-book-right { padding: 4px 6px; gap: 2px; }
+.scene-modal-backdrop .writing-preview-art { height: 32px; min-height: 32px; }
+.scene-modal-backdrop .writing-work-excerpt { -webkit-line-clamp: 2; font-size: 10px; line-height: 1.2; margin: 1px 0; }
+.scene-modal-backdrop .writing-book-actions { padding-top: 3px; flex-shrink: 0; }
+.scene-modal-backdrop .brand-exhibition { min-height: 0; height: 100%; }
+.scene-modal-backdrop .brand-panels { min-height: 0; grid-template-rows: minmax(0, 1fr); }
+.brand-panel-content { min-height: 0; flex: 1; overflow: auto; display: flex; flex-direction: column; gap: 3px; scrollbar-width: thin; }
+.brand-panel-content > * { flex-shrink: 0; }
+.brand-panel-content > p { font-size: 9px; line-height: 1.5; color: #6f634b; }
+.brand-panel-label, .brand-case-button { flex-shrink: 0; }
+.scene-modal-backdrop .brand-panel { min-height: 0; overflow: hidden; padding: 4px; gap: 3px; }
+.scene-modal-backdrop .brand-panel-label { min-height: 20px; }
+.scene-modal-backdrop .brand-panel-label h3 { font-size: 13px; }
+.scene-modal-backdrop .brand-panel-label svg { width: 17px; height: 17px; }
+.scene-modal-backdrop .brand-panel-art { height: 38px; min-height: 38px; }
+.scene-modal-backdrop .brand-panel h4 { min-height: 15px; -webkit-line-clamp: 1; }
+.scene-modal-backdrop .brand-panel > p { -webkit-line-clamp: 2; }
+.scene-modal-backdrop .brand-seaside { flex-shrink: 0; height: 16px; min-height: 16px; font-size: 7px; overflow: hidden; }
+.scene-modal-backdrop .lab-archive { min-height: 0; }
+.scene-modal-backdrop .lab-record { overflow: auto; gap: 3px; padding: 4px 6px; }
+.scene-modal-backdrop .lab-record-art { height: 38px; }
+.scene-modal-backdrop .lab-record h3 { font-size: 12px; }
+.scene-modal-backdrop .lab-record-description { -webkit-line-clamp: 1; flex-shrink: 0; }
+.scene-modal-backdrop .lab-record-meta { padding: 2px 0; flex-shrink: 0; }
+.scene-modal-backdrop .lab-record-actions { flex-shrink: 0; }
+.scene-modal-backdrop .lab-file-tab { min-height: 30px; padding: 3px; }
+.mm-cinema-program { min-height: 0; flex: 1; overflow: auto; display: flex; flex-direction: column; gap: 6px; }
+.scene-modal-backdrop .mm-cinema { overflow: hidden; gap: 4px; }
+.scene-modal-backdrop .mm-cinema > .mm-actions { margin-top: auto; padding-bottom: 2px; gap: 5px; }
+.scene-modal-backdrop .mm-cinema > .mm-actions .mm-button { font-size: 10px!important; min-height: 24px; padding: 3px 6px; }
+.scene-modal-backdrop .mm-ticket-art { width: 110px; height: 58px; }
+.scene-modal-backdrop .mm-ticket { padding: 5px 7px; }
+.scene-modal-backdrop .mm-ticket-copy h3 { font-size: 14px; }
+.scene-modal-backdrop .mm-stamp { display: none; }
+.scene-modal-backdrop .mm-film-facts { padding: 4px; gap: 3px; }
+.scene-modal-backdrop .mm-hobby-media-row { min-height: 52px; height: 62px; }
+.scene-modal-backdrop .mm-hobby-shelf { display: none; }
+.scene-modal-backdrop .mm-hobby-caption p { -webkit-line-clamp: 1; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
+.scene-modal-backdrop .mm-hobby-actions { padding-top: 3px; }
+.scene-modal-backdrop .mm-hobby-actions .mm-button { min-height: 24px; padding: 3px 5px; font-size: 9px!important; }
+@media (max-width: 620px) {
+  .scene-modal-backdrop { padding-top: 4px; }
+  .scene-modal-frame { width: 90%; }
+  .scene-modal-header { min-height: 38px; flex-basis: 38px; padding-bottom: 3px; }
+  .scene-modal-heading h2 { font-size: 10px; letter-spacing: 0; }
+  .scene-modal-heading p { font-size: 5px; }
+  .scene-header-crest { top: -9px; left: calc(50% - 6px); }
+  .scene-header-crest > svg { width: 12px; height: 12px; }
+  .scene-header-coast { height: 28px; width: 26px; bottom: 5px; }
+  .scene-header-coast > :first-child { width: 20px; height: 20px; }
+  .scene-header-coast > :last-child { width: 14px; height: 14px; }
+  .scene-modal-close { width: 19px; height: 19px; right: 5px; bottom: 3px; font-size: 14px; line-height: 12px; }
+  .scene-modal-footer { min-height: 13px; font-size: 6px; padding: 1px 4px; }
+  .scene-modal-footer .mm-footer { font-size: 6px; }
+}

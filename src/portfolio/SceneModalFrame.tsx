@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { PixelPalmTree, PixelSeagull, PixelShell, PixelBook, PixelFilm, PixelGamepad, PixelCamera, PixelRobot, PixelLighthouse } from '../shell/PixelIcons';
 import './sceneModal.css';
+import { SceneModalCrown } from './SceneModalCrown';
 
 export interface SceneModalFrameProps {
   title: string;
@@ -41,6 +42,7 @@ export const SceneModalFrame: React.FC<SceneModalFrameProps> = ({
       onWheel={(event) => event.stopPropagation()}
     >
       <header className="scene-modal-header">
+        <SceneModalCrown kind={isLab ? 'lab' : variant} />
         <div className="scene-header-coast scene-header-coast-left" aria-hidden="true">
           <PixelPalmTree size={28} /><PixelSeagull size={21} />
         </div>

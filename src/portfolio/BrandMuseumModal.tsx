@@ -68,11 +68,13 @@ export const BrandMuseumModal: React.FC = () => {
           const entry = works[visiblePage];
           return <section key={id} className={`brand-panel ${selected === id ? 'is-active' : ''}`} onMouseEnter={() => setSelected(id)}>
             <button className="brand-panel-label" onClick={() => setSelected(id)} aria-pressed={selected === id}><Icon size={20} /><h3>{title}</h3><span>0{index + 1}</span></button>
+            <div className="brand-panel-content">
             <div className="brand-panel-art"><ContentMedia asset={entry?.cover} kind={`brand-${id}`} title={entry?.title ?? title} fit="cover" /></div>
             <h4>{entry?.title ?? title}</h4>
             <p>{entry?.description ?? slogan}</p>
             {entry?.isSample && <small className="scene-sample-label">示例内容</small>}
             {works.length > 1 && <div className="scene-pagination"><button onClick={() => turnPage(id, -1)} aria-label={`${title}上一个案例`}>◀</button><span>{visiblePage + 1} / {works.length}</span><button onClick={() => turnPage(id, 1)} aria-label={`${title}下一个案例`}>▶</button></div>}
+            </div>
             <button className="scene-button brand-case-button" disabled={!entry} onClick={() => entry && openCase(entry.id)}>{entry ? '查看案例 ▶' : '暂无案例'}</button>
           </section>;
         })}</div>

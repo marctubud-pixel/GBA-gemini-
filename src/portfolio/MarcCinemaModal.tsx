@@ -73,6 +73,7 @@ export const MarcCinemaModal = () => {
         </section>
       : panel === 'detail' ? <div className="mm-detail"><ContentDetail entry={film} onBack={() => setPanel('ticket')} /></div>
       : <>
+          <div className="mm-cinema-program">
           <div className="mm-cinema-banner" aria-hidden="true"><PixelPalmTree /><span>SAME SKIES · BRIGHTER STORIES</span><PixelSeagull /></div>
           <div className="mm-ticket-switcher">
             <button className="mm-arrow" aria-label="上一部影片" disabled={films.length < 2} onClick={() => changeFilm(-1)}>◀</button>
@@ -83,6 +84,7 @@ export const MarcCinemaModal = () => {
             <button className="mm-arrow" aria-label="下一部影片" disabled={films.length < 2} onClick={() => changeFilm(1)}>▶</button>
           </div>
           <dl className="mm-film-facts"><div><dt>影片类型</dt><dd>{film.category}</dd></div><div><dt>影片时长</dt><dd>{film.duration || '时长待补充'}</dd></div><div className="mm-synopsis"><dt>剧情简介</dt><dd>{film.description || '简介待补充'}</dd></div></dl>
+          </div>
           <div className="mm-actions"><button className="mm-button mm-button-gold" disabled={!video} onClick={play}>{video ? '▶ 播放影片' : '待上传影片'}</button><button className="mm-button mm-button-light" onClick={openDetail}>作品详情</button><button className="mm-button" onClick={closeLandmarkModal}>返回放映室</button><button className="mm-button mm-button-light" disabled={films.length < 2} onClick={() => changeFilm(1)}>再看一部 ▶</button></div>
         </>}
     </div>
