@@ -4,14 +4,14 @@ import { TOTAL_WORLD_WIDTH } from '../data/worldSegments';
 import { WORLD_LOCATIONS } from '../data/locations';
 import { Volume2, VolumeX, Compass, User, Sparkles, House } from 'lucide-react';
 import { pixelSound } from '../game/audio/PixelSoundManager';
-import { GBAHardware, GBA_HIT_AREAS, GBA_COLORS, hardwarePosition, GBAPressedKeys, GBAColor } from './GBAHardware';
+import { GBAHardware, GBA_HIT_AREAS, GBA_LCD_RECT, GBA_SMALL_HIT_AREAS, GBA_COLORS, hardwarePosition, GBAPressedKeys, GBAColor } from './GBAHardware';
 import './gbaHardware.css';
 
 interface DeviceShellProps {
   children: React.ReactNode;
 }
 
-/** Smooth, moulded hardware around the unchanged pixel-art game aperture. */
+/** Photographed hardware around the unchanged pixel-art game viewport. */
 export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
   const [shellColor, setShellColor] = useState<GBAColor>(() => {
     try {
@@ -24,6 +24,11 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
     setShellColor(color);
     try { localStorage.setItem('marc-island-gba-color', color); } catch { /* Optional preference. */ }
   };
+  useEffect(() => {
+    for (const option of Object.values(GBA_COLORS)) {
+      const image = new Image(); image.src = option.image;
+    }
+  }, []);
   const {
     currentView,
     isStarting,
@@ -353,28 +358,20 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
         <div className="gba-console" data-gba-color={shellColor} aria-label="GBA 游戏机">
           <GBAHardware pressed={pressedKeys} color={shellColor} />
 
-          {/* --------------------------------------------------------------- */}
-          {/* CENTER SCREEN: Widescreen game inset inside the classic grey GBA bezel */}
-          {/* Completely fills the GBA screen with ZERO top/bottom black bars! */}
-          {/* --------------------------------------------------------------- */}
+          {/* Preserve the original LCD opening and center the 16:9 game within it. */}
           <div 
             className="absolute z-10 overflow-hidden bg-black flex items-center justify-center pixel-canvas gba-screen"
-            style={{
-              left: '21%',
-              top: '18.6666667%',
-              width: '58%',
-              height: '58%'
-            }}
+            style={hardwarePosition(...GBA_LCD_RECT)}
           >
             {/* The Live Game Canvas + In-Screen Modals */}
-            <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
+            <div className="gba-game-viewport flex items-center justify-center">
               {children}
             </div>
 
             {/* Subtle GBA LCD Scanlines overlay */}
             <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.12)_50%)] bg-[length:100%_4px] opacity-20" />
             {/* Subtle Lens Glare Reflection */}
-            <div className="absolute top-1 left-2 w-32 h-10 bg-gradient-to-br from-white/10 to-transparent rounded-full blur-[2px] pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-br from-white/[.035] via-transparent to-black/[.04] pointer-events-none" />
           </div>
 
           {([
@@ -385,16 +382,13 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
             style={hardwarePosition(...GBA_HIT_AREAS[control])} aria-label={label}
             title={control === 'j' ? 'B · J 加速 / 确认' : control === 'k' ? 'A · K 互动 / 返回' : label} />)}
 
-          {([{ y: 320, label: 'START', view: 'info', title: '查看简历 PDF' },
-            { y: 349, label: 'SELECT', view: 'index', title: '打开索引' }] as const).map(({ y, label, view, title }) =>
-            <div key={label}>
-              <button className="gba-small-button" style={hardwarePosition(103, y, 17, 17)}
+          {([{ control: 'start', label: 'START', view: 'info', title: '查看简历 PDF' },
+            { control: 'select', label: 'SELECT', view: 'index', title: '打开索引' }] as const).map(({ control, label, view, title }) =>
+              <button key={label} className="gba-small-button" style={hardwarePosition(...GBA_SMALL_HIT_AREAS[control])}
                 onClick={() => { pixelSound.playConfirm(); if (!isStarting) setCurrentView(view); }}
-                disabled={isStarting} title={`${label}: ${title}`} aria-label={`${label}: ${title}`} />
-              <span className="gba-small-label" style={hardwarePosition(51, y + 4, 43, 9)}>{label}</span>
-            </div>)}
+                disabled={isStarting} title={`${label}: ${title}`} aria-label={`${label}: ${title}`} />)}
 
-          <div className="gba-volume" data-gba-volume style={hardwarePosition(432, 404, 186, 21)} role="group" aria-label="机身音量控制">
+          <div className="gba-volume" data-gba-volume style={hardwarePosition(430, 400, 150, 17)} role="group" aria-label="机身音量控制">
             <button className="gba-mute" onClick={toggleSound} aria-label={soundEnabled ? '静音' : '开启声音'}
               aria-pressed={!soundEnabled} title={soundEnabled ? '静音' : '开启声音'}>
               {soundEnabled ? <Volume2 /> : <VolumeX />}
