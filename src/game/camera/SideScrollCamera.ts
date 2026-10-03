@@ -1,12 +1,13 @@
 import Phaser from 'phaser';
+import { CHARACTER_SCREEN_SCALE } from '../player/presentation';
 
 export class SideScrollCamera {
   private camera: Phaser.Cameras.Scene2D.Camera;
-  private targetZoom = 1.4;
+  private targetZoom = CHARACTER_SCREEN_SCALE;
 
   constructor(scene: Phaser.Scene) {
     this.camera = scene.cameras.main;
-    this.camera.setZoom(1.4);
+    this.camera.setZoom(CHARACTER_SCREEN_SCALE);
   }
 
   public initCenter(targetX: number, targetY: number) {

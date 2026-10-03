@@ -1,0 +1,5 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": { "types": ["node"], "lib": ["ES2020", "DOM"], "noUnusedLocals": false },
+  "include": ["./localContent.ts", "../vite.config.ts"]
+}

@@ -1,151 +1,69 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useWorldStore } from '../store/useWorldStore';
-import { PORTFOLIO_PROJECTS, PortfolioProject } from '../data/projects';
+import { useContentStore } from '../store/useContentStore';
+import type { ContentKind } from '../data/contentTypes';
 import { WORLD_LOCATIONS } from '../data/locations';
-import { X, Bike, ArrowUpRight, Compass, Filter, Sparkles } from 'lucide-react';
+import { PixelBook, PixelBike } from '../shell/PixelIcons';
+import './sceneModal.css';
+import { openExternalDetail } from './ManagedProjectViewer';
+
+const KIND_LABELS: Record<ContentKind, string> = {
+  writing: '文案与叙事', brand: '品牌与视觉', film: '电影与影像',
+  'game-experience': '游戏经历', 'game-project': '游戏制作', hobby: '个人爱好', experiment: '创作实验', general: '世界与探索',
+};
 
 export const ProjectIndex: React.FC = () => {
-  const {
-    currentView,
-    setCurrentView,
-    openProjectOverlay,
-    teleportToLocation,
-    enterPrintHouseInterior,
-    setPrintHouseBookOpen
-  } = useWorldStore();
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const { currentView, isOverlayOpen, setCurrentView, openContentOverlay, teleportToLocation } = useWorldStore();
+  const entries = useContentStore((state) => state.entries);
+  const status = useContentStore((state) => state.status);
+  const [selectedKind, setSelectedKind] = useState<ContentKind | 'all'>('all');
+  const isOpen = currentView === 'index';
+  const kinds = Array.from(new Set(entries.map((entry) => entry.kind)));
+  const filtered = selectedKind === 'all' ? entries : entries.filter((entry) => entry.kind === selectedKind);
+  const openEntry = (id: string) => { const entry = entries.find(item => item.id === id); if (!openExternalDetail(entry)) openContentOverlay(id); };
 
-  if (currentView !== 'index') return null;
+  useEffect(() => {
+    if (!isOpen || isOverlayOpen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.code !== 'Escape' && event.code !== 'KeyK') return;
+      event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation();
+      if (!event.repeat) setCurrentView('game');
+    };
+    window.addEventListener('keydown', onKey, true);
+    return () => window.removeEventListener('keydown', onKey, true);
+  }, [isOpen, isOverlayOpen, setCurrentView]);
 
-  const categories = ['All', ...Array.from(new Set(PORTFOLIO_PROJECTS.map((p) => p.category)))];
-
-  const filteredProjects = selectedCategory === 'All'
-    ? PORTFOLIO_PROJECTS
-    : PORTFOLIO_PROJECTS.filter((p) => p.category === selectedCategory);
-
-  const handleRideTo = (project: PortfolioProject) => {
-    teleportToLocation(project.locationId);
-  };
-
-  const handleOpenDetail = (project: PortfolioProject) => {
-    if (project.locationId === 'print-house') {
-      setCurrentView('game');
-      useWorldStore.getState().openPrintHouseModal();
-      return;
-    }
-    openProjectOverlay(project);
-  };
-
-  return (
-    <div className="fixed inset-0 z-40 bg-slate-950/85 backdrop-blur-md overflow-y-auto p-4 sm:p-8 animate-fadeIn">
-      <div className="max-w-5xl mx-auto space-y-6">
-        {/* Top Header */}
-        <div className="flex items-center justify-between bg-white/95 backdrop-blur p-6 rounded-2xl shadow-xl border border-slate-100">
-          <div>
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-blue-600">
-              <Compass className="w-4 h-4" />
-              Recruiter & Quick Explorer Mode
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-1">
-              作品全览索引 (Project Index)
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              为招聘方与快速浏览准备的直接清单。点击任意项目可查看深度 Case Study，或骑车前往该地标。
-            </p>
-          </div>
-
-          <button
-            onClick={() => setCurrentView('game')}
-            className="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center gap-1.5 text-xs font-bold"
-          >
-            <X className="w-4 h-4" />
-            <span className="hidden sm:inline">回到世界 (Back)</span>
-          </button>
-        </div>
-
-        {/* Filter Pills */}
-        <div className="flex flex-wrap gap-2 items-center bg-white/80 p-3 rounded-xl border border-slate-100 shadow-sm">
-          <Filter className="w-4 h-4 text-slate-400 ml-2 mr-1" />
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition ${
-                selectedCategory === cat
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }`}
-            >
-              {cat === 'All' ? '全部领域 (All Works)' : cat}
-            </button>
-          ))}
-        </div>
-
-        {/* Projects Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-          {filteredProjects.map((project) => {
-            const loc = WORLD_LOCATIONS.find((l) => l.id === project.locationId);
-            return (
-              <div
-                key={project.id}
-                className="bg-white rounded-2xl p-6 border border-slate-100 shadow-md hover:shadow-xl transition-all duration-200 flex flex-col justify-between group"
-              >
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span 
-                      className="px-2.5 py-1 text-[11px] font-bold rounded-md text-white shadow-xs"
-                      style={{ backgroundColor: loc?.bannerColor || '#2e6db4' }}
-                    >
-                      {loc?.name || 'Landmark'}
-                    </span>
-                    <span className="text-xs text-slate-400 font-medium">{project.date}</span>
-                  </div>
-
-                  <div>
-                    <h3 className="text-lg font-bold text-slate-900 group-hover:text-blue-600 transition">
-                      {project.title}
-                    </h3>
-                    <p className="text-xs text-slate-500 font-medium mt-0.5 line-clamp-1">
-                      {project.subtitle}
-                    </p>
-                  </div>
-
-                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed line-clamp-3">
-                    {project.oneLiner}
-                  </p>
-
-                  <div className="flex flex-wrap gap-1.5 pt-1">
-                    {project.tools.slice(0, 4).map((t) => (
-                      <span key={t} className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 pt-5 mt-4 border-t border-slate-100">
-                  <button
-                    onClick={() => handleOpenDetail(project)}
-                    className="flex-1 py-2 px-3 text-xs font-bold text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-xl transition flex items-center justify-center gap-1"
-                  >
-                    查看详情
-                    <ArrowUpRight className="w-3.5 h-3.5" />
-                  </button>
-
-                  <button
-                    onClick={() => handleRideTo(project)}
-                    className="py-2 px-3 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition flex items-center justify-center gap-1.5 shadow-sm"
-                    title="在海边世界骑车传送到此建筑"
-                  >
-                    <Bike className="w-4 h-4" />
-                    骑车前往
-                  </button>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+  if (!isOpen) return null;
+  return <div className="portfolio-index"><main className="portfolio-index-content">
+    <header className="portfolio-index-header">
+      <div><span className="portfolio-index-eyebrow">MY WORLD · QUICK EXPLORER</span><h1><PixelBook size={24} /> 作品全览索引</h1><p>直接阅读作品详情，或回到小镇继续探索。</p></div>
+      <button className="scene-button scene-button-muted" onClick={() => setCurrentView('game')}>返回小镇 ×</button>
+    </header>
+    <nav className="portfolio-index-filters" aria-label="作品领域">
+      <button className={selectedKind === 'all' ? 'is-active' : ''} onClick={() => setSelectedKind('all')}>全部作品</button>
+      {kinds.map((kind) => <button key={kind} className={selectedKind === kind ? 'is-active' : ''} onClick={() => setSelectedKind(kind)}>{KIND_LABELS[kind]}</button>)}
+      <span>{filtered.length} 件</span>
+    </nav>
+    <div className="portfolio-index-status" aria-live="polite">
+      {status === 'loading' && '正在载入作品内容…'}
+      {status === 'error' && '内容暂未更新，继续显示已有作品。'}
+      {status === 'local' && '当前按简历内容占位。作品图来自简历，影片、Demo 与详细项目说明待补充。'}
     </div>
-  );
+    <div className="portfolio-index-grid">{filtered.map((entry) => {
+      const location = WORLD_LOCATIONS.find((item) => item.id === entry.locationId);
+      return <article className="portfolio-index-card" key={entry.id}>
+        <div className="portfolio-index-card-meta"><span>{KIND_LABELS[entry.kind]}</span><span>{entry.isSample ? '示例内容' : entry.source || entry.date}</span></div>
+        <h2>{entry.title}</h2>
+        {entry.subtitle && <p className="portfolio-index-card-subtitle">{entry.subtitle}</p>}
+        <p className="portfolio-index-card-description">{entry.description}</p>
+        <div className="portfolio-index-tags">{entry.tags.slice(0, 4).map((tag) => <span key={tag}>{tag}</span>)}</div>
+        <div className="portfolio-index-card-actions">
+          <button className="scene-button" onClick={() => openEntry(entry.id)}>查看详情 ▶</button>
+          {entry.locationId && <button className="scene-button scene-button-muted" onClick={() => teleportToLocation(entry.locationId!)} title={`前往${location?.name ?? '对应地标'}`}><PixelBike size={16} /> 前往地标</button>}
+        </div>
+        {location && <small className="portfolio-index-location">{location.name}</small>}
+      </article>;
+    })}</div>
+    {filtered.length === 0 && <div className="scene-empty"><PixelBook size={32} /><h2>这个领域还没有作品</h2><p>选择其他领域继续浏览。</p></div>}
+  </main></div>;
 };

@@ -1,0 +1,3 @@
+.project-cover { width: 100%; height: 100%; min-width: 0; min-height: 0; container-type: size; display: grid; place-items: center; }
+.project-cover-frame { min-width: 0; min-height: 0; overflow: hidden; background: #e8e7da; }
+.project-cover-frame > .content-media { width: 100%; height: 100%; min-height: 0; }

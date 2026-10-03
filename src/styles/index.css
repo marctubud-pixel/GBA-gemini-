@@ -228,3 +228,5 @@ button, a, [role="button"], .cursor-pointer {
   box-shadow: inset 1px 1px 0 #cbd5e1, 0 1px 0 #0c2340;
 }
 
+
+.project-preview-loading { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; background: #0d131a; color: #d7e6e9; font: 14px system-ui, sans-serif; }

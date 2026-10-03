@@ -1,0 +1,55 @@
+.handheld-stage { background: radial-gradient(ellipse at 50% 42%, #33343e 0%, #1b1c24 47%, #0c0d13 100%); }
+.handheld-console { position: relative; width: min(1332px, 100%, calc((100dvh - 144px) * 1200 / 500)); aspect-ratio: 1200 / 500; container-type: inline-size; flex-shrink: 0; filter: drop-shadow(0 24px 20px #0008) drop-shadow(0 5px 3px #0007); }
+.handheld-hardware { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.handheld-screen { border-radius: 1px; box-shadow: inset 0 0 4px #000a; }
+.handheld-game-viewport { position: relative; width: 100%; aspect-ratio: 16 / 9; flex-shrink: 0; overflow: hidden; }
+.handheld-hit { position: absolute; z-index: 20; border: 0; background: transparent; cursor: pointer; touch-action: none; border-radius: 4px; }
+.handheld-hit-round { border-radius: 50%; }
+.handheld-hit:focus-visible { outline: 2px solid #f4ebaa; outline-offset: 2px; }
+.handheld-small-button { position: absolute; z-index: 20; background: transparent; border: 0; border-radius: 50%; cursor: pointer; }
+.handheld-small-button:active { background: #0003; }
+.handheld-volume { display: flex; align-items: center; gap: 3px; margin-left: 4px; padding-left: 8px; border-left: 1px solid #ffffff18; }
+.handheld-volume button { display: grid; place-items: center; width: 22px; height: 25px; padding: 0; border: 0; border-radius: 6px; color: #c9d7e8; font: 15px/1 system-ui, sans-serif; background: transparent; cursor: pointer; }
+.handheld-volume button:hover { background: #ffffff10; color: #fff; }
+.handheld-volume button:active { background: #ffffff20; }
+.handheld-volume button:focus-visible, .handheld-small-button:focus-visible, .handheld-volume input:focus-visible { outline: 2px solid #f4ebaa; outline-offset: 2px; }
+.handheld-volume .handheld-mute { width: 28px; background: #1e293b; }
+.handheld-volume svg { width: 15px; height: 15px; }
+.handheld-volume input { appearance: none; -webkit-appearance: none; width: 66px; height: 4px; margin: 0 3px; border-radius: 4px; background: #58667b; outline: none; cursor: ew-resize; touch-action: none; }
+.handheld-volume input::-webkit-slider-thumb { appearance: none; width: 10px; height: 10px; border: 1px solid #bae6fd; border-radius: 50%; background: #7dd3fc; }
+.handheld-volume input::-moz-range-thumb { width: 10px; height: 10px; border: 1px solid #bae6fd; border-radius: 50%; background: #7dd3fc; }
+@media (max-width: 640px) { .handheld-volume { gap: 1px; padding-left: 5px; margin-left: 0; } .handheld-volume input { width: 42px; } .handheld-volume button:not(.handheld-mute) { display: none; } }
+.handheld-stage[data-handheld-device="ps-portal"] { background: radial-gradient(ellipse at 50% 46%, #4b505d 0%, #303541 40%, #171b25 75%, #0c0f16 100%); }
+.handheld-console[data-handheld-device="ps-portal"] { filter: drop-shadow(0 27px 19px #0009) drop-shadow(0 4px 2px #0008); }
+
+.handheld-console { --handheld-mark: #b7b8bc; }
+.handheld-device-options { position: absolute; left: 50%; bottom: -34px; transform: translateX(-50%); display: flex; align-items: center; gap: 6px; padding: 4px 7px; border-radius: 20px; background: #15161dcc; border: 1px solid #ffffff0d; white-space: nowrap; }
+.handheld-device-options button { display: flex; align-items: center; gap: 7px; padding: 4px 9px; border: 0; border-radius: 20px; background: transparent; color: #a6a7b2; font: 11px/1.3 system-ui, sans-serif; }
+.handheld-device-options button[aria-checked="true"] { color: #ececf2; background: #ffffff10; }
+.handheld-device-options button:hover { color: #fff; }
+.handheld-device-options button:focus-visible { outline: 2px solid #eee4b1; outline-offset: 1px; }
+.handheld-device-options button span { width: 13px; height: 13px; border-radius: 50%; box-shadow: inset 0 1px 1px #fffa, inset 0 -1px 2px #0005, 0 1px 2px #0007; }
+.handheld-model-credit { padding: 0 3px; color: #969da9; font: 13px/1 system-ui, sans-serif; text-decoration: none; }
+.handheld-model-credit:hover { color: #e5e8ef; }
+.handheld-model-credit:focus-visible { outline: 2px solid #eee4b1; outline-offset: 2px; }
+@media (max-height: 500px) { .handheld-device-options { bottom: -29px; padding: 2px 5px; } .handheld-device-options button { font-size: 10px; padding: 3px 6px; } }
+
+.handheld-device-label { padding: 0 6px; font: 11px/1.3 system-ui, sans-serif; color: #9498a4; }
+@media (max-width: 480px) { .handheld-device-options { gap: 2px; padding: 4px; } .handheld-device-options button { gap: 4px; padding: 4px 7px; font-size: 10px; } .handheld-device-label { display: none; } }
+
+.handheld-hardware > canvas { display: block; width: 100%; height: 100%; image-rendering: auto; }
+.handheld-render-error { position: absolute; top: 95%; left: 50%; transform: translateX(-50%); font: 11px system-ui, sans-serif; color: #b9bcc7; white-space: nowrap; }
+
+.handheld-stick-hit { position: absolute; z-index: 20; border-radius: 50%; overflow: hidden; }
+.handheld-stick-sector { position: absolute; inset: 0; border: 0; padding: 0; cursor: pointer; touch-action: none; background: transparent; }
+.handheld-stick-up { clip-path: polygon(0 0, 100% 0, 50% 50%); }
+.handheld-stick-right { clip-path: polygon(100% 0, 100% 100%, 50% 50%); }
+.handheld-stick-down { clip-path: polygon(0 100%, 100% 100%, 50% 50%); }
+.handheld-stick-left { clip-path: polygon(0 0, 0 100%, 50% 50%); }
+.handheld-stick-sector:focus-visible { background: #e3d59726; }
+
+@media (max-width: 480px) {
+  .handheld-volume { position: relative; }
+  .handheld-volume input { position: absolute; top: 35px; right: 0; width: 82px; margin: 0; opacity: 0; pointer-events: none; box-shadow: 0 0 0 10px #111b2bee; }
+  .handheld-volume:focus-within input, .handheld-volume:hover input { opacity: 1; pointer-events: auto; }
+}

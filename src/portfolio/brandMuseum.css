@@ -1,0 +1,21 @@
+.brand-museum-base{display:contents}
+.brand-exhibition .brand-panel-content{overflow:hidden;gap:4px;min-height:0}
+.scene-modal-backdrop .brand-exhibition .brand-panel-art{flex:1 1 auto;height:auto;min-height:48px;margin:0;border:1px solid #8fb5c9;background:#e7f0ee;box-shadow:inset 1px 1px #fbfcf2;display:block;width:100%;padding:0;overflow:hidden}
+.brand-exhibition .brand-art-entry:hover{border-color:#2679bd;box-shadow:inset 0 0 0 1px #7cc9e8}
+.scene-modal-backdrop .brand-exhibition .brand-panel h4{font-size:12px;line-height:1.35;min-height:16px;flex-shrink:0;-webkit-line-clamp:2}
+.brand-exhibition .brand-panel-content>p{font-size:10px;line-height:1.4;color:#557182;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;flex-shrink:0}
+.scene-modal-backdrop .brand-exhibition .brand-panels{grid-template-columns:repeat(5,minmax(0,1fr))}
+.brand-exhibition .brand-panel-label{min-width:0;white-space:nowrap}
+.brand-exhibition .brand-panel-label svg{flex-shrink:0}
+.brand-exhibition .brand-panel-label h3{white-space:nowrap}
+.brand-museum-base .scene-modal-footer{justify-content:flex-end}
+.brand-museum-base .brand-navigation-hint{gap:0}
+@media(max-width:620px){
+  .scene-modal-backdrop .brand-exhibition .brand-panels{gap:3px}
+  .scene-modal-backdrop .brand-exhibition .brand-panel{padding:3px;gap:4px}
+  .scene-modal-backdrop .brand-exhibition .brand-panel-label{gap:3px}
+  .scene-modal-backdrop .brand-exhibition .brand-panel-label h3{font-size:13px}
+  .brand-exhibition .brand-panel-label svg{width:15px;height:15px}
+  .scene-modal-backdrop .brand-exhibition .brand-panel h4{font-size:10px}
+  .brand-exhibition .brand-panel-content>p{font-size:9px}
+}

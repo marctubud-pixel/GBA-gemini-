@@ -1,0 +1,31 @@
+.arcade-library-base { display: contents; }
+.arcade-library { display: flex; flex-direction: column; gap: 7px; min-height: 0; height: 100%; color: #153e62; font-family: inherit; }
+.arcade-library * { box-sizing: border-box; }
+.arcade-library-heading { display: flex; align-items: center; gap: 8px; flex: 0 0 25px; min-height: 25px; padding: 2px 9px; color: #fff9e9; background: #217cbd; border: 1px solid #115c99; box-shadow: inset 0 1px #75c7f0, inset 0 -1px #16558b; }
+.arcade-library-heading svg { flex: 0 0 auto; }
+.arcade-library-heading h3 { margin: 0; font-size: 14px; line-height: 1.25; font-weight: 700; letter-spacing: .6px; }
+.arcade-library-list { display: flex; flex-direction: column; gap: 5px; flex: 1 1 auto; min-height: 0; overflow: auto; overscroll-behavior: contain; padding: 1px 5px 3px 1px; scrollbar-width: thin; scrollbar-color: #3593c8 #e5f1ee; }
+.arcade-library-row { display: flex; flex: 0 0 52px; align-items: center; gap: 10px; width: 100%; min-height: 52px; padding: 4px 7px; color: #153e62; text-align: left; background: #fffbee; border: 1px solid #a5c9d5; box-shadow: inset 0 1px #fffdf6, inset 0 -1px #e2e1c8; font: inherit; cursor: pointer; }
+.arcade-library-row:hover, .arcade-library-row.is-active { background: #ebf5f1; border-color: #268ec5; box-shadow: inset 2px 0 #268ec5, inset 0 1px #fffdf6; }
+.arcade-library-row.is-project:hover { background: #e1f2f7; }
+.arcade-library-row:focus-visible { outline: 2px solid #e0b347; outline-offset: 1px; }
+.arcade-library-thumb { flex: 0 0 73px; width: 73px; height: 40px; overflow: hidden; border: 1px solid #4888a4; background: #173e56; }
+.arcade-library-thumb .content-media, .arcade-library-thumb .content-media-placeholder, .arcade-library-thumb img, .arcade-library-thumb .content-media-placeholder > svg { display: block; width: 100%; height: 100%; }
+.arcade-library-thumb img { object-fit: cover; image-rendering: auto !important; }
+.arcade-library[data-game-mode="journey"] .arcade-library-thumb { flex-basis: 42px; width: 42px; height: 42px; aspect-ratio: 1; }
+.arcade-library[data-game-mode="journey"] .arcade-library-row { display: grid; grid-template-columns: 42px minmax(0, 1fr) max-content; }
+.arcade-library-copy { display: flex; flex: 1; flex-direction: column; justify-content: center; gap: 3px; min-width: 0; }
+.arcade-library-copy strong { overflow: hidden; color: #133e68; font-size: 16px; font-weight: 700; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
+.arcade-library[data-game-mode="journey"] .arcade-library-copy { text-align: left; }
+.arcade-library-hours { display: flex; align-items: center; align-self: center; gap: 5px; color: #376988; font-size: 10px; line-height: 1.2; white-space: nowrap; }
+.arcade-library-hours b { color: #164f78; font-size: 11px; font-weight: 700; }
+.arcade-library-type { flex: 0 0 auto; min-width: 40px; padding: 2px 6px; text-align: center; color: #286181; background: #e6f0ed; border: 1px solid #a9c4cc; font-size: 10px; }
+.arcade-library-footer { display: flex; justify-content: space-between; gap: 9px; width: 100%; font-size: 9px; line-height: 1.35; }
+.arcade-library-empty { display: flex; flex: 1; min-height: 100px; align-items: center; justify-content: center; flex-direction: column; gap: 8px; color: #48748a; background: #f2eddd; border: 1px dashed #b4cbd0; }
+.arcade-library-empty h3 { margin: 0; font-size: 14px; }
+@media (max-width: 520px) {
+  .arcade-library-row { gap: 8px; padding-inline: 5px; }
+  .arcade-library-thumb { flex-basis: 66px; width: 66px; }
+  .arcade-library-copy strong { font-size: 14px; }
+  .arcade-library-footer { font-size: 8px; gap: 5px; }
+}

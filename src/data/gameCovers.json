@@ -1,0 +1,80 @@
+{
+  "resume-wukong": {
+    "id": "wukong-cover",
+    "type": "image",
+    "url": "/media/game-covers/wukong-square.webp",
+    "alt": "黑神话：悟空 · 官方宣传封面"
+  },
+  "resume-persona": {
+    "id": "persona-cover",
+    "type": "image",
+    "url": "/media/game-covers/persona-square.webp",
+    "alt": "女神异闻录 5 · 官方宣传封面"
+  },
+  "resume-zelda-botw": {
+    "id": "zelda-cover",
+    "type": "image",
+    "url": "/media/game-covers/zelda-square.webp",
+    "alt": "塞尔达传说：旷野之息 · 官方宣传封面"
+  },
+  "resume-uncharted": {
+    "id": "uncharted-cover",
+    "type": "image",
+    "url": "/media/game-covers/uncharted-square.webp",
+    "alt": "神秘海域系列 · 官方宣传封面"
+  },
+  "resume-mario": {
+    "id": "mario-cover",
+    "type": "image",
+    "url": "/media/game-covers/mario-square.webp",
+    "alt": "超级马力欧 奥德赛 · 官方宣传封面"
+  },
+  "resume-last-of-us": {
+    "id": "last-of-us-cover",
+    "type": "image",
+    "url": "/media/game-covers/last-of-us-square.webp",
+    "alt": "最后生还者系列 · 官方宣传封面"
+  },
+  "resume-tsushima": {
+    "id": "tsushima-cover",
+    "type": "image",
+    "url": "/media/game-covers/tsushima-square.webp",
+    "alt": "对马岛之魂 · 官方宣传封面"
+  },
+  "resume-god-of-war": {
+    "id": "god-of-war-cover",
+    "type": "image",
+    "url": "/media/game-covers/god-of-war-square.webp",
+    "alt": "战神 3 / 战神 4 · 官方宣传封面"
+  },
+  "resume-spiderman": {
+    "id": "spiderman-cover",
+    "type": "image",
+    "url": "/media/game-covers/spiderman-square.webp",
+    "alt": "漫威蜘蛛侠系列 · 官方宣传封面"
+  },
+  "resume-yotei": {
+    "id": "yotei-cover",
+    "type": "image",
+    "url": "/media/game-covers/yotei-square.webp",
+    "alt": "羊蹄山之魂 · 官方宣传封面"
+  },
+  "resume-astral-chain": {
+    "id": "astral-cover",
+    "type": "image",
+    "url": "/media/game-covers/astral-square.webp",
+    "alt": "异界锁链 · 官方宣传封面"
+  },
+  "resume-devil-may-cry": {
+    "id": "devil-may-cry-cover",
+    "type": "image",
+    "url": "/media/game-covers/devil-may-cry-square.webp",
+    "alt": "鬼泣 4 · 官方宣传封面"
+  },
+  "resume-other-games": {
+    "id": "other-games-cover",
+    "type": "image",
+    "url": "/media/game-covers/other-games-square.webp",
+    "alt": "其他游戏体验 · 游戏合集封面"
+  }
+}

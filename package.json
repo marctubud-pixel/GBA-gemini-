@@ -5,25 +5,34 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
+    "build": "tsc && tsc -p server/tsconfig.json && vite build",
+    "preview": "vite preview",
+    "start": "vite preview --host 127.0.0.1 --port 3012 --strictPort",
+    "test:content": "node --test tests/localContent.test.mjs",
+    "test:preview": "node --test tests/projectPreview.test.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.441.0",
+    "pdfjs-dist": "^6.3.289",
     "phaser": "^3.88.2",
+    "qrcode": "^1.5.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "three": "^0.186.1",
     "zustand": "^4.5.5"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
+    "@types/node": "^26.6.4",
+    "@types/qrcode": "^1.5.6",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
+    "@types/three": "^0.186.0",
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.6.1",
     "postcss": "^8.5.28",
     "tailwindcss": "^4.3.3",
     "typescript": "^5.5.4",
-    "vite": "^5.4.3"
+    "vite": "^6.4.3"
   }
 }

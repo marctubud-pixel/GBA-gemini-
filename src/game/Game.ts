@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { BootScene } from './scenes/BootScene';
 import { WorldScene } from './scenes/WorldScene';
-import { PrintHouseScene } from './scenes/PrintHouseScene';
+import { InteriorScene } from './scenes/InteriorScene';
 
 export function createGame(parent: HTMLElement): Phaser.Game {
   const config: Phaser.Types.Core.GameConfig = {
@@ -26,7 +26,7 @@ export function createGame(parent: HTMLElement): Phaser.Game {
         debug: false
       }
     },
-    scene: [BootScene, WorldScene, PrintHouseScene]
+    scene: [BootScene, WorldScene, InteriorScene]
   };
 
   return new Phaser.Game(config);

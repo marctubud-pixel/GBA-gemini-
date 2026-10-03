@@ -9,6 +9,8 @@ class PixelSoundManager {
   private noiseBuffer: AudioBuffer | null = null;
   private stepToggle = false;
   private soundEnabled = true;
+  private soundVolume = .75;
+  private outputGain: GainNode | null = null;
 
   // Continuous Bicycle Rolling Audio Nodes
   private bikeNoiseSource: AudioBufferSourceNode | null = null;
@@ -73,11 +75,12 @@ class PixelSoundManager {
    * Connect world store updates cleanly without circular module import
    */
   public connectStore(store: {
-    getState: () => { soundEnabled: boolean; isOverlayOpen: boolean; currentView: string };
+    getState: () => { soundEnabled: boolean; soundVolume: number; isOverlayOpen: boolean; currentView: string };
     subscribe: (listener: (state: any, prevState: any) => void) => () => void;
   }): () => void {
     if (!store) return () => {};
     const initialState = store.getState();
+    this.setSoundVolume(initialState.soundVolume);
     this.setSoundEnabled(initialState.soundEnabled);
     const initialDucked = initialState.isOverlayOpen || initialState.currentView !== 'game';
     this.updateBGMDucking(initialDucked);
@@ -86,6 +89,7 @@ class PixelSoundManager {
       if (state.soundEnabled !== prevState.soundEnabled) {
         this.setSoundEnabled(state.soundEnabled);
       }
+      if (state.soundVolume !== prevState.soundVolume) this.setSoundVolume(state.soundVolume);
       const isDucked = state.isOverlayOpen || state.currentView !== 'game';
       const wasDucked = prevState.isOverlayOpen || prevState.currentView !== 'game';
       if (isDucked !== wasDucked) {
@@ -96,10 +100,22 @@ class PixelSoundManager {
 
   public setSoundEnabled(enabled: boolean) {
     this.soundEnabled = enabled;
+    this.updateOutputVolume();
     this.setBGMEnabled(enabled);
     if (this.oceanGain && this.ctx) {
       const now = this.ctx.currentTime;
       this.oceanGain.gain.setTargetAtTime(enabled ? 0.045 : 0.0001, now, 0.1);
+    }
+  }
+
+  public setSoundVolume(volume: number) {
+    this.soundVolume = Math.max(0, Math.min(1, volume));
+    this.updateOutputVolume();
+  }
+
+  private updateOutputVolume() {
+    if (this.outputGain && this.ctx) {
+      this.outputGain.gain.setTargetAtTime(this.soundEnabled ? this.soundVolume : 0, this.ctx.currentTime, .025);
     }
   }
 
@@ -108,6 +124,9 @@ class PixelSoundManager {
       const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       if (AudioCtx) {
         this.ctx = new AudioCtx();
+        this.outputGain = this.ctx.createGain();
+        this.outputGain.gain.value = this.soundEnabled ? this.soundVolume : 0;
+        this.outputGain.connect(this.ctx.destination);
         this.generateNoiseBuffer();
         this.initBGM(this.ctx);
         this.initOceanWaves(this.ctx);
@@ -121,7 +140,7 @@ class PixelSoundManager {
   }
 
   private isEnabled(): boolean {
-    return this.soundEnabled;
+    return this.soundEnabled && this.soundVolume > 0;
   }
 
   private generateNoiseBuffer() {
@@ -175,7 +194,7 @@ class PixelSoundManager {
     // Connect audio chain
     this.oceanSource.connect(this.oceanFilter);
     this.oceanFilter.connect(this.oceanGain);
-    this.oceanGain.connect(ctx.destination);
+    this.oceanGain.connect(this.outputGain!);
 
     this.oceanSource.start();
     this.oceanLFO.start();
@@ -230,7 +249,7 @@ class PixelSoundManager {
       gain.gain.exponentialRampToValueAtTime(0.0001, t + c.duration);
 
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(this.outputGain!);
 
       osc.start(t);
       osc.stop(t + c.duration + 0.02);
@@ -293,10 +312,10 @@ class PixelSoundManager {
     gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.44);
 
     osc1.connect(gain1);
-    gain1.connect(ctx.destination);
+    gain1.connect(this.outputGain!);
 
     osc2.connect(gain2);
-    gain2.connect(ctx.destination);
+    gain2.connect(this.outputGain!);
 
     osc1.start(now);
     osc1.stop(now + 0.50);
@@ -323,7 +342,7 @@ class PixelSoundManager {
     purrGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.65);
 
     purrChest.connect(purrGain);
-    purrGain.connect(ctx.destination);
+    purrGain.connect(this.outputGain!);
 
     tremolo.start(now + 0.1);
     tremolo.stop(now + 0.66);
@@ -348,7 +367,7 @@ class PixelSoundManager {
     this.bgmMasterGain.gain.setValueAtTime(targetGain, ctx.currentTime);
 
     this.bgmFilter.connect(this.bgmMasterGain);
-    this.bgmMasterGain.connect(ctx.destination);
+    this.bgmMasterGain.connect(this.outputGain!);
 
     this.startBGMScheduler();
   }
@@ -697,7 +716,7 @@ class PixelSoundManager {
 
     this.bikeNoiseSource.connect(this.bikeNoiseFilter);
     this.bikeNoiseFilter.connect(this.bikeNoiseGain);
-    this.bikeNoiseGain.connect(ctx.destination);
+    this.bikeNoiseGain.connect(this.outputGain!);
     this.bikeNoiseSource.start(now);
 
     // 2. Mechanical Gear & Chain Purr Layer
@@ -715,7 +734,7 @@ class PixelSoundManager {
 
     this.bikeOsc.connect(this.bikeOscFilter);
     this.bikeOscFilter.connect(this.bikeOscGain);
-    this.bikeOscGain.connect(ctx.destination);
+    this.bikeOscGain.connect(this.outputGain!);
     this.bikeOsc.start(now);
 
     this.bikeIsRolling = true;
@@ -780,7 +799,7 @@ class PixelSoundManager {
     gain.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
 
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(this.outputGain!);
     osc.start(now);
     osc.stop(now + 0.035);
 
@@ -799,7 +818,7 @@ class PixelSoundManager {
 
       noise.connect(filter);
       filter.connect(noiseGain);
-      noiseGain.connect(ctx.destination);
+      noiseGain.connect(this.outputGain!);
       noise.start(now);
       noise.stop(now + 0.025);
     }
@@ -825,7 +844,7 @@ class PixelSoundManager {
     gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
 
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(this.outputGain!);
     osc.start(now);
     osc.stop(now + 0.09);
   }
@@ -851,7 +870,7 @@ class PixelSoundManager {
     gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
 
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(this.outputGain!);
     osc.start(now);
     osc.stop(now + 0.09);
   }
@@ -881,7 +900,7 @@ class PixelSoundManager {
     gain.gain.exponentialRampToValueAtTime(0.001, now + 0.032);
 
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(this.outputGain!);
     osc.start(now);
     osc.stop(now + 0.032);
   }
@@ -912,7 +931,7 @@ class PixelSoundManager {
       gain.gain.exponentialRampToValueAtTime(0.001, startTime + noteDuration);
 
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(this.outputGain!);
       osc.start(startTime);
       osc.stop(startTime + noteDuration);
     });
@@ -943,7 +962,7 @@ class PixelSoundManager {
       gain.gain.exponentialRampToValueAtTime(0.001, startTime + noteDuration);
 
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(this.outputGain!);
       osc.start(startTime);
       osc.stop(startTime + noteDuration);
     });

@@ -1,0 +1,9 @@
+.resume-overlay{position:fixed;inset:0;z-index:1200;background:#0f263ae8;backdrop-filter:blur(6px);display:grid;place-items:center;color:#f1f5f9;font-family:var(--c-font-main)}
+.resume-dialog{width:min(1200px,94vw);height:94dvh;display:flex;flex-direction:column;gap:12px;min-height:0}
+.resume-toolbar{display:flex;align-items:center;gap:18px;min-height:38px;flex-shrink:0}
+.resume-toolbar h1{font-size:17px;font-weight:600;flex:1;margin:0}
+.resume-toolbar a{font-size:12px;color:#c9e3f5;text-decoration:underline}
+.resume-toolbar>button{border:1px solid #92b6ce;background:#234963;color:#fff;padding:7px 12px;font-size:13px;cursor:pointer}
+.resume-paper{display:flex;flex-direction:column;flex:1;min-height:0;background:#e1e5df;border:3px solid #47728b;box-shadow:0 5px #132f46}
+.resume-dialog button:focus-visible,.resume-dialog a:focus-visible,.resume-dialog [tabindex="0"]:focus-visible{outline:2px solid #f3c653;outline-offset:2px}
+@media(max-width:600px){.resume-dialog{width:96vw;height:96dvh;gap:8px}.resume-toolbar{gap:8px}.resume-toolbar h1{font-size:13px}.resume-toolbar a{font-size:10px}.resume-toolbar>button{padding:6px 8px;font-size:11px}}

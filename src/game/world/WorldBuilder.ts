@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { COASTAL_PALETTE as coast, coastalColor } from './coastalPalette';
 import { WORLD_LOCATIONS, WorldLocation } from '../../data/locations';
 import { WORLD_SEGMENTS } from '../../data/worldSegments';
 
@@ -141,7 +142,7 @@ export class WorldBuilder {
     // 1. Multi-tone Mediterranean Sky Gradient (Layer 1, ScrollFactor 0.06)
     const sky = this.scene.add.graphics();
     // Vibrant Mediterranean Azure Blue at top to warm crystal cyan at horizon
-    sky.fillGradientStyle(0x3584d4, 0x3584d4, 0xd0ebfc, 0xd0ebfc, 1);
+    sky.fillGradientStyle(coastalColor(coast.skyTop), coastalColor(coast.skyTop), coastalColor(coast.skyHorizon), coastalColor(coast.skyHorizon), 1);
     sky.fillRect(0, 0, totalW, 360);
     sky.setScrollFactor(0.06, 0.06);
     sky.setDepth(1);
@@ -229,24 +230,24 @@ export class WorldBuilder {
     sea.setDepth(3);
 
     // Horizon Glisten Line (Sharp sunlit demarcation between sky and water)
-    sea.fillStyle(0xbbe7fa, 0.9);
+    sea.fillStyle(coastalColor(coast.horizon), 0.9);
     sea.fillRect(0, 168, totalW, 2);
 
     // Deep Azure Ocean Body (3-step depth gradient)
-    sea.fillStyle(0x1e608a, 1); // Deep sapphire ocean horizon
+    sea.fillStyle(coastalColor(coast.seaFar), 1); // Deep sapphire ocean horizon
     sea.fillRect(0, 170, totalW, 30);
 
-    sea.fillStyle(0x277da1, 1); // Vibrant Mediterranean blue mid-sea
+    sea.fillStyle(coastalColor(coast.seaMid), 1); // Vibrant Mediterranean blue mid-sea
     sea.fillRect(0, 200, totalW, 35);
 
-    sea.fillStyle(0x389aa6, 1); // Clear emerald coastal shelf water
+    sea.fillStyle(coastalColor(coast.seaNear), 1); // Clear emerald coastal shelf water
     sea.fillRect(0, 235, totalW, 35);
 
     // 2. Layer 1 Distant Mountains (Very far hazy blue silhouettes, ScrollFactor 0.10, Depth 2)
     const farMountains = this.scene.add.graphics();
     farMountains.setScrollFactor(0.1, 0.1);
     farMountains.setDepth(2);
-    farMountains.fillStyle(0x608ea8, 0.45); // Hazy atmospheric blue
+    farMountains.fillStyle(coastalColor(coast.mountainFar), 0.45); // Hazy atmospheric blue
 
     for (let fx = 0; fx < totalW + 400; fx += 520) {
       farMountains.beginPath();
@@ -263,7 +264,7 @@ export class WorldBuilder {
     const midMountains = this.scene.add.graphics();
     midMountains.setScrollFactor(0.18, 0.18);
     midMountains.setDepth(2);
-    midMountains.fillStyle(0x4a7f96, 0.6);
+    midMountains.fillStyle(coastalColor(coast.mountainMid), 0.6);
 
     for (let fx = 100; fx < totalW + 400; fx += 580) {
       midMountains.beginPath();
@@ -282,7 +283,7 @@ export class WorldBuilder {
 
     for (let ix = 60; ix < totalW; ix += 480) {
       // Base island body (rich coastal blue-green)
-      nearIslands.fillStyle(0x2d6874, 0.85);
+      nearIslands.fillStyle(coastalColor(coast.island), 0.85);
       nearIslands.beginPath();
       nearIslands.moveTo(ix - 30, 195);
       nearIslands.lineTo(ix + 90, 154);
@@ -292,7 +293,7 @@ export class WorldBuilder {
       nearIslands.fill();
 
       // Sunlit ridge highlight (lush green terraced slope)
-      nearIslands.fillStyle(0x448d7d, 0.75);
+      nearIslands.fillStyle(coastalColor(coast.islandLight), 0.75);
       nearIslands.beginPath();
       nearIslands.moveTo(ix + 20, 178);
       nearIslands.lineTo(ix + 90, 154);
@@ -420,7 +421,7 @@ export class WorldBuilder {
       town.closePath();
       town.fill();
 
-      town.fillStyle(0x2d6874, 0.7);
+      town.fillStyle(coastalColor(coast.island), 0.7);
       town.beginPath();
       town.moveTo(gx + 26, 205);
       town.lineTo(gx + 19, 255);
@@ -484,15 +485,15 @@ export class WorldBuilder {
       roadGraphics.fillRect(x, y1 + 14 + foamH, coastStep, 2);
 
       // Layer 1: Vibrant Coastal Azure Water (y1 + 17 to y1 + 42)
-      roadGraphics.fillStyle(0x0284c7, 1);
+      roadGraphics.fillStyle(coastalColor(coast.waterNear), 1);
       roadGraphics.fillRect(x, y1 + 17, coastStep, 25);
 
       // Layer 2: Deep Mediterranean Sapphire Water (y1 + 42 to y1 + 75)
-      roadGraphics.fillStyle(0x0369a1, 1);
+      roadGraphics.fillStyle(coastalColor(coast.waterMid), 1);
       roadGraphics.fillRect(x, y1 + 42, coastStep, 33);
 
       // Layer 3: Deep Oceanic Marine Blue (y1 + 75 to 450)
-      roadGraphics.fillStyle(0x075985, 1);
+      roadGraphics.fillStyle(coastalColor(coast.waterDeep), 1);
       roadGraphics.fillRect(x, y1 + 75, coastStep, 450 - (y1 + 75));
     }
 
