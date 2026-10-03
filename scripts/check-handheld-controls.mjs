@@ -8,6 +8,7 @@ import * as THREE from 'three';
 const root = path.resolve(import.meta.dirname, '..');
 const temporary = path.join(root, 'node_modules/.handheld-controls-check.mjs');
 await build({ stdin: { contents: `export { loadHandheldAsset } from './src/shell/importedHandheldModels';
+export { createSwitchLiteModel } from './src/shell/switchLiteModel';
 export { createHardwareFeedback } from './src/shell/handheldFeedback';
 export { HANDHELD_LAYOUTS, HANDHELD_SCREEN_RECT } from './src/shell/HandheldHardware';`, resolveDir: root, loader: 'ts' },
   bundle: true, format: 'esm', platform: 'node', packages: 'external', outfile: temporary });
@@ -20,8 +21,70 @@ const checks = [];
 const check = (label, fn) => { fn(); checks.push(label); };
 const empty = () => ({ left: false, right: false, up: false, down: false, j: false, k: false });
 try {
-  const { loadHandheldAsset, createHardwareFeedback, HANDHELD_LAYOUTS, HANDHELD_SCREEN_RECT } = await import(pathToFileURL(temporary));
+  const { loadHandheldAsset, createSwitchLiteModel, createHardwareFeedback, HANDHELD_LAYOUTS, HANDHELD_SCREEN_RECT } = await import(pathToFileURL(temporary));
   check('The common 16:9 viewport stays full size', () => assert.deepEqual(HANDHELD_SCREEN_RECT, [270, 50, 660, 371.25]));
+  const lite = createSwitchLiteModel(); lite.group.updateMatrixWorld(true);
+  const probeAt = (x, y, object) => new THREE.Raycaster(new THREE.Vector3(x, y, 200), new THREE.Vector3(0, 0, -1)).intersectObject(object, true);
+  check('Lite: same full-size LCD aperture and metadata', () => {
+    assert.deepEqual(lite.group.userData.screenRect, HANDHELD_SCREEN_RECT);
+    for (const [x, y] of [[270.1, 50.1], [929.9, 50.1], [270.1, 421.15], [929.9, 421.15], [600, 235]]) {
+      assert.equal(probeAt(x - 600, 250 - y, lite.group).length, 0);
+    }
+  });
+  check('Lite: smaller faceplate with a continuous frame beside the LCD', () => {
+    const plate = lite.group.getObjectByName('turquoise-display-faceplate');
+    assert.ok(new THREE.Box3().setFromObject(plate).getSize(new THREE.Vector3()).x < 720);
+    for (const [x, y] of [[250, 240], [950, 240], [600, 35], [600, 440]]) {
+      assert.ok(probeAt(x - 600, 250 - y, plate).length);
+    }
+  });
+  check('Lite: unwanted lower corner holes removed', () => assert.ok(!lite.group.getObjectByName('lite-speaker-slot')));
+  for (const key of ['lite-volume-minus-key', 'lite-volume-plus-key']) check(`Lite: ${key} protrudes above the shell silhouette`, () => {
+    const box = new THREE.Box3().setFromObject(lite.group.getObjectByName(key));
+    const shell = new THREE.Box3().setFromObject(lite.group.getObjectByName('front-housing'));
+    assert.ok(box.max.y > shell.max.y + 3 && box.getSize(new THREE.Vector3()).z > 5);
+  });
+  for (const side of ['left', 'right']) {
+    const stick = lite.sticks[side], cap = lite.group.getObjectByName(`lite-stick-${side}-domed-cap`);
+    const origin = stick.getWorldPosition(new THREE.Vector3());
+    const topAt = (r, angle = 0) => probeAt(origin.x + r * Math.cos(angle), origin.y + r * Math.sin(angle), cap)[0]?.point.z;
+    check(`Lite ${side} analog: dome center is visibly above the outer shoulder`, () => assert.ok(topAt(.1) > topAt(32.8, Math.PI / 4) + 3));
+    check(`Lite ${side} analog: outer ring is an actual recessed channel`, () => assert.ok(topAt(29.7, Math.PI / 4) < topAt(27, Math.PI / 4) - 2));
+    check(`Lite ${side} analog: four cardinal rim grooves are recessed`, () => {
+      const uncut = topAt(32.8, Math.PI / 4);
+      for (let i = 0; i < 4; i++) assert.ok(topAt(32.8, i * Math.PI / 2) < uncut - .7);
+    });
+    check(`Lite ${side} analog: round cap with no unequal scaling`, () => {
+      const size = new THREE.Box3().setFromObject(cap).getSize(new THREE.Vector3());
+      assert.ok(Math.abs(size.x - size.y) < .001);
+    });
+    check(`Lite ${side}: curved white shoulder is visible outside the shell`, () => {
+      const box = new THREE.Box3().setFromObject(lite.group.getObjectByName(`lite-${side}-shoulder`));
+      assert.ok(box.max.y > 246 && box.getSize(new THREE.Vector3()).y > 70);
+    });
+  }
+  for (const [control, [x, y, w, h]] of Object.entries(HANDHELD_LAYOUTS.switch.controls)) check(`Lite: ${control} touch center hits its key`, () => {
+    assert.ok(probeAt(x + w / 2 - 600, 250 - y - h / 2, lite.buttons[control]).length);
+  });
+  const liteFeedback = createHardwareFeedback(lite, false);
+  const liteJRest = lite.buttons.j.position.z;
+  let litePress;
+  for (let frame = 0; frame < 9; frame++) litePress = liteFeedback.update({ ...empty(), j: frame === 0 }, frame * 16, 16, false);
+  check('Lite: quick face-button tap produces physical depression', () => assert.ok(litePress.pressure > .95 && liteJRest - lite.buttons.j.position.z > 2));
+  for (let frame = 9; frame < 60; frame++) liteFeedback.update(empty(), frame * 16, 16, false);
+  check('Lite: face-button cap returns after release', () => assert.ok(Math.abs(lite.buttons.j.position.z - liteJRest) < .001));
+  for (let frame = 0; frame < 12; frame++) liteFeedback.update({ ...empty(), up: true }, 2000 + frame * 16, 16, false);
+  check('Lite: one-piece D-pad rocks in the pressed direction', () => assert.ok(Math.abs(lite.buttons.up.rotation.x) > .055));
+  for (let frame = 0; frame < 60; frame++) liteFeedback.update(empty(), 2200 + frame * 16, 16, false);
+  for (const side of ['left', 'right']) {
+    for (let frame = 0; frame < 12; frame++) liteFeedback.update({ ...empty(), right: true }, 3000 + frame * 16, 16, false, side);
+    check(`Lite: ${side} stick can tilt without moving the other stick`, () => {
+      assert.ok(lite.sticks[side].rotation.y > .13);
+      assert.ok(Math.abs(lite.sticks[side === 'left' ? 'right' : 'left'].rotation.y) < .001);
+    });
+    for (let frame = 0; frame < 60; frame++) liteFeedback.update(empty(), 3200 + frame * 16, 16, false, side);
+    check(`Lite: ${side} stick springs back after release`, () => assert.ok(Math.abs(lite.sticks[side].rotation.y) < .001));
+  }
   for (const device of ['steam-deck', 'ps-portal']) {
     const model = await loadHandheldAsset(device);
     model.group.updateMatrixWorld(true);

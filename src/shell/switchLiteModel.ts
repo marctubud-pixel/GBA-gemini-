@@ -23,14 +23,14 @@ function perimeter() {
   const line = (x: number, y: number) => shape.lineTo(...coord(x, y));
   const curve = (a: number, b: number, c: number, d: number, x: number, y: number) =>
     shape.bezierCurveTo(...coord(a, b), ...coord(c, d), ...coord(x, y));
-  move(135, 17); line(1065, 17);
-  curve(1122, 17, 1154, 47, 1157, 107);
+  move(145, 20); line(1055, 20);
+  curve(1112, 20, 1144, 49, 1147, 107);
   // Bowed sidewalls and long corner transitions, rather than a tablet rectangle.
-  curve(1166, 189, 1166, 311, 1157, 393);
-  curve(1154, 453, 1122, 483, 1065, 483); line(135, 483);
-  curve(78, 483, 46, 453, 43, 393);
-  curve(34, 311, 34, 189, 43, 107);
-  curve(46, 47, 78, 17, 135, 17); shape.closePath(); return shape;
+  curve(1156, 189, 1156, 311, 1147, 390);
+  curve(1144, 449, 1112, 477, 1055, 477); line(145, 477);
+  curve(88, 477, 56, 449, 53, 390);
+  curve(44, 311, 44, 189, 53, 107);
+  curve(56, 49, 88, 20, 145, 20); shape.closePath(); return shape;
 }
 function openScreen(shape: THREE.Shape, clearance: number) {
   shape.holes.push(rectangle(SCREEN[0] - clearance, SCREEN[1] - clearance,
@@ -64,7 +64,7 @@ function materials() {
   });
   return {
     front: plastic('#00b5b1'), back: plastic('#009894', .7), seam: plastic('#126a69', .76),
-    bezel: new THREE.MeshPhysicalMaterial({ color: '#079f9d', roughness: .36, metalness: 0,
+    bezel: new THREE.MeshPhysicalMaterial({ color: '#08aaa6', roughness: .36, metalness: 0,
       clearcoat: .18, clearcoatRoughness: .35, specularIntensity: .7 }),
     key: plastic('#dce0db', .54), stick: plastic('#cdd3ce', .62),
     engraving: new THREE.MeshStandardMaterial({ color: '#bac4bf', roughness: .73 }),
@@ -78,8 +78,8 @@ type Materials = ReturnType<typeof materials>;
 
 function crown(x: number, y: number) {
   const lateral = x < 225 ? x : x > 975 ? 1200 - x : 225;
-  return 4.2 * Math.sin(Math.PI * THREE.MathUtils.clamp((lateral - 32) / 193, 0, 1)) *
-    Math.sin(Math.PI * THREE.MathUtils.clamp((y - 17) / 466, 0, 1));
+  return 4.2 * Math.sin(Math.PI * THREE.MathUtils.clamp((lateral - 44) / 181, 0, 1)) *
+    Math.sin(Math.PI * THREE.MathUtils.clamp((y - 20) / 457, 0, 1));
 }
 /** Deform with analytic normals, so triangulation cannot produce diagonal creases. */
 function curvedFace(mesh: THREE.Mesh, lift: (x: number, y: number) => number,
@@ -134,21 +134,40 @@ function cap(parent: THREE.Group, x: number, y: number, radius: number, symbol: 
   const surface = 9 + crown(x, y);
   parent.add(cylinder(radius + 1.3, 1.7, kit.recess, x, y, surface + .4));
   const button = new THREE.Group(); button.position.copy(point(x, y, surface));
+  button.name = symbol ? `lite-face-${symbol}` : 'lite-home-key';
   button.add(lathed([[0, .5], [radius - 1, .5], [radius, 1.2], [radius, 4.1],
     [radius - .25, 5.2], [radius - 1, 6], [radius - 2, 6.35], [0, 6.5]], kit.key));
   letter(button, symbol, 6.65, kit); parent.add(button);
   button.userData.pressDepth = 2.3; return button;
 }
-function joystick(parent: THREE.Group, x: number, y: number, kit: Materials) {
+function joystick(parent: THREE.Group, x: number, y: number, side: 'left' | 'right', kit: Materials) {
   const z = 9 + crown(x, y), radius = 34;
-  parent.add(cylinder(radius + 2.4, 1.9, kit.recess, x, y, z + .5));
-  const stick = new THREE.Group(); stick.position.copy(point(x, y, z)); stick.name = 'lite-analog-stick';
+  const socket = cylinder(radius + 2.4, 1.9, kit.recess, x, y, z + .5);
+  socket.name = `lite-stick-${side}-socket`; parent.add(socket);
+  const stick = new THREE.Group(); stick.position.copy(point(x, y, z)); stick.name = `lite-stick-${side}`;
   stick.add(cylinder(15, 7, kit.rubber, 600, 250, 5));
-  // A single rounded rubber cap: concave thumb well, raised lip and soft edge.
-  stick.add(lathed([[0, 5], [15, 5], [27, 7.3], [32, 10.6], [34, 13.5], [34, 16.2],
-    [33.3, 18.1], [31.7, 19], [30, 18.8], [28.5, 17.6], [25, 15.9], [18, 14.3], [0, 13.8]], kit.stick));
-  const groove = new THREE.Mesh(new THREE.TorusGeometry(30.4, .28, 8, 96), kit.engraving);
-  groove.position.z = 18.95; stick.add(groove); parent.add(stick);
+  // The center rises above the perimeter. The annular channel is cut into the
+  // actual cap profile; four cardinal cuts segment its rim without a painted X.
+  const profile: [number, number][] = [[0, 5], [15, 5], [27, 7.3], [32, 10.6],
+    [34, 13.5], [34, 16.2], [33.6, 18.1], [32.8, 19], [31.7, 19.3],
+    [31, 18.9], [30.4, 17.75], [29.7, 17.6], [29, 18.25], [28.3, 19.5],
+    [27, 20.05], [25, 20.45], [20, 21.4], [14, 22.2], [7, 22.7], [0, 22.85]];
+  const geometry = new THREE.LatheGeometry(profile.map(([r, height]) => new THREE.Vector2(r, height)), 192);
+  const positions = geometry.getAttribute('position');
+  for (let i = 0; i < positions.count; i++) {
+    const x = positions.getX(i), y = positions.getY(i), radialZ = positions.getZ(i);
+    const r = Math.hypot(x, radialZ), crossDistance = Math.min(Math.abs(x), Math.abs(radialZ));
+    if (r < 27 || y < 17.5) continue;
+    const rim = THREE.MathUtils.smoothstep(r, 27, 29);
+    positions.setY(i, y - .9 * rim * Math.exp(-((crossDistance / .6) ** 2)));
+  }
+  geometry.computeVertexNormals();
+  const top = new THREE.Mesh(geometry, kit.stick); top.rotation.x = Math.PI / 2;
+  top.name = `lite-stick-${side}-domed-cap`; top.castShadow = top.receiveShadow = true;
+  stick.add(top);
+  const channel = new THREE.Mesh(new THREE.TorusGeometry(29.7, .18, 8, 192), kit.engraving);
+  channel.name = `lite-stick-${side}-ring-channel`; channel.position.z = 17.6;
+  stick.add(channel); parent.add(stick); return stick;
 }
 function cross(half: number, arm: number) {
   const xy = [[-arm, -half], [arm, -half], [arm, -arm], [half, -arm], [half, arm],
@@ -190,9 +209,11 @@ function smallKeys(parent: THREE.Group, kit: Materials) {
   // Capture is a square molded key; Home is circular with a shallow house mark.
   const squareX = 186, squareY = 398, squareZ = 9 + crown(squareX, squareY);
   parent.add(molded(rectangle(squareX - 11.5, squareY - 11.5, 23, 23, 3), kit.recess, squareZ, 1, .35));
-  parent.add(molded(rectangle(squareX - 10.1, squareY - 10.1, 20.2, 20.2, 2.6), kit.key, squareZ + .5, 3.2, .8));
+  const captureKey = molded(rectangle(squareX - 10.1, squareY - 10.1, 20.2, 20.2, 2.6), kit.key, squareZ + .5, 3.2, .8);
+  captureKey.name = 'lite-capture-key'; parent.add(captureKey);
   const capture = new THREE.Group(); capture.position.copy(point(squareX, squareY, squareZ + 4.6));
-  capture.add(cylinder(5.4, .3, kit.engraving, 600, 250, 0)); parent.add(capture);
+  const captureRing = new THREE.Mesh(new THREE.TorusGeometry(5.4, .45, 8, 48), kit.engraving);
+  capture.add(captureRing); parent.add(capture);
   const home = cap(parent, 1019, 387, 13, '', kit);
   stroke(home, [[-5, -.5], [-5, -4.5], [5, -4.5], [5, -.5]], 6.65, kit.engraving, .5);
   stroke(home, [[-6, -.5], [0, 4.8], [6, -.5]], 6.65, kit.engraving, .5);
@@ -204,13 +225,28 @@ function smallKeys(parent: THREE.Group, kit: Materials) {
     const socket = molded(shape.clone(), kit.recess, 0, 1, 1);
     socket.position.copy(point(x, y, z + .2)); parent.add(socket);
     const key = molded(shape, kit.key, 0, 2.4, .65);
+    key.name = plus ? 'lite-plus-key' : 'lite-minus-key';
     key.position.copy(point(x, y, z + 1)); parent.add(key);
   }
 }
-function speakers(parent: THREE.Group, kit: Materials) {
-  for (const x of [213, 973]) for (let i = 0; i < 4; i++) {
-    const slot = molded(rectangle(x + i * 4.2, 479, 1.7, 6.5, .8), kit.recess, 9.8, .2, .1);
-    slot.name = 'lite-speaker-slot'; parent.add(slot);
+function topKeys(parent: THREE.Group, kit: Materials) {
+  for (const [index, x] of [287, 326].entries()) {
+    const socket = molded(rectangle(x - 1, 5.5, 25, 5.5, 1.2), kit.seam, -13, 5, .5);
+    socket.name = `lite-volume-${index === 0 ? 'minus' : 'plus'}-socket`; parent.add(socket);
+    const key = molded(rectangle(x, 2.5, 23, 6, 1.7), kit.front, -9, 5, .9);
+    key.name = `lite-volume-${index === 0 ? 'minus' : 'plus'}-key`; parent.add(key);
+  }
+  // Curved shoulder caps follow each upper corner, with their own molded edge.
+  for (const side of ['left', 'right'] as const) {
+    const shape = new THREE.Shape();
+    const xy = (x: number, y: number) => coord(side === 'left' ? x - 4 : 1204 - x, y - 10);
+    shape.moveTo(...xy(190, 13)); shape.lineTo(...xy(145, 13));
+    shape.bezierCurveTo(...xy(88, 13), ...xy(48, 43), ...xy(43, 85));
+    shape.lineTo(...xy(54, 88));
+    shape.bezierCurveTo(...xy(65, 49), ...xy(96, 26), ...xy(145, 25));
+    shape.lineTo(...xy(190, 25)); shape.closePath();
+    const key = molded(shape, kit.key, -15, 7, 1.4);
+    key.name = `lite-${side}-shoulder`; parent.add(key);
   }
 }
 
@@ -224,18 +260,16 @@ export function createSwitchLiteModel(): HandheldModel {
   const front = molded(openScreen(perimeter(), 15), kit.front, -23, 19, 13);
   curvedFace(front, crown, 19, 32); front.name = 'front-housing'; group.add(front);
   // A flush turquoise faceplate frames the fixed LCD. Only its thin inner gasket is black.
-  const bezel = molded(openScreen(rectangle(225, 18, 750, 440, 5), 3.5), kit.bezel, 10, .45, .65);
+  const bezel = molded(openScreen(rectangle(243, 29, 714, 419, 5), 3.5), kit.bezel, 10, .45, .65);
   bezel.name = 'turquoise-display-faceplate'; group.add(bezel);
   const lens = molded(openScreen(rectangle(267, 47, 666, 377.25, 1.5), .35), kit.lens, 11.3, .45, .35);
   lens.name = 'screen-lens-surround'; group.add(lens);
-  joystick(group, 140, 123, kit); joystick(group, 1065, 265, kit);
+  const sticks = { left: joystick(group, 140, 123, 'left', kit), right: joystick(group, 1065, 265, 'right', kit) };
   dpad(group, kit, buttons);
   buttons.j = cap(group, 1101, 128, 18, 'A', kit);
   buttons.k = cap(group, 1063, 166, 18, 'B', kit);
   cap(group, 1063, 90, 18, 'X', kit); cap(group, 1025, 128, 18, 'Y', kit);
-  smallKeys(group, kit); speakers(group, kit);
-  // White shoulder caps sit behind the rounded shell edge rather than on its face.
-  for (const x of [92, 993]) group.add(molded(rectangle(x, 10.5, 115, 11, 5), kit.key, -19, 5, 1.2));
+  smallKeys(group, kit); topKeys(group, kit);
   for (const object of new Set(Object.values(buttons))) if (object) object.userData.restZ = object.position.z;
-  return { group, buttons };
+  return { group, buttons, sticks };
 }

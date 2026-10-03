@@ -29,6 +29,7 @@ export const HANDHELD_LAYOUTS: Record<HandheldDevice, HardwareLayout> = {
   switch: {
     controls: { up: [126, 241, 28, 28], down: [126, 299, 28, 28], left: [97, 270, 28, 28], right: [155, 270, 28, 28], j: [1083, 110, 36, 36], k: [1045, 148, 36, 36] },
     shortcuts: { info: [175, 387, 22, 22], index: [1006, 374, 26, 26] },
+    sticks: { left: [103.6, 86.6, 72.8, 72.8], right: [1028.6, 228.6, 72.8, 72.8] },
   },
   'steam-deck': {
     controls: { up: [62, 48, 28, 28], down: [62, 100, 28, 28], left: [36, 74, 28, 28], right: [88, 74, 28, 28], j: [1112, 110, 30, 30], k: [1148, 74, 30, 30] },
