@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useWorldStore } from '../store/useWorldStore';
 import { TOTAL_WORLD_WIDTH } from '../data/worldSegments';
 import { WORLD_LOCATIONS } from '../data/locations';
 import { Volume2, VolumeX, Compass, User, Sparkles, House } from 'lucide-react';
 import { pixelSound } from '../game/audio/PixelSoundManager';
-import { HandheldHardware, HANDHELD_DEVICES, HANDHELD_LAYOUTS, HANDHELD_SCREEN_RECT, hardwarePosition, HandheldPressedKeys, HandheldDevice } from './HandheldHardware';
+import { HandheldHardware, HANDHELD_DEVICES, HANDHELD_LAYOUTS, HANDHELD_FALLBACK_LAYOUTS, HANDHELD_SCREEN_RECT, hardwarePosition, HandheldPressedKeys, HandheldDevice } from './HandheldHardware';
 import './handheldHardware.css';
 
 interface DeviceShellProps {
@@ -24,7 +24,9 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
     setDevice(nextDevice);
     try { localStorage.setItem('marc-island-handheld', nextDevice); } catch { /* Optional preference. */ }
   };
-  const layout = HANDHELD_LAYOUTS[device];
+  const [importedDevice, setImportedDevice] = useState<HandheldDevice | null>(null);
+  const onAssetReady = useCallback((loadedDevice: HandheldDevice, ready: boolean) => setImportedDevice(ready ? loadedDevice : null), []);
+  const layout = (importedDevice === device ? HANDHELD_LAYOUTS : HANDHELD_FALLBACK_LAYOUTS)[device];
   const {
     currentView,
     isStarting,
@@ -352,7 +354,7 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
       {/* Main Console Viewport Area */}
       <div className="relative w-full h-full flex items-center justify-center pt-8 pb-10 px-2 sm:px-4">
         <div className="handheld-console" data-handheld-device={device} aria-label={`${HANDHELD_DEVICES[device].label} 掌机`}>
-          <HandheldHardware pressed={pressedKeys} device={device} />
+          <HandheldHardware pressed={pressedKeys} device={device} onAssetReady={onAssetReady} />
 
           {/* Every device shares this 16:9 viewport; hardware never changes its size. */}
           <div 
@@ -403,6 +405,7 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
                 onClick={() => chooseDevice(nextDevice)} aria-label={option.label}>
                 <span style={{ backgroundColor: option.swatch }} aria-hidden="true" />{option.label}
               </button>)}
+            <a className="handheld-model-credit" href="/assets/hardware/credits.html" target="_blank" rel="noopener noreferrer" aria-label="掌机模型署名" title="模型署名">ⓘ</a>
           </div>
         </div>
       </div>

@@ -4,19 +4,29 @@
 
 ## 模型与材质
 
-`src/shell/handheldModels.ts` 程序构建立体几何：前后壳、倒角、壳缝、黑色开孔屏框、曲面握把、扬声器槽、摇杆、十字键和独立操作键。机身没有产品 PNG、产品照片、烘焙光影或预渲染外壳贴图。细颗粒粗糙度数据由确定性程序生成，作为实时物理材质的一部分；表面法线来自连续曲面，不烘焙光影。
+Switch Lite 由 `src/shell/switchLiteModel.ts` 构建原生立体几何。Steam Deck 与 PS Portal 使用 `src/shell/importedHandheldModels.ts` 加载本地 GLB 资产，再赋予实时物理材质。机身没有产品 PNG、照片或预渲染外壳背景；材质使用按世界尺寸映射的微细粗糙度及浅凹凸、模型法线及小型立体按钮符号。灰白聚合物、哑光黑壳、橡胶摇杆、微亮键帽和玻璃内缘分别设定反光强度，避免所有部件像同一张光滑平面。游戏仍单独渲染在贯通屏孔内，原模型的 LCD 画面已移除。
 
-`src/shell/HandheldHardware.tsx` 使用单个 Three.js WebGL 渲染器、正交相机、物理材质、环境反射、上侧软箱灯和阴影。鼠标位置轻微调整光照，按键在实体模型上真实下沉与复位；减少动态效果偏好关闭光照移动和过渡。空闲时只保留轻量动画调度，模型或光照发生变化才绘制。换机型时释放旧模型，退出时释放几何、材质、纹理、渲染器和观察器。
+`src/shell/HandheldHardware.tsx` 使用单个 Three.js WebGL 渲染器、正交相机、物理材质、环境反射、上侧软箱灯和阴影。鼠标位置轻微调整光照，按键在实体模型上真实下沉与复位；减少动态效果偏好关闭光照移动和过渡。空闲时只保留轻量动画调度，模型或光照发生变化才绘制。模型下载缓存仅保存二进制；每个游戏或后台预览独立解析和释放几何、材质与纹理。快速换壳时已过期的异步结果被释放。资源加载期间或失败时保留程序构建的备用外壳，操作热区同步使用备用布局。
 
 造型以各掌机的辨识特征为依据，统一大屏所需的机身比例经过适配。正面机位保证游戏像素和网页浮窗清晰，并使触控热区与实体控件一致。
 
 ### Switch Lite 造型校准
 
-Switch Lite 由 `src/shell/switchLiteModel.ts` 独立构建，对照青绿色实机参考校准左右侧弧、肩键、白色控件和显示盖板；Steam Deck 与 PS Portal 沿用已有模型。外壳使用长弧转角与向外微弓的侧面，滚圆边缘连接前后壳。显示盖板为略暗、较平整的青绿色，仅 LCD 开口边保留窄黑色 gasket。
+Switch Lite 对照青绿色实机参考校准左右侧弧、肩键、白色控件和显示盖板。外壳使用长弧转角与向外微弓的侧面，滚圆边缘连接前后壳。显示盖板为略暗、较平整的青绿色，仅 LCD 开口边保留窄黑色 gasket。
 
 十字键是整块白色十字，不含四臂之间的分割线；中央浅凹与四端箭头直接建成立体几何。方向输入使整块键轻微下沉并沿对应方向摇动，松开复位。摇杆使用连续旋转截面形成凹面拇指槽、圆润外沿和底座；ABXY 使用圆角键帽、小型浅色浮雕字母与窄压槽。捕获键为方形，Home 含房屋标记，`−/+` 使用实际符号造型，扬声器孔位于底缘。
 
 参考：[任天堂 Switch Lite 青绿色产品页](https://www.nintendo.com/en-ca/store/products/nintendo-switch-lite-turquoise/)。游戏需要更大的可读区域，因此保留统一的 16:9 大屏开口，机身轮廓在其周围适配。
+
+### GitHub 三维资产
+
+Steam Deck 基于 wallmasterr 的 **Steam Deck console**，[GitHub 文件及许可](https://github.com/people-climbing/website/tree/33ba12bb6b23d5013be3493df08d8f2dd96ef7e4/public/models/steamdeck)明确为 CC BY 4.0。转换脚本 `scripts/prepare-steam-deck-model.py` 从原 glTF 分离连通部件，移除 LCD 和完整贴图，适配中央开口与侧翼，输出约 1.25 MB 的 `public/assets/hardware/steam-deck/deck.glb`。清掉裁切产生的退化面，仅以前表面重算壳体及握把平面法线，避免背侧支撑面污染细壳缝。Deck 的重叠闭合面不接收自身阴影，保留真实曲面反光和外部投影，消去直角黑块。一体十字键保留摇动，ABXY 使用立体字母，补小型立体扬声器插孔，点击区域对齐真实按键。
+
+GitHub 检索未找到具有明确许可、可直接接入的完整 PS Portal 模型，因此其两侧基于 Taohid Animation 的 **PS5 Controller**，[Safa Elmali 整理的 DualSense GLB 与署名](https://github.com/SafaElmali/dualsense-studio/blob/cbae4342498d4d9395aa79ec11a1569ce0977d00/controller/ATTRIBUTION.md)为 CC BY 4.0。`scripts/prepare-portal-model.py` 保留真实握柄、摇杆、按钮和扳机几何，裁切并封合内侧壳体，重新制作开孔中央屏框及音量槽。它是手柄模型改造的展示外壳，比例为游戏大屏适配，不能作为尺寸精确的官方 Portal CAD。
+
+Portal 约 2.78 MB。屏框保留平直黑色盖板和窄倒角，键帽原弧面分出约 0.8 单位的微亮灰边沿，按钮符号使用浅灰立体线条。白黑壳接合处有细蓝光导条，肩键保持深色，橡胶顶面与塑料摇杆井区分。外观对照 [Valve 官方 Steam Deck 图片](https://www.steamdeck.com/en/press)及 [Sony 官方 Portal 图片](https://www.playstation.com/en-us/accessories/playstation-portal-remote-player/)，所用材质参数为照片观察后的表现调整，并非厂商公开的物理测量值。Switch Lite 的几何及材质在这次资产接入中保持原样。
+
+原作者、源链接、许可和改造说明保存在各资产目录的 `ATTRIBUTION.md`，GLB 元数据也保留来源。选择掌机旁的署名入口打开 `public/assets/hardware/credits.html`。应用代码与模型分别遵循各自许可。
 
 ## 大屏与操作
 

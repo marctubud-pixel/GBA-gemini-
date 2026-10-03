@@ -1,0 +1,77 @@
+{
+  "sourceCommit": "cbae4342498d4d9395aa79ec11a1569ce0977d00",
+  "sourceSHA256": "e55e172f3a6704769818954970fda2d29038a31f85ba7358a36d0549df4f9d30",
+  "modelSHA256": "9f9fe0be8a0204b5333fa6b8064ac6b2cd9f7996f36b1b5b6f638ccc871af97d",
+  "bytes": 2777444,
+  "meshes": 57,
+  "triangles": 80935,
+  "refinements": {
+    "carrierChamfer": 1.5,
+    "glassLipWidth": 1.0,
+    "capRimWidth": 0.8,
+    "lightGuideDiameter": 0.96,
+    "lightGuideSource": "original white-shell boundary geometry"
+  },
+  "screenUI": [
+    270,
+    50,
+    660,
+    371.25
+  ],
+  "hotspotsUI": {
+    "index": [
+      1020.458,
+      81.271,
+      16.44,
+      28.214
+    ],
+    "info": [
+      163.105,
+      81.271,
+      16.44,
+      28.214
+    ],
+    "j": [
+      1057.851,
+      189.566,
+      39.343,
+      39.343
+    ],
+    "k": [
+      1104.142,
+      143.773,
+      38.66,
+      38.918
+    ],
+    "up": [
+      104.682,
+      109.632,
+      36.712,
+      44.774
+    ],
+    "right": [
+      130.752,
+      145.775,
+      44.774,
+      36.714
+    ],
+    "down": [
+      102.652,
+      172.163,
+      36.712,
+      44.774
+    ],
+    "left": [
+      68.367,
+      143.709,
+      44.766,
+      36.723
+    ]
+  },
+  "volumeUI": [
+    525,
+    438,
+    150,
+    13
+  ]
+}

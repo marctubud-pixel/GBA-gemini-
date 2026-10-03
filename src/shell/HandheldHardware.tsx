@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
 import { createHandheldModel } from './handheldModels';
+import { loadHandheldAsset } from './importedHandheldModels';
 
 export type HandheldControl = 'left' | 'right' | 'up' | 'down' | 'j' | 'k';
 export type HandheldPressedKeys = Record<HandheldControl, boolean>;
@@ -28,6 +29,17 @@ export const HANDHELD_LAYOUTS: Record<HandheldDevice, HardwareLayout> = {
     controls: { up: [126, 241, 28, 28], down: [126, 299, 28, 28], left: [97, 270, 28, 28], right: [155, 270, 28, 28], j: [1083, 110, 36, 36], k: [1045, 148, 36, 36] },
     shortcuts: { info: [175, 387, 22, 22], index: [1006, 374, 26, 26] }, volume: [525, 438, 150, 13],
   },
+  'steam-deck': {
+    controls: { up: [68, 33, 28, 28], down: [68, 91, 28, 28], left: [39, 62, 28, 28], right: [97, 62, 28, 28], j: [1107, 98, 36, 36], k: [1137, 63, 36, 36] },
+    shortcuts: { info: [166, 313, 54, 29], index: [980, 313, 54, 29] }, volume: [525, 438, 150, 13],
+  },
+  'ps-portal': {
+    controls: { up: [103.45, 108.28, 39.84, 47.92], down: [101.43, 170.67, 39.84, 47.92], left: [67.2, 142.32, 47.91, 39.83], right: [129.44, 144.36, 47.92, 39.84], j: [1057.68, 189.57, 39.51, 39.84], k: [1104.13, 143.77, 38.79, 39.26] },
+    shortcuts: { info: [163.1, 81.27, 16.44, 28.21], index: [1020.46, 81.27, 16.44, 28.21] }, volume: [525, 438, 150, 13],
+  },
+};
+export const HANDHELD_FALLBACK_LAYOUTS: Record<HandheldDevice, HardwareLayout> = {
+  switch: HANDHELD_LAYOUTS.switch,
   'steam-deck': {
     controls: { up: [73, 94, 28, 28], down: [73, 151, 28, 28], left: [44, 123, 28, 28], right: [102, 123, 28, 28], j: [1093, 145, 34, 34], k: [1125, 113, 34, 34] },
     shortcuts: { info: [187, 373, 32, 32], index: [985, 373, 32, 32] }, volume: [525, 438, 150, 13],
@@ -62,13 +74,14 @@ function disposeObject(root: THREE.Object3D) {
   geometries.forEach(value => value.dispose()); materials.forEach(value => value.dispose()); textures.forEach(value => value.dispose());
 }
 
-export function HandheldHardware({ pressed, device }: { pressed: HandheldPressedKeys; device: HandheldDevice }) {
+export function HandheldHardware({ pressed, device, onAssetReady }: { pressed: HandheldPressedKeys; device: HandheldDevice; onAssetReady?: (device: HandheldDevice, ready: boolean) => void }) {
   const mount = useRef<HTMLDivElement>(null);
   const runtime = useRef<HardwareRuntime | null>(null);
   const input = useRef(pressed); input.current = pressed;
   const [ready, setReady] = useState(false);
   const [unavailable, setUnavailable] = useState(false);
   const [renderedDevice, setRenderedDevice] = useState(device);
+  const [modelSource, setModelSource] = useState<'native' | 'loading' | 'asset' | 'fallback'>(device === 'switch' ? 'native' : 'loading');
 
   useEffect(() => {
     const host = mount.current;
@@ -178,15 +191,28 @@ export function HandheldHardware({ pressed, device }: { pressed: HandheldPressed
 
   useEffect(() => {
     const state = runtime.current;
-    if (!state || state.device === device) return;
-    const next = createHandheldModel(device);
-    state.scene.remove(state.model.group); disposeObject(state.model.group);
-    state.model = next; state.device = device; state.restPositions = restPositions(next);
-    state.scene.add(next.group); state.dirty = true; setRenderedDevice(device);
-  }, [device]);
+    if (!state) return;
+    let cancelled = false;
+    const replace = (next: Model) => {
+      state.scene.remove(state.model.group); disposeObject(state.model.group);
+      state.model = next; state.device = device; state.restPositions = restPositions(next);
+      state.scene.add(next.group); state.dirty = true; setRenderedDevice(device);
+    };
+    if (state.device !== device) replace(createHandheldModel(device));
+    onAssetReady?.(device, false);
+    setModelSource(device === 'switch' ? 'native' : 'loading');
+    if (device !== 'switch') loadHandheldAsset(device).then(next => {
+      if (!next) return;
+      if (cancelled || runtime.current !== state) { disposeObject(next.group); return; }
+      replace(next); setModelSource('asset'); onAssetReady?.(device, true);
+    }).catch(() => {
+      if (!cancelled && runtime.current === state) setModelSource('fallback');
+    });
+    return () => { cancelled = true; };
+  }, [device, onAssetReady]);
 
   return <div ref={mount} className="handheld-hardware" aria-hidden="true" data-material="physical-3d"
-    data-ready={ready} data-device-rendered={renderedDevice} data-handheld-pressed={Object.keys(pressed).filter(key => pressed[key as HandheldControl]).join(' ') || undefined}
+    data-ready={ready} data-device-rendered={renderedDevice} data-model-source={modelSource} data-handheld-pressed={Object.keys(pressed).filter(key => pressed[key as HandheldControl]).join(' ') || undefined}
     data-render-error={unavailable || undefined}>
     {unavailable && <span className="handheld-render-error">机身外观加载失败，请刷新重试</span>}
   </div>;
