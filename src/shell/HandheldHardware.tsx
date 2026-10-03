@@ -25,8 +25,8 @@ export const hardwarePosition = (x: number, y: number, width: number, height: nu
 });
 export const HANDHELD_LAYOUTS: Record<HandheldDevice, HardwareLayout> = {
   switch: {
-    controls: { up: [148, 227, 30, 30], down: [148, 290, 30, 30], left: [116, 259, 30, 30], right: [180, 259, 30, 30], j: [1045, 142, 38, 38], k: [1011, 176, 38, 38] },
-    shortcuts: { info: [184, 375, 28, 28], index: [1016, 377, 28, 28] }, volume: [525, 438, 150, 13],
+    controls: { up: [126, 241, 28, 28], down: [126, 299, 28, 28], left: [97, 270, 28, 28], right: [155, 270, 28, 28], j: [1083, 110, 36, 36], k: [1045, 148, 36, 36] },
+    shortcuts: { info: [175, 387, 22, 22], index: [1006, 374, 26, 26] }, volume: [525, 438, 150, 13],
   },
   'steam-deck': {
     controls: { up: [73, 94, 28, 28], down: [73, 151, 28, 28], left: [44, 123, 28, 28], right: [102, 123, 28, 28], j: [1093, 145, 34, 34], k: [1125, 113, 34, 34] },
@@ -140,9 +140,17 @@ export function HandheldHardware({ pressed, device }: { pressed: HandheldPressed
       let maxDepth = 0;
       for (const [object, down] of held) {
         const rest = state.restPositions.get(object) ?? object.position.z;
-        const target = rest - (down ? 3.5 : 0);
+        const target = rest - (down ? (object.userData.pressDepth ?? 3.5) : 0);
         if (Math.abs(object.position.z - target) > .01) { object.position.z = THREE.MathUtils.lerp(object.position.z, target, blend); moving = true; }
         maxDepth = Math.max(maxDepth, rest - object.position.z);
+        if (object.userData.rocker) {
+          const tiltX = ((input.current.down ? 1 : 0) - (input.current.up ? 1 : 0)) * .06;
+          const tiltY = ((input.current.right ? 1 : 0) - (input.current.left ? 1 : 0)) * .06;
+          if (Math.abs(object.rotation.x - tiltX) + Math.abs(object.rotation.y - tiltY) > .0002) {
+            object.rotation.x = THREE.MathUtils.lerp(object.rotation.x, tiltX, blend);
+            object.rotation.y = THREE.MathUtils.lerp(object.rotation.y, tiltY, blend); moving = true;
+          }
+        }
       }
       if (Math.abs(key.position.x - targetLight.x) + Math.abs(key.position.y - targetLight.y) > .1) {
         key.position.x = THREE.MathUtils.lerp(key.position.x, targetLight.x, blend);

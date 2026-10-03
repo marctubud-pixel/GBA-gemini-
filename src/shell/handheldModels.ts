@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { TessellateModifier } from 'three/addons/modifiers/TessellateModifier.js';
+import { createSwitchLiteModel } from './switchLiteModel';
 
 export type ModelDevice = 'switch' | 'steam-deck' | 'ps-portal';
 export type ModelControl = 'up' | 'down' | 'left' | 'right' | 'j' | 'k';
@@ -245,20 +246,6 @@ function commonBody(parent: THREE.Group, shape: () => THREE.Shape, kit: Material
   for (let i = 0; i < 7; i++) parent.add(extrusion(roundedRect(580 + i * 6, 440, 1.5, 9, .6), kit.trim, 1, .7, .15));
 }
 
-function switchLite(group: THREE.Group, kit: Materials, buttons: HandheldModel['buttons']) {
-  commonBody(group, () => roundedRect(23, 24, 1154, 449, 49), kit, 7, 2.5);
-  stick(group, 163, 144, 34, kit, true); stick(group, 1030, 306, 34, kit, true);
-  dpad(group, 163, 273, 46, 15, kit, buttons);
-  buttons.j = faceButton(group, 1064, 161, 19, 'A', kit);
-  buttons.k = faceButton(group, 1030, 195, 19, 'B', kit);
-  faceButton(group, 1030, 127, 19, 'X', kit); faceButton(group, 996, 161, 19, 'Y', kit);
-  faceButton(group, 198, 389, 14, 'square', kit); faceButton(group, 1030, 391, 14, 'circle', kit);
-  faceButton(group, 219, 72, 9, 'minus', kit); faceButton(group, 980, 73, 9, 'plus', kit);
-  speaker(group, 210, 431, kit); speaker(group, 962, 431, kit);
-  // Shoulder caps, exposed shell seam and screw sockets give a physical sidewall.
-  group.add(extrusion(roundedRect(68, 20, 131, 17, 8), kit.keys, -12, 7, 2));
-  group.add(extrusion(roundedRect(1001, 20, 131, 17, 8), kit.keys, -12, 7, 2));
-}
 function steamDeck(group: THREE.Group, kit: Materials, buttons: HandheldModel['buttons']) {
   const body = () => outline([[113, 26], [1087, 26], { curve: [1151, 24, 1185, 69, 1188, 143] },
     [1190, 334], { curve: [1190, 430, 1165, 478, 1105, 477] },
@@ -313,11 +300,11 @@ function psPortal(group: THREE.Group, kit: Materials, buttons: HandheldModel['bu
 
 /** All models share one open screen aperture and can be lit, rotated and depressed in real time. */
 export function createHandheldModel(device: ModelDevice): HandheldModel {
+  if (device === 'switch') return createSwitchLiteModel();
   const group = new THREE.Group(); group.name = `physical-${device}`;
   group.userData.screenRect = [SCREEN.x, SCREEN.y, SCREEN.width, SCREEN.height];
   const buttons: HandheldModel['buttons'] = {}, kit = materialKit(device);
-  if (device === 'switch') switchLite(group, kit, buttons);
-  else if (device === 'steam-deck') steamDeck(group, kit, buttons);
+  if (device === 'steam-deck') steamDeck(group, kit, buttons);
   else psPortal(group, kit, buttons);
   for (const [control, object] of Object.entries(buttons)) {
     if (!object) continue; object.name = `button-${control}`;
