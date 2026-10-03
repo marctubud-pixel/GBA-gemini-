@@ -28,10 +28,9 @@ export function JourneyBackdrop({ kind, progress=0 }: { kind: JourneySceneKind; 
   return <canvas ref={canvas} width={640} height={360} className="journey-backdrop" aria-hidden="true" />;
 }
 
-export function WelcomeScreen({ onStart,onResume,soundEnabled,onSound }: { onStart:()=>void;onResume:()=>void;soundEnabled:boolean;onSound:()=>void }) {
+export function WelcomeScreen({ onStart,onResume }: { onStart:()=>void;onResume:()=>void }) {
   return <JourneyFrame className="journey-welcome" aria-label="MARC ISLAND 开场">
     <JourneyBackdrop kind="welcome" />
-    <button className="journey-sound" onClick={onSound} aria-label={soundEnabled?'关闭声音':'开启声音'}>SOUND {soundEnabled?'ON':'OFF'}</button>
     <div className="journey-welcome-copy"><span className="journey-kicker">A PLAYABLE CREATIVE WORLD</span><h1>MARC ISLAND</h1><p className="journey-tagline">RIDE · EXPLORE · CREATE</p><span className="journey-rule" />
       <div className="journey-menu"><button className="journey-button journey-button-cream" onClick={onStart}><kbd>J</kbd><span>START GAME</span><b aria-hidden="true">▶</b></button><button className="journey-button" onClick={onResume}><kbd>K</kbd><span>VIEW RESUME</span><b aria-hidden="true">▶</b></button></div>
       <p className="journey-caption">沿着海岸，发现作品与生活。</p>

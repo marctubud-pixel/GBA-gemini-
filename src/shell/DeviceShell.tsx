@@ -1,30 +1,36 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useWorldStore } from '../store/useWorldStore';
 import { TOTAL_WORLD_WIDTH } from '../data/worldSegments';
 import { WORLD_LOCATIONS } from '../data/locations';
 import { Volume2, VolumeX, Compass, User, Sparkles, House } from 'lucide-react';
 import { pixelSound } from '../game/audio/PixelSoundManager';
-import { GBAPixelShellRenderer, GBAPressedKeys } from './GBAPixelShellRenderer';
+import { GBAHardware, GBA_HIT_AREAS, GBA_COLORS, hardwarePosition, GBAPressedKeys, GBAColor } from './GBAHardware';
+import './gbaHardware.css';
 
 interface DeviceShellProps {
   children: React.ReactNode;
 }
 
-/**
- * DeviceShell.tsx
- * 
- * 100% AUTHENTIC PROCEDURAL PIXEL-ART GBA (AGB-001) HARDWARE CHASSIS
- * - Driven by GBAPixelShellRenderer on a high-precision pixel canvas.
- * - Exact 16:9 Inner Screen Cutout (64% width, 64% height) -> ZERO BLACK BARS!
- * - Real-time button depression & luminous glowing visual feedback for D-Pad and J/K keys!
- * - J = Accelerate / Start, K = Brake / Action / Enter / Back
- */
+/** Smooth, moulded hardware around the unchanged pixel-art game aperture. */
 export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
+  const [shellColor, setShellColor] = useState<GBAColor>(() => {
+    try {
+      const saved = localStorage.getItem('marc-island-gba-color');
+      if (saved && Object.prototype.hasOwnProperty.call(GBA_COLORS, saved)) return saved as GBAColor;
+    } catch { /* Color selection still works when browser storage is unavailable. */ }
+    return 'classic-grey';
+  });
+  const chooseColor = (color: GBAColor) => {
+    setShellColor(color);
+    try { localStorage.setItem('marc-island-gba-color', color); } catch { /* Optional preference. */ }
+  };
   const {
     currentView,
     isStarting,
     soundEnabled,
     toggleSound,
+    soundVolume,
+    setSoundVolume,
     currentSegment,
     playerX,
     playerState,
@@ -47,8 +53,6 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
     closePostcard,
     isEndingModalOpen,
   } = useWorldStore();
-
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   // Track pressed state for all GBA buttons
   const [pressedKeys, setPressedKeys] = useState<GBAPressedKeys>({
@@ -90,19 +94,66 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
     };
   }, []);
 
-  // Paint the pure pixel-art GBA console chassis whenever buttons are pressed/released
+  // Physical volume controls must not send navigation keys into the game or a popup.
   useEffect(() => {
-    if (canvasRef.current) {
-      GBAPixelShellRenderer.render(canvasRef.current, pressedKeys);
-    }
-  }, [pressedKeys]);
+    const handleVolumeKey = (event: KeyboardEvent) => {
+      const target = event.target instanceof HTMLElement ? event.target : null;
+      const colorGroup = target?.closest('[data-gba-colors]');
+      if (colorGroup && event.code !== 'Tab') {
+        event.stopImmediatePropagation();
+        if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.code)) {
+          event.preventDefault();
+          const buttons = Array.from(colorGroup.querySelectorAll<HTMLButtonElement>('button'));
+          const direction = ['ArrowRight', 'ArrowDown'].includes(event.code) ? 1 : -1;
+          const next = buttons[(buttons.indexOf(target as HTMLButtonElement) + direction + buttons.length) % buttons.length];
+          next.focus(); next.click();
+        } else if (['Enter', 'Space'].includes(event.code)) {
+          event.preventDefault(); if (!event.repeat) target?.click();
+        }
+        return;
+      }
+      if (!target?.closest('[data-gba-volume]') || event.code === 'Tab') return;
+      event.stopImmediatePropagation();
+      if (target instanceof HTMLInputElement) {
+        const current = useWorldStore.getState().soundVolume;
+        const delta = ['ArrowRight', 'ArrowUp'].includes(event.code) ? .05
+          : ['ArrowLeft', 'ArrowDown'].includes(event.code) ? -.05 : 0;
+        if (delta || event.code === 'Home' || event.code === 'End') {
+          event.preventDefault();
+          useWorldStore.getState().setSoundVolume(event.code === 'Home' ? 0 : event.code === 'End' ? 1 : current + delta);
+        } else if (event.code !== 'Escape') event.preventDefault();
+        if (event.code === 'Escape') target.blur();
+      } else if (target instanceof HTMLButtonElement && ['Enter', 'Space'].includes(event.code)) {
+        event.preventDefault();
+        if (!event.repeat) target.click();
+      }
+    };
+    window.addEventListener('keydown', handleVolumeKey, true);
+    return () => window.removeEventListener('keydown', handleVolumeKey, true);
+  }, []);
+
+  // Uploaded films use the same machine volume as music, waves and game effects.
+  useEffect(() => {
+    const apply = (element: HTMLMediaElement) => { element.volume = soundVolume; element.muted = !soundEnabled; };
+    document.querySelectorAll<HTMLMediaElement>('video, audio').forEach(apply);
+    const observer = new MutationObserver(records => {
+      for (const record of records) for (const node of record.addedNodes) {
+        if (node instanceof HTMLMediaElement) apply(node);
+        if (node instanceof Element) node.querySelectorAll<HTMLMediaElement>('video, audio').forEach(apply);
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, [soundVolume, soundEnabled]);
 
   const progressPercent = Math.min(100, Math.max(0, (playerX / TOTAL_WORLD_WIDTH) * 100));
 
   // Determine bottom action prompt
   let actionPrompt: { key: string; text: string; color: string } | null = null;
 
-  if (isStarting) {
+  if (currentView === 'welcome' && !isStarting) {
+    actionPrompt = null;
+  } else if (isStarting) {
     actionPrompt = { key: 'LOADING', text: '正在准备海岛 · 即将出发', color: 'bg-[#245587] text-white' };
   } else if (isEndingModalOpen) {
     actionPrompt = { key: 'J / K', text: 'J 确认 · 方向键选择 · K 再次探索', color: 'bg-[#245587] text-white' };
@@ -221,7 +272,7 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
   });
 
   return (
-    <div className="relative w-full h-full flex flex-col items-center justify-center bg-[#090d14] select-none overflow-hidden">
+    <div className="relative w-full h-full flex flex-col items-center justify-center gba-stage select-none overflow-hidden">
       {/* Top Floating HUD Bar */}
       <header className="absolute top-0 left-0 right-0 z-30 px-3 sm:px-6 py-2 bg-slate-950/80 backdrop-blur-md border-b border-white/10 flex items-center justify-between text-xs text-white">
         {/* Left: Current Zone & Segment */}
@@ -294,43 +345,25 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
             </button>
           )}
 
-          <button
-            onClick={toggleSound}
-            onMouseEnter={() => pixelSound.playSelect()}
-            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition cursor-pointer"
-            title={soundEnabled ? '音效开启' : '音效静音'}
-          >
-            {soundEnabled ? <Volume2 className="w-3.5 h-3.5 text-emerald-400" /> : <VolumeX className="w-3.5 h-3.5 text-slate-500" />}
-          </button>
         </div>
       </header>
 
       {/* Main Console Viewport Area */}
       <div className="relative w-full h-full flex items-center justify-center pt-8 pb-10 px-2 sm:px-4">
-        {/* ================================================================= */}
-        {/* AUTHENTIC PIXEL-ART GBA CONSOLE CHASSIS CONTAINER                 */}
-        {/* Aspect Ratio 800:450 = 16:9 Ratio Matching the Canvas             */}
-        {/* ================================================================= */}
-        <div className="relative w-full max-w-[1040px] aspect-[800/450] max-h-[88vh] flex items-center justify-center select-none">
-          {/* Background Canvas: Paints the complete 100% genuine Pixel Art GBA console */}
-          <canvas
-            ref={canvasRef}
-            width={800}
-            height={450}
-            className="absolute inset-0 w-full h-full object-contain pointer-events-none pixel-canvas z-0 drop-shadow-[0_25px_50px_rgba(0,0,0,0.95)]"
-          />
+        <div className="gba-console" data-gba-color={shellColor} aria-label="GBA 游戏机">
+          <GBAHardware pressed={pressedKeys} color={shellColor} />
 
           {/* --------------------------------------------------------------- */}
-          {/* CENTER SCREEN: Exact 16:9 Cutout (18% left, 18% top, 64% w, 64% h) */}
+          {/* CENTER SCREEN: Widescreen game inset inside the classic grey GBA bezel */}
           {/* Completely fills the GBA screen with ZERO top/bottom black bars! */}
           {/* --------------------------------------------------------------- */}
           <div 
-            className="absolute z-10 overflow-hidden bg-black flex items-center justify-center pixel-canvas shadow-inner"
+            className="absolute z-10 overflow-hidden bg-black flex items-center justify-center pixel-canvas gba-screen"
             style={{
-              left: '18%',
-              top: '18%',
-              width: '64%',
-              height: '64%'
+              left: '21%',
+              top: '18.6666667%',
+              width: '58%',
+              height: '58%'
             }}
           >
             {/* The Live Game Canvas + In-Screen Modals */}
@@ -344,84 +377,41 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
             <div className="absolute top-1 left-2 w-32 h-10 bg-gradient-to-br from-white/10 to-transparent rounded-full blur-[2px] pointer-events-none" />
           </div>
 
-          {/* --------------------------------------------------------------- */}
-          {/* LEFT WING OVERLAY: Interactive Cross D-Pad                      */}
-          {/* --------------------------------------------------------------- */}
-          <div 
-            className="absolute z-20 flex items-center justify-center"
-            style={{
-              left: '4.5%',
-              top: '36%',
-              width: '12%',
-              height: '24%'
-            }}
-          >
-            <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center">
-              {([
-                ['up', 'absolute top-0 w-6 h-6', '▲ 上'],
-                ['down', 'absolute bottom-0 w-6 h-6', '▼ 下'],
-                ['left', 'absolute left-0 w-6 h-6', '◀ 向左移动'],
-                ['right', 'absolute right-0 w-6 h-6', '▶ 向右移动'],
-              ] as const).map(([control, position, label]) => <button
-                key={control} {...controlEvents(control)}
-                className={`${position} rounded cursor-pointer touch-none`}
-                title={label} aria-label={label}
-              />)}
-            </div>
-          </div>
+          {([
+            ['up', '▲ 上'], ['down', '▼ 下'], ['left', '◀ 向左移动'], ['right', '▶ 向右移动'],
+            ['j', 'J 确认'], ['k', 'K 互动或返回'],
+          ] as const).map(([control, label]) => <button key={control} {...controlEvents(control)}
+            className={`gba-hit ${control === 'j' || control === 'k' ? 'gba-hit-round' : ''}`}
+            style={hardwarePosition(...GBA_HIT_AREAS[control])} aria-label={label}
+            title={control === 'j' ? 'B · J 加速 / 确认' : control === 'k' ? 'A · K 互动 / 返回' : label} />)}
 
-          {/* --------------------------------------------------------------- */}
-          {/* RIGHT WING OVERLAY: Interactive J & K Buttons                   */}
-          {/* --------------------------------------------------------------- */}
-          <div 
-            className="absolute z-20 flex items-center justify-center"
-            style={{
-              right: '4%',
-              top: '34%',
-              width: '12%',
-              height: '24%'
-            }}
-          >
-            <div className="relative w-16 h-16 sm:w-20 sm:h-20">
-              <button {...controlEvents('j')}
-                className="absolute bottom-1 left-0 w-8 h-8 sm:w-9 sm:h-9 rounded-full cursor-pointer touch-none"
-                title="J 键 (加速 / 确认)" aria-label="J 确认" />
-              <button {...controlEvents('k')}
-                className="absolute top-1 right-0 w-8 h-8 sm:w-9 sm:h-9 rounded-full cursor-pointer touch-none"
-                title="K 键 (互动 / 返回)" aria-label="K 互动或返回" />
-            </div>
-          </div>
+          {([{ y: 320, label: 'START', view: 'info', title: '查看简历 PDF' },
+            { y: 349, label: 'SELECT', view: 'index', title: '打开索引' }] as const).map(({ y, label, view, title }) =>
+            <div key={label}>
+              <button className="gba-small-button" style={hardwarePosition(103, y, 17, 17)}
+                onClick={() => { pixelSound.playConfirm(); if (!isStarting) setCurrentView(view); }}
+                disabled={isStarting} title={`${label}: ${title}`} aria-label={`${label}: ${title}`} />
+              <span className="gba-small-label" style={hardwarePosition(51, y + 4, 43, 9)}>{label}</span>
+            </div>)}
 
-          {/* --------------------------------------------------------------- */}
-          {/* BOTTOM CENTER: SELECT & START Buttons                           */}
-          {/* --------------------------------------------------------------- */}
-          <div 
-            className="absolute z-20 flex items-center justify-center gap-6 sm:gap-10"
-            style={{
-              bottom: '5%',
-              left: '18%',
-              width: '26%',
-              height: '6%'
-            }}
-          >
-            <button
-              onClick={() => {
-                pixelSound.playConfirm();
-                if (!isStarting) setCurrentView('index');
-              }}
-              onMouseEnter={() => pixelSound.playSelect()}
-              className="w-8 h-4 rotate-[-25deg] hover:bg-white/15 active:bg-white/30 rounded-full cursor-pointer"
-              disabled={isStarting} title="SELECT: 打开索引"
-            />
-            <button
-              onClick={() => {
-                pixelSound.playConfirm();
-                if (!isStarting) setCurrentView('info');
-              }}
-              onMouseEnter={() => pixelSound.playSelect()}
-              className="w-8 h-4 rotate-[-25deg] hover:bg-white/15 active:bg-white/30 rounded-full cursor-pointer"
-              disabled={isStarting} title="START: 查看简历 PDF"
-            />
+          <div className="gba-volume" data-gba-volume style={hardwarePosition(432, 404, 186, 21)} role="group" aria-label="机身音量控制">
+            <button className="gba-mute" onClick={toggleSound} aria-label={soundEnabled ? '静音' : '开启声音'}
+              aria-pressed={!soundEnabled} title={soundEnabled ? '静音' : '开启声音'}>
+              {soundEnabled ? <Volume2 /> : <VolumeX />}
+            </button>
+            <button onClick={() => setSoundVolume(soundVolume - .05)} aria-label="降低音量" title="降低音量">−</button>
+            <input type="range" min="0" max="100" step="5" value={Math.round(soundVolume * 100)}
+              onChange={event => setSoundVolume(Number(event.currentTarget.value) / 100)} aria-label="音量"
+              aria-valuetext={soundEnabled ? `${Math.round(soundVolume * 100)}%` : '静音'}
+              title={`音量 ${Math.round(soundVolume * 100)}%`} />
+            <button onClick={() => setSoundVolume(soundVolume + .05)} aria-label="提高音量" title="提高音量">+</button>
+          </div>
+          <div className="gba-color-options" data-gba-colors role="radiogroup" aria-label="机身配色">
+            {(Object.entries(GBA_COLORS) as [GBAColor, typeof GBA_COLORS[GBAColor]][]).map(([color, option]) =>
+              <button key={color} role="radio" aria-checked={shellColor === color} tabIndex={shellColor === color ? 0 : -1}
+                onClick={() => chooseColor(color)} aria-label={option.label}>
+                <span style={{ backgroundColor: option.swatch }} aria-hidden="true" />{option.label}
+              </button>)}
           </div>
         </div>
       </div>

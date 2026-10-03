@@ -21,6 +21,8 @@ interface WorldState {
   setStarting: (starting: boolean) => void;
   deviceShell: ShellType;
   soundEnabled: boolean;
+  soundVolume: number;
+  setSoundVolume: (volume: number) => void;
   activeInterior: InteriorId | null;
   interiorPrompt: string | null;
   modalContext: string | null;
@@ -133,6 +135,12 @@ export const useWorldStore = create<WorldState>((set, get) => ({
   setStarting: (isStarting) => set({ isStarting, virtualInput: { left: false, right: false, action: false } }),
   deviceShell: 'gba',
   soundEnabled: true,
+  soundVolume: .75,
+  setSoundVolume: (volume) => {
+    if (!Number.isFinite(volume)) return;
+    const soundVolume = Math.round(Math.max(0, Math.min(1, volume)) * 100) / 100;
+    set({ soundVolume, soundEnabled: soundVolume > 0 });
+  },
   activeInterior: null,
   interiorPrompt: null,
   modalContext: null,
@@ -210,7 +218,8 @@ export const useWorldStore = create<WorldState>((set, get) => ({
       virtualInput: { left: false, right: false, action: false } });
   },
   setDeviceShell: (shell) => set({ deviceShell: shell }),
-  toggleSound: () => set((state) => ({ soundEnabled: !state.soundEnabled })),
+  toggleSound: () => set((state) => ({ soundEnabled: !state.soundEnabled,
+    soundVolume: !state.soundEnabled && state.soundVolume === 0 ? .75 : state.soundVolume })),
 
   setPlayerState: (playerState) => set({ playerState }),
 

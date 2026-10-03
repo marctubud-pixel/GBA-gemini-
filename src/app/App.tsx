@@ -25,7 +25,6 @@ const WELCOME_KEYS=new Set(['KeyJ','KeyK','KeyE','KeyA','KeyD','KeyW','KeyS','En
 
 export const App = () => {
   const currentView=useWorldStore(s=>s.currentView);
-  const soundEnabled=useWorldStore(s=>s.soundEnabled);
   const gameContainerRef=useRef<HTMLDivElement>(null);
   const phaserGameRef=useRef<Phaser.Game|null>(null);
   const startInProgress=useRef(false);
@@ -110,7 +109,7 @@ export const App = () => {
   return <div className="relative w-screen h-screen overflow-hidden bg-[#0d131a]">
     <DeviceShell>
       <div ref={gameContainerRef} id="phaser-container" className="w-full h-full flex items-center justify-center" />
-      {currentView==='welcome'&&!preview.active&&(isLoading?<LoadingScreen progress={progress} ready={isWorldReady} error={loadingError} onRetry={handleStartGame}/>:<WelcomeScreen onStart={handleStartGame} onResume={handleResume} soundEnabled={soundEnabled} onSound={()=>useWorldStore.getState().toggleSound()}/>)}
+      {currentView==='welcome'&&!preview.active&&(isLoading?<LoadingScreen progress={progress} ready={isWorldReady} error={loadingError} onRetry={handleStartGame}/>:<WelcomeScreen onStart={handleStartGame} onResume={handleResume}/>)}
       <WriteHouseModal/><MarcCinemaModal/><BrandMuseumModal/><ArcadeGameModal/><HobbyStudioModal/><ExperimentLabModal/>
       <PostcardModal/><EndingModal/>
     </DeviceShell>
