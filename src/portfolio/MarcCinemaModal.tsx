@@ -102,14 +102,13 @@ export const MarcCinemaModal = () => {
               </div>
               <div className="cinema-ticket-stub">
                 <span className="cinema-stub-label" aria-hidden="true">票 根</span>
-                <button className="cinema-ticket-play" aria-label={video ? `播放${film.title}` : `${film.title}影片待上传`} title={video ? '播放影片 · J' : '完整影片待上传'} disabled={!video} onClick={play}><span aria-hidden="true">▶</span><span>播放</span></button>
-                {!video && <small className="cinema-upload-note">影片待上传</small>}
+                <span className="cinema-stub-number" aria-hidden="true">NO. {String(filmIndex + 1).padStart(2, '0')}</span>
                 <i className="cinema-stub-barcode" aria-hidden="true" />
               </div>
             </article>
             <button className="cinema-ticket-arrow" aria-label="下一部影片" title="下一部影片 · D / →" disabled={films.length < 2} onClick={() => changeFilm(1)}><span aria-hidden="true">▶</span></button>
           </div>
-          <div className="cinema-ticket-actions"><button className="cinema-detail-entry" onClick={openDetail}>作品详情 <span aria-hidden="true">↗</span></button></div>
+          <div className="cinema-ticket-actions"><button className="cinema-ticket-play" aria-label={video ? `播放${film.title}` : `${film.title}影片待上传`} title={video ? '播放影片 · J' : '完整影片待上传'} disabled={!video} onClick={play}><span aria-hidden="true">▶</span><span>{video ? '播放' : '影片待上传'}</span></button><button className="cinema-detail-entry" onClick={openDetail}>作品详情 <span aria-hidden="true">↗</span></button></div>
         </>}
     </div>
   </SceneModalFrame>

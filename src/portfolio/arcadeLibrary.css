@@ -11,7 +11,8 @@
 .arcade-library-row:focus-visible { outline: 2px solid #e0b347; outline-offset: 1px; }
 .arcade-library-thumb { flex: 0 0 73px; width: 73px; height: 40px; overflow: hidden; border: 1px solid #4888a4; background: #173e56; }
 .arcade-library-thumb .content-media, .arcade-library-thumb .content-media-placeholder, .arcade-library-thumb img, .arcade-library-thumb .content-media-placeholder > svg { display: block; width: 100%; height: 100%; }
-.arcade-library-thumb img { object-fit: cover; }
+.arcade-library-thumb img { object-fit: cover; image-rendering: auto !important; }
+.arcade-library[data-game-mode="journey"] .arcade-library-thumb { flex-basis: 42px; width: 42px; height: 42px; aspect-ratio: 1; }
 .arcade-library-copy { display: flex; flex: 1; flex-direction: column; justify-content: center; gap: 3px; min-width: 0; }
 .arcade-library-copy strong { overflow: hidden; color: #133e68; font-size: 14px; font-weight: 700; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
 .arcade-library-hours { display: flex; align-items: center; gap: 5px; color: #376988; font-size: 10px; line-height: 1.2; }

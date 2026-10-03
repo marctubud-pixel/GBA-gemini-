@@ -1,0 +1,418 @@
+[
+  {
+    "id": "sample-photo-hills",
+    "kind": "hobby",
+    "category": "photo",
+    "title": "原野 · 示例",
+    "description": "Unsplash 摄影占位图片，用于检查照片架尺寸；可替换为你的摄影作品。",
+    "locationId": "my-studio",
+    "cover": {
+      "id": "photo-hills",
+      "type": "image",
+      "url": "/media/hobby-samples/photo-hills.webp",
+      "alt": "原野 · 摄影占位示例"
+    },
+    "coverLayout": {
+      "ratio": "original",
+      "fit": "contain"
+    },
+    "media": [
+      {
+        "id": "photo-hills",
+        "type": "image",
+        "url": "/media/hobby-samples/photo-hills.webp",
+        "alt": "原野 · 摄影占位示例"
+      }
+    ],
+    "tags": [
+      "布局占位"
+    ],
+    "isSample": true,
+    "presentation": "original",
+    "source": "Unsplash 占位照片"
+  },
+  {
+    "id": "sample-photo-cabin",
+    "kind": "hobby",
+    "category": "photo",
+    "title": "湖畔小屋 · 示例",
+    "description": "Unsplash 摄影占位图片，用于检查照片架尺寸；可替换为你的摄影作品。",
+    "locationId": "my-studio",
+    "cover": {
+      "id": "photo-cabin",
+      "type": "image",
+      "url": "/media/hobby-samples/photo-cabin.webp",
+      "alt": "湖畔小屋 · 摄影占位示例"
+    },
+    "coverLayout": {
+      "ratio": "original",
+      "fit": "contain"
+    },
+    "media": [
+      {
+        "id": "photo-cabin",
+        "type": "image",
+        "url": "/media/hobby-samples/photo-cabin.webp",
+        "alt": "湖畔小屋 · 摄影占位示例"
+      }
+    ],
+    "tags": [
+      "布局占位"
+    ],
+    "isSample": true,
+    "presentation": "original",
+    "source": "Unsplash 占位照片"
+  },
+  {
+    "id": "sample-photo-lake",
+    "kind": "hobby",
+    "category": "photo",
+    "title": "山间湖泊 · 示例",
+    "description": "Unsplash 摄影占位图片，用于检查照片架尺寸；可替换为你的摄影作品。",
+    "locationId": "my-studio",
+    "cover": {
+      "id": "photo-lake",
+      "type": "image",
+      "url": "/media/hobby-samples/photo-lake.webp",
+      "alt": "山间湖泊 · 摄影占位示例"
+    },
+    "coverLayout": {
+      "ratio": "original",
+      "fit": "contain"
+    },
+    "media": [
+      {
+        "id": "photo-lake",
+        "type": "image",
+        "url": "/media/hobby-samples/photo-lake.webp",
+        "alt": "山间湖泊 · 摄影占位示例"
+      }
+    ],
+    "tags": [
+      "布局占位"
+    ],
+    "isSample": true,
+    "presentation": "original",
+    "source": "Unsplash 占位照片"
+  },
+  {
+    "id": "sample-photo-coast",
+    "kind": "hobby",
+    "category": "photo",
+    "title": "海浪 · 示例",
+    "description": "Unsplash 摄影占位图片，用于检查照片架尺寸；可替换为你的摄影作品。",
+    "locationId": "my-studio",
+    "cover": {
+      "id": "photo-coast",
+      "type": "image",
+      "url": "/media/hobby-samples/photo-coast.webp",
+      "alt": "海浪 · 摄影占位示例"
+    },
+    "coverLayout": {
+      "ratio": "original",
+      "fit": "contain"
+    },
+    "media": [
+      {
+        "id": "photo-coast",
+        "type": "image",
+        "url": "/media/hobby-samples/photo-coast.webp",
+        "alt": "海浪 · 摄影占位示例"
+      }
+    ],
+    "tags": [
+      "布局占位"
+    ],
+    "isSample": true,
+    "presentation": "original",
+    "source": "Unsplash 占位照片"
+  },
+  {
+    "id": "sample-book-coast",
+    "kind": "hobby",
+    "category": "reading",
+    "title": "海边手记 · 示例",
+    "description": "尺寸与展示效果占位，可在后台替换为你的收藏。",
+    "locationId": "my-studio",
+    "cover": {
+      "id": "book-coast-cover",
+      "type": "image",
+      "url": "/media/hobby-samples/book-coast.svg",
+      "alt": "海边手记 · 布局示例封面"
+    },
+    "coverLayout": {
+      "ratio": "original",
+      "fit": "contain"
+    },
+    "media": [
+      {
+        "id": "book-coast-cover",
+        "type": "image",
+        "url": "/media/hobby-samples/book-coast.svg",
+        "alt": "海边手记 · 布局示例封面"
+      }
+    ],
+    "tags": [
+      "布局占位"
+    ],
+    "isSample": true,
+    "presentation": "portrait",
+    "source": "原创占位封面"
+  },
+  {
+    "id": "sample-book-light",
+    "kind": "hobby",
+    "category": "reading",
+    "title": "光与日常 · 示例",
+    "description": "尺寸与展示效果占位，可在后台替换为你的收藏。",
+    "locationId": "my-studio",
+    "cover": {
+      "id": "book-light-cover",
+      "type": "image",
+      "url": "/media/hobby-samples/book-light.svg",
+      "alt": "光与日常 · 布局示例封面"
+    },
+    "coverLayout": {
+      "ratio": "original",
+      "fit": "contain"
+    },
+    "media": [
+      {
+        "id": "book-light-cover",
+        "type": "image",
+        "url": "/media/hobby-samples/book-light.svg",
+        "alt": "光与日常 · 布局示例封面"
+      }
+    ],
+    "tags": [
+      "布局占位"
+    ],
+    "isSample": true,
+    "presentation": "portrait",
+    "source": "原创占位封面"
+  },
+  {
+    "id": "sample-book-road",
+    "kind": "hobby",
+    "category": "reading",
+    "title": "慢慢向前 · 示例",
+    "description": "尺寸与展示效果占位，可在后台替换为你的收藏。",
+    "locationId": "my-studio",
+    "cover": {
+      "id": "book-road-cover",
+      "type": "image",
+      "url": "/media/hobby-samples/book-road.svg",
+      "alt": "慢慢向前 · 布局示例封面"
+    },
+    "coverLayout": {
+      "ratio": "original",
+      "fit": "contain"
+    },
+    "media": [
+      {
+        "id": "book-road-cover",
+        "type": "image",
+        "url": "/media/hobby-samples/book-road.svg",
+        "alt": "慢慢向前 · 布局示例封面"
+      }
+    ],
+    "tags": [
+      "布局占位"
+    ],
+    "isSample": true,
+    "presentation": "portrait",
+    "source": "原创占位封面"
+  },
+  {
+    "id": "sample-vinyl-blue",
+    "kind": "hobby",
+    "category": "vinyl",
+    "title": "蓝色时刻 · 示例",
+    "description": "尺寸与展示效果占位，可在后台替换为你的收藏。",
+    "locationId": "my-studio",
+    "cover": {
+      "id": "vinyl-blue-cover",
+      "type": "image",
+      "url": "/media/hobby-samples/vinyl-blue.svg",
+      "alt": "蓝色时刻 · 布局示例封面"
+    },
+    "coverLayout": {
+      "ratio": "1:1",
+      "fit": "contain"
+    },
+    "media": [
+      {
+        "id": "vinyl-blue-cover",
+        "type": "image",
+        "url": "/media/hobby-samples/vinyl-blue.svg",
+        "alt": "蓝色时刻 · 布局示例封面"
+      }
+    ],
+    "tags": [
+      "布局占位"
+    ],
+    "isSample": true,
+    "presentation": "square",
+    "source": "原创占位封面"
+  },
+  {
+    "id": "sample-vinyl-lake",
+    "kind": "hobby",
+    "category": "vinyl",
+    "title": "山间回声 · 示例",
+    "description": "尺寸与展示效果占位，可在后台替换为你的收藏。",
+    "locationId": "my-studio",
+    "cover": {
+      "id": "vinyl-lake-cover",
+      "type": "image",
+      "url": "/media/hobby-samples/vinyl-lake.svg",
+      "alt": "山间回声 · 布局示例封面"
+    },
+    "coverLayout": {
+      "ratio": "1:1",
+      "fit": "contain"
+    },
+    "media": [
+      {
+        "id": "vinyl-lake-cover",
+        "type": "image",
+        "url": "/media/hobby-samples/vinyl-lake.svg",
+        "alt": "山间回声 · 布局示例封面"
+      }
+    ],
+    "tags": [
+      "布局占位"
+    ],
+    "isSample": true,
+    "presentation": "square",
+    "source": "原创占位封面"
+  },
+  {
+    "id": "sample-vinyl-fields",
+    "kind": "hobby",
+    "category": "vinyl",
+    "title": "晚风电台 · 示例",
+    "description": "尺寸与展示效果占位，可在后台替换为你的收藏。",
+    "locationId": "my-studio",
+    "cover": {
+      "id": "vinyl-fields-cover",
+      "type": "image",
+      "url": "/media/hobby-samples/vinyl-fields.svg",
+      "alt": "晚风电台 · 布局示例封面"
+    },
+    "coverLayout": {
+      "ratio": "1:1",
+      "fit": "contain"
+    },
+    "media": [
+      {
+        "id": "vinyl-fields-cover",
+        "type": "image",
+        "url": "/media/hobby-samples/vinyl-fields.svg",
+        "alt": "晚风电台 · 布局示例封面"
+      }
+    ],
+    "tags": [
+      "布局占位"
+    ],
+    "isSample": true,
+    "presentation": "square",
+    "source": "原创占位封面"
+  },
+  {
+    "id": "sample-film-coast",
+    "kind": "hobby",
+    "category": "film",
+    "title": "去海边 · 示例",
+    "description": "尺寸与展示效果占位，可在后台替换为你的收藏。",
+    "locationId": "my-studio",
+    "cover": {
+      "id": "film-coast-cover",
+      "type": "image",
+      "url": "/media/hobby-samples/film-coast.svg",
+      "alt": "去海边 · 布局示例封面"
+    },
+    "coverLayout": {
+      "ratio": "original",
+      "fit": "contain"
+    },
+    "media": [
+      {
+        "id": "film-coast-cover",
+        "type": "image",
+        "url": "/media/hobby-samples/film-coast.svg",
+        "alt": "去海边 · 布局示例封面"
+      }
+    ],
+    "tags": [
+      "布局占位"
+    ],
+    "isSample": true,
+    "presentation": "portrait",
+    "source": "原创占位封面"
+  },
+  {
+    "id": "sample-film-cabin",
+    "kind": "hobby",
+    "category": "film",
+    "title": "湖畔来信 · 示例",
+    "description": "尺寸与展示效果占位，可在后台替换为你的收藏。",
+    "locationId": "my-studio",
+    "cover": {
+      "id": "film-cabin-cover",
+      "type": "image",
+      "url": "/media/hobby-samples/film-cabin.svg",
+      "alt": "湖畔来信 · 布局示例封面"
+    },
+    "coverLayout": {
+      "ratio": "original",
+      "fit": "contain"
+    },
+    "media": [
+      {
+        "id": "film-cabin-cover",
+        "type": "image",
+        "url": "/media/hobby-samples/film-cabin.svg",
+        "alt": "湖畔来信 · 布局示例封面"
+      }
+    ],
+    "tags": [
+      "布局占位"
+    ],
+    "isSample": true,
+    "presentation": "portrait",
+    "source": "原创占位封面"
+  },
+  {
+    "id": "sample-film-lake",
+    "kind": "hobby",
+    "category": "film",
+    "title": "远山之后 · 示例",
+    "description": "尺寸与展示效果占位，可在后台替换为你的收藏。",
+    "locationId": "my-studio",
+    "cover": {
+      "id": "film-lake-cover",
+      "type": "image",
+      "url": "/media/hobby-samples/film-lake.svg",
+      "alt": "远山之后 · 布局示例封面"
+    },
+    "coverLayout": {
+      "ratio": "original",
+      "fit": "contain"
+    },
+    "media": [
+      {
+        "id": "film-lake-cover",
+        "type": "image",
+        "url": "/media/hobby-samples/film-lake.svg",
+        "alt": "远山之后 · 布局示例封面"
+      }
+    ],
+    "tags": [
+      "布局占位"
+    ],
+    "isSample": true,
+    "presentation": "portrait",
+    "source": "原创占位封面"
+  }
+]

@@ -73,7 +73,7 @@ export default function AdminPage() {
     const nextCategory = category === 'all' ? group.categories[0][0] : category;
     setDraft({ id: `work-${crypto.randomUUID()}`, kind: group.kind, category: nextCategory, title: '', description: '', media: [], tags: [],
       locationId: group.location || undefined, section: group.kind === 'writing' ? 'WORDS' : undefined,
-      presentation: defaultPresentation(group.kind, nextCategory), coverLayout: { ratio: group.kind === 'film' ? '16:9' : 'original', fit: 'contain' } }); setOriginal(''); setError('');
+      presentation: defaultPresentation(group.kind, nextCategory), coverLayout: { ratio: group.kind === 'film' ? '16:9' : group.kind === 'game-experience' ? '1:1' : 'original', fit: 'contain' } }); setOriginal(''); setError('');
   }
   async function persist(nextEntries: ContentEntry[], nextDraft: ContentEntry | null, text: string) {
     if (!session || !snapshot) return;

@@ -2,6 +2,9 @@ import { COPYWRITING_WORKS } from './copywritingProjects';
 import { PORTFOLIO_PROJECTS, type PortfolioProject } from './projects';
 import type { ContentEntry, ContentKind } from './contentTypes';
 import resumeDocument from './resumeEntries.json';
+import gameCovers from './gameCovers.json';
+import hobbySamples from './hobbySamples.json';
+import cinemaCovers from './cinemaCovers.json';
 import { parseContentDocument } from '../content/contentRepository';
 
 export function projectToContentEntry(project: PortfolioProject): ContentEntry {
@@ -110,4 +113,11 @@ const experiments: ContentEntry[] = [
 
 const general = PORTFOLIO_PROJECTS.filter(p => !['print-house', 'brand-museum', 'marc-cinema', 'experiment-lab'].includes(p.locationId)).map(projectToContentEntry);
 export const CONTENT_EXAMPLE: ContentEntry[] = [...words, ...writingNotes, ...brands, ...films, ...gameExperience, ...gameProjects, ...hobbies, ...experiments, ...general];
-export const CONTENT_SEED: ContentEntry[] = parseContentDocument(resumeDocument).entries;
+const defaultCovers = gameCovers as Record<string, ContentEntry['cover']>;
+const ticketCovers = cinemaCovers as Record<string, ContentEntry['cover']>;
+export const CONTENT_SEED: ContentEntry[] = parseContentDocument({ version: 1, entries: [
+  ...resumeDocument.entries.map(entry => ({ ...entry,
+    ...(defaultCovers[entry.id] ? { cover: defaultCovers[entry.id], coverLayout: { ratio: '1:1', fit: 'contain' } } : {}),
+    ...(entry.kind === 'film' ? { cover: ticketCovers[entry.id] || entry.cover, coverLayout: { ratio: '16:9', fit: 'contain' } } : {}),
+  })), ...hobbySamples,
+] }).entries;

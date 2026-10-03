@@ -1,0 +1,50 @@
+{
+  "resume-ink-kill": {
+    "id": "ink-kill-ticket-cover",
+    "type": "image",
+    "url": "/media/cinema-samples/ink-kill.svg",
+    "alt": "墨杀·三千怨 · 16:9 封面占位"
+  },
+  "resume-mine-rebirth": {
+    "id": "mine-rebirth-ticket-cover",
+    "type": "image",
+    "url": "/media/cinema-samples/mine-rebirth.svg",
+    "alt": "矿境重生 · 16:9 封面占位"
+  },
+  "resume-christmas": {
+    "id": "christmas-ticket-cover",
+    "type": "image",
+    "url": "/media/cinema-samples/christmas.svg",
+    "alt": "圣诞奇妙夜 · 16:9 封面占位"
+  },
+  "resume-who-am-i": {
+    "id": "who-am-i-ticket-cover",
+    "type": "image",
+    "url": "/media/cinema-samples/who-am-i.svg",
+    "alt": "我是谁 · 16:9 封面占位"
+  },
+  "resume-shuangou": {
+    "id": "shuangou-ticket-cover",
+    "type": "image",
+    "url": "/media/cinema-samples/shuangou.svg",
+    "alt": "双沟酒业 · 品牌视频 · 16:9 封面占位"
+  },
+  "resume-cigna": {
+    "id": "cigna-ticket-cover",
+    "type": "image",
+    "url": "/media/cinema-samples/cigna.svg",
+    "alt": "招商信诺 · IP 形象短片 · 16:9 封面占位"
+  },
+  "resume-byd-feature": {
+    "id": "byd-feature-ticket-cover",
+    "type": "image",
+    "url": "/media/cinema-samples/byd-feature.svg",
+    "alt": "比亚迪 · 汽车功能短片 · 16:9 封面占位"
+  },
+  "resume-kuaishou": {
+    "id": "kuaishou-ticket-cover",
+    "type": "image",
+    "url": "/media/cinema-samples/kuaishou.svg",
+    "alt": "露一手·敬新年 · 16:9 封面占位"
+  }
+}
