@@ -71,9 +71,10 @@ function physicalMaterials(group: THREE.Group, device: ModelDevice) {
       const direction = object.name === 'direction-cross';
       const stem = device === 'steam-deck' && ['deck-part-0-0-2', 'deck-part-0-0-3'].includes(object.name);
       const trackpad = role === 'trackpad';
+      const grip = device === 'steam-deck' && ['deck-part-2-0-1', 'deck-part-2-0-2'].includes(object.name);
       const white = role === 'plastic-white';
       const light = role.startsWith('lights');
-      const profile = lens ? 'lens' : glyph ? 'glyph' : light ? 'light' : rim ? 'rim' : rubber ? 'rubber' : well ? 'well' : stem ? 'stem' : direction ? 'direction' : darkCap ? 'dark-cap' : cap ? 'cap' : trackpad ? 'trackpad' : white ? 'white' : 'shell';
+      const profile = lens ? 'lens' : glyph ? 'glyph' : light ? 'light' : rim ? 'rim' : rubber ? 'rubber' : well ? 'well' : stem ? 'stem' : direction ? 'direction' : darkCap ? 'dark-cap' : cap ? 'cap' : trackpad ? 'trackpad' : grip ? 'grip' : white ? 'white' : 'shell';
       const key = `${source.uuid}:${profile}`;
       let result = replacements.get(key);
       if (!result) {
@@ -82,6 +83,7 @@ function physicalMaterials(group: THREE.Group, device: ModelDevice) {
         else if (rubber) color.set(device === 'steam-deck' ? '#343538' : '#30343b');
         else if (well) color.set(device === 'steam-deck' ? '#282a2d' : '#181a20');
         else if (stem) color.set('#5f6265');
+        else if (grip) color.set('#25282c');
         else if (glyph && device === 'ps-portal') color.set('#959ba3');
         else if (rim) color.set('#e2e4e6');
         else if (darkCap) color.set('#252932');

@@ -51,6 +51,34 @@ try {
         const size = new THREE.Box3().setFromObject(model.buttons.up).getSize(new THREE.Vector3());
         assert.ok(Math.abs(size.x - size.y) < .001);
       });
+      check('Deck face buttons: at least 14 units of visible space between sockets', () => {
+        for (const [a, b] of [['A', 'X'], ['X', 'Y'], ['Y', 'B'], ['B', 'A']]) {
+          const first = model.group.getObjectByName(`face-${a}-socket`), second = model.group.getObjectByName(`face-${b}-socket`);
+          const size = new THREE.Box3().setFromObject(first).getSize(new THREE.Vector3());
+          assert.ok(first.position.distanceTo(second.position) - size.x > 14);
+        }
+      });
+      check('Deck X button and right analog: no crowded or touching sockets', () => {
+        const button = model.group.getObjectByName('face-X-socket'), stick = model.group.getObjectByName('stick-right-socket');
+        const radius = (new THREE.Box3().setFromObject(button).getSize(new THREE.Vector3()).x + new THREE.Box3().setFromObject(stick).getSize(new THREE.Vector3()).x) / 2;
+        assert.ok(Math.hypot(button.position.x - stick.position.x, button.position.y - stick.position.y) - radius > 14);
+      });
+      check('Deck D-pad and left analog: a clear gap remains', () => {
+        const cross = new THREE.Box3().setFromObject(model.buttons.up), stick = new THREE.Box3().setFromObject(model.group.getObjectByName('stick-left-socket'));
+        assert.ok(stick.min.x - cross.max.x > 20);
+      });
+      for (const side of ['left', 'right']) check(`Deck ${side} grip joint: full lower contour stays outside the viewport`, () => {
+        const box = new THREE.Box3().setFromObject(model.group.getObjectByName(`grip-${side}-joint`));
+        assert.ok(box.max.y - box.min.y > 290);
+        assert.ok(side === 'left' ? box.max.x < -330 : box.min.x > 330);
+        assert.ok(model.group.getObjectByName(`grip-${side}-joint-shoulder`));
+      });
+      check('Deck left and right structural joints mirror each other', () => {
+        const left = new THREE.Box3().setFromObject(model.group.getObjectByName('grip-left-joint'));
+        const right = new THREE.Box3().setFromObject(model.group.getObjectByName('grip-right-joint'));
+        assert.ok(Math.abs(left.max.x + right.min.x) < .02 && Math.abs(left.min.x + right.max.x) < .02);
+      });
+
     }
     const feedback = createHardwareFeedback(model, true);
     const j = model.buttons.j, restPosition = j.position.clone(), restScale = j.scale.clone();

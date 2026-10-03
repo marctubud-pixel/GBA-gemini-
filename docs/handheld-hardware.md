@@ -20,7 +20,7 @@ Switch Lite 对照青绿色实机参考校准左右侧弧、肩键、白色控�
 
 ### GitHub 三维资产
 
-Steam Deck 基于 wallmasterr 的 **Steam Deck console**，[GitHub 文件及许可](https://github.com/people-climbing/website/tree/33ba12bb6b23d5013be3493df08d8f2dd96ef7e4/public/models/steamdeck)明确为 CC BY 4.0。转换脚本 `scripts/prepare-steam-deck-model.py` 从原 glTF 分离连通部件，移除 LCD 和完整贴图，适配中央开口与侧翼，输出约 1.25 MB 的 `public/assets/hardware/steam-deck/deck.glb`。清掉裁切产生的退化面，仅以前表面重算壳体及握把平面法线，避免背侧支撑面污染细壳缝。Deck 的重叠闭合面不接收自身阴影，保留真实曲面反光和外部投影，消去直角黑块。一体十字键保留摇动，补小型立体扬声器插孔。`steamDeckControls.ts` 在屏幕适配之后重新构建两套圆形摇杆：旋转截面使用 96 段，XY 等比，分出摇杆井、塑料杆、橡胶凹面和细圆环。校准十字键与 ABXY 的相对位置，Y 上、X 左、B 右、A 下，四个键帽统一圆形尺寸，点击区域用射线检查对齐。
+Steam Deck 基于 wallmasterr 的 **Steam Deck console**，[GitHub 文件及许可](https://github.com/people-climbing/website/tree/33ba12bb6b23d5013be3493df08d8f2dd96ef7e4/public/models/steamdeck)明确为 CC BY 4.0。转换脚本 `scripts/prepare-steam-deck-model.py` 从原 glTF 分离连通部件，移除 LCD 和完整贴图，适配中央开口与侧翼，输出约 1.25 MB 的 `public/assets/hardware/steam-deck/deck.glb`。清掉裁切产生的退化面，仅以前表面重算壳体及握把平面法线，避免背侧支撑面污染细壳缝。Deck 的重叠闭合面不接收自身阴影，保留真实曲面反光和外部投影，消去直角黑块。一体十字键保留摇动，补小型立体扬声器插孔。`steamDeckControls.ts` 在屏幕适配之后重新构建两套圆形摇杆：旋转截面使用 96 段，XY 等比，分出摇杆井、塑料杆、橡胶凹面和细圆环。校准十字键与 ABXY 的相对位置，Y 上、X 左、B 右、A 下，四个键帽统一圆形尺寸并适当缩小，菱形中心步距加大，十字键和摇杆之间也留出间隔；外圈不相接，键帽底座按实际壳面高度落座，点击区域用射线检查对齐。两侧下方的原始握把轮廓补上贴合壳面的立体凹槽与细窄内肩，保留上端圆角回折和向下扫入底角的结构曲线。握把聚合物比中央前壳略暗，帮助显示分件层次。
 
 GitHub 检索未找到具有明确许可、可直接接入的完整 PS Portal 模型，因此其两侧基于 Taohid Animation 的 **PS5 Controller**，[Safa Elmali 整理的 DualSense GLB 与署名](https://github.com/SafaElmali/dualsense-studio/blob/cbae4342498d4d9395aa79ec11a1569ce0977d00/controller/ATTRIBUTION.md)为 CC BY 4.0。`scripts/prepare-portal-model.py` 保留真实握柄、摇杆、按钮和扳机几何，裁切并封合内侧壳体，重新制作开孔中央屏框。旧音量槽在运行时移除，音量改放页面右上角。它是手柄模型改造的展示外壳，比例为游戏大屏适配，不能作为尺寸精确的官方 Portal CAD。
 
@@ -40,4 +40,4 @@ Portal 约 2.78 MB。屏框保留平直黑色盖板和窄倒角，键帽原弧�
 
 Switch Lite 校准另用射线命中检查六个透明热区与对应实体键帽的对齐，实际按下和释放验证实体下沉及十字键摇动。大屏的尺寸和位置与改动前一致。
 
-本轮 `node scripts/check-handheld-controls.mjs` 验证实际 GLB、重建几何及反馈：两组圆形摇杆的 XY 直径、96 段曲面、ABXY 排列、12 个实体按键热区、短按可见压力、未按键不移动、松开复位、两款摇杆倾斜及减少动态效果，共 44 项。浏览器验证右上角音量、实际点击下压与复位、共用大屏及换壳。
+本轮 `node scripts/check-handheld-controls.mjs` 验证实际 GLB、重建几何及反馈：两组圆形摇杆的 XY 直径、96 段曲面、ABXY 排列、12 个实体按键热区、短按可见压力、未按键不移动、松开复位、两款摇杆倾斜、减少动态效果、按钮组留白、摇杆间距以及左右完整握把结构线，共 50 项。浏览器验证右上角音量、实际点击下压与复位、共用大屏及换壳。
