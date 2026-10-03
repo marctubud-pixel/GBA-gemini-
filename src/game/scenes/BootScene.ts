@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { PixelArtGenerator } from '../world/PixelArtGenerator';
+import { registerJourneyTextures } from '../../app/journeyTextures';
 export class BootScene extends Phaser.Scene {
   constructor() {
     super('BootScene');
@@ -26,9 +27,9 @@ export class BootScene extends Phaser.Scene {
   create() {
     // 3. Generate procedural pixel art textures (props, clouds, waves, landmarks)
     PixelArtGenerator.generateAllTextures(this);
+    registerJourneyTextures(this.textures);
 
     // Transition immediately to WorldScene
     this.scene.start('WorldScene');
   }
 }
-

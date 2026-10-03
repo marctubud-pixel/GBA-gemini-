@@ -1,39 +1,73 @@
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { useWorldStore } from '../store/useWorldStore';
-import { profile } from '../data/profile';
-import { Mail, MapPin, ExternalLink, Sparkles } from 'lucide-react';
-import { PixelBike } from '../shell/PixelIcons';
+import './managedProjectViewer.css';
 import './infoView.css';
 
+const PdfReader = lazy(() => import('./PdfReader'));
+export const RESUME_PDF_URL = '/media/resume/zhang-zhen-game-2026.pdf';
+
+/** All resume entrances open the supplied PDF, with no reconstructed profile page. */
 export const InfoView = () => {
-  const { currentView, setCurrentView } = useWorldStore();
+  const currentView = useWorldStore(state => state.currentView);
+  const closeInfo = useWorldStore(state => state.closeInfo);
+  const [zoom, setZoom] = useState(100);
+  const dialog = useRef<HTMLElement>(null);
+  const closeButton = useRef<HTMLButtonElement>(null);
   useEffect(() => {
     if (currentView !== 'info') return;
-    const close = (event: KeyboardEvent) => {
-      if (event.code !== 'Escape' && event.code !== 'KeyK') return;
-      event.preventDefault(); event.stopPropagation(); event.stopImmediatePropagation();
-      if (!event.repeat) setCurrentView('game');
+    setZoom(100);
+    const origin = document.activeElement as HTMLElement | null;
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    closeButton.current?.focus({ preventScroll: true });
+    const keys = new Set(['Escape', 'KeyK', 'KeyA', 'KeyD', 'KeyW', 'KeyS',
+      'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End']);
+    const key = (event: KeyboardEvent) => {
+      if (event.key === 'Tab') {
+        event.preventDefault(); event.stopImmediatePropagation();
+        const controls = Array.from(dialog.current?.querySelectorAll<HTMLElement>('button:not(:disabled), a[href], [tabindex="0"]') || []);
+        if (controls.length) {
+          const index = controls.indexOf(document.activeElement as HTMLElement);
+          controls[(index + (event.shiftKey ? -1 : 1) + controls.length) % controls.length].focus();
+        }
+        return;
+      }
+      if (!keys.has(event.code)) return;
+      event.preventDefault(); event.stopImmediatePropagation();
+      if (event.code === 'Escape' || event.code === 'KeyK') { if (!event.repeat) closeInfo(); return; }
+      const area = dialog.current?.querySelector<HTMLElement>('[data-project-scroll]');
+      if (!area) return;
+      if (event.code === 'Home') area.scrollTo({ top: 0 });
+      else if (event.code === 'End') area.scrollTo({ top: area.scrollHeight });
+      else if (['KeyA', 'ArrowLeft', 'KeyD', 'ArrowRight'].includes(event.code))
+        area.scrollBy({ left: ['KeyA', 'ArrowLeft'].includes(event.code) ? -140 : 140 });
+      else area.scrollBy({ top: ['KeyW', 'ArrowUp', 'PageUp'].includes(event.code) ? -180 : 180 });
     };
-    window.addEventListener('keydown', close, true);
-    return () => window.removeEventListener('keydown', close, true);
-  }, [currentView, setCurrentView]);
+    const up = (event: KeyboardEvent) => { if (keys.has(event.code)) event.stopImmediatePropagation(); };
+    window.addEventListener('keydown', key, true); window.addEventListener('keyup', up, true);
+    return () => {
+      window.removeEventListener('keydown', key, true); window.removeEventListener('keyup', up, true);
+      document.body.style.overflow = overflow;
+      if (origin?.isConnected) origin.focus({ preventScroll: true });
+    };
+  }, [currentView, closeInfo]);
   if (currentView !== 'info') return null;
-  return <div className="profile-overlay">
-    <div className="profile-toolbar"><span>PERSONAL PROFILE</span><button onClick={() => setCurrentView('game')} aria-label="返回游戏">ESC · 返回小镇</button></div>
-    <article className="profile-card">
-      <header className="profile-banner"><span>个人资料与工作经历</span></header>
-      <div className="profile-content">
-        <div className="profile-heading">
-          <div className="profile-avatar">{profile.avatarUrl ? <img src={profile.avatarUrl} alt={`${profile.name}头像`} /> : <PixelBike size={40} />}</div>
-          <div><h1>{profile.name}</h1><p className="profile-english">{profile.englishName}</p><p className="profile-role">{profile.title}</p></div>
-          <p className="profile-location"><MapPin size={14} />{profile.location}</p>
-        </div>
-        <p className="profile-tagline">{profile.tagline}</p>
-        <section className="profile-section"><h2>关于创作者 (About)</h2><p>{profile.longBio}</p></section>
-        <section className="profile-section"><h2>能力与经验 (Skills)</h2><div className="profile-skills">{profile.skills.map(group => <div className="profile-skill-group" key={group.category}><h3><Sparkles size={14} />{group.category}</h3><div className="profile-tags">{group.items.map(item => <span key={item}>{item}</span>)}</div></div>)}</div></section>
-        <section className="profile-section"><h2>工作经历 (Experience)</h2><ol className="profile-jobs">{profile.experience.map(job => <li className="profile-job" key={`${job.company}-${job.period}`}><div className="profile-job-heading"><h3>{job.company}</h3><time>{job.period}</time></div><p className="profile-role">{job.role}</p><ul>{job.responsibilities.map(text => <li key={text}>{text}</li>)}</ul></li>)}</ol></section>
-        <footer className="profile-contact"><a href={`mailto:${profile.email}`}><Mail size={15} />{profile.email}</a>{profile.links.map(link => <a key={link.label} href={link.url} target="_blank" rel="noreferrer">{link.label}<ExternalLink size={13} /></a>)}<span>内容来源：用户提供的简历</span></footer>
+  return <div className="resume-overlay">
+    <section className="resume-dialog" ref={dialog} role="dialog" aria-modal="true" aria-label="张震简历2026（游戏）PDF">
+      <header className="resume-toolbar"><h1>张震简历2026（游戏）</h1>
+        <a href={RESUME_PDF_URL} target="_blank" rel="noopener noreferrer">打开原文件 ↗</a>
+        <button ref={closeButton} onClick={closeInfo}>ESC · 关闭</button>
+      </header>
+      <div className="resume-paper">
+        <div className="project-reader-controls"><span>滚动 / 拖动阅读</span><div>
+          <button aria-label="缩小简历" disabled={zoom <= 60} onClick={() => setZoom(value => Math.max(60, value - 20))}>−</button>
+          <span>{zoom}%</span>
+          <button aria-label="放大简历" disabled={zoom >= 220} onClick={() => setZoom(value => Math.min(220, value + 20))}>＋</button>
+        </div></div>
+        <Suspense fallback={<p className="project-reader-empty" role="status">正在打开简历 PDF…</p>}>
+          <PdfReader url={RESUME_PDF_URL} zoom={zoom} />
+        </Suspense>
       </div>
-    </article>
+    </section>
   </div>;
 };

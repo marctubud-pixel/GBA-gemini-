@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { useWorldStore } from '../store/useWorldStore';
 import { TOTAL_WORLD_WIDTH } from '../data/worldSegments';
 import { WORLD_LOCATIONS } from '../data/locations';
-import { Volume2, VolumeX, Compass, User, Sparkles } from 'lucide-react';
+import { Volume2, VolumeX, Compass, User, Sparkles, House } from 'lucide-react';
 import { pixelSound } from '../game/audio/PixelSoundManager';
 import { GBAPixelShellRenderer, GBAPressedKeys } from './GBAPixelShellRenderer';
 
@@ -32,6 +32,7 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
     nearParkedBike,
     nearInteraction,
     setCurrentView,
+    returnToWelcome,
     setVirtualInput,
     activeLandmarkModal,
     activeInterior,
@@ -224,10 +225,10 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
       {/* Top Floating HUD Bar */}
       <header className="absolute top-0 left-0 right-0 z-30 px-3 sm:px-6 py-2 bg-slate-950/80 backdrop-blur-md border-b border-white/10 flex items-center justify-between text-xs text-white">
         {/* Left: Current Zone & Segment */}
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 font-bold tracking-wide">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="flex items-center gap-1.5 font-bold tracking-wide min-w-0">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-sky-300 font-pixel text-xs">{activeInterior ? WORLD_LOCATIONS.find(loc => loc.id === activeInterior)?.name : currentSegment.name}</span>
+            <span className="text-sky-300 font-pixel text-xs truncate">{activeInterior ? WORLD_LOCATIONS.find(loc => loc.id === activeInterior)?.name : currentSegment.name}</span>
           </div>
           <span className="hidden md:inline text-[11px] font-pixel text-slate-400 border-l border-white/10 pl-3">
             {activeInterior ? '室内探索 · 步行模式' : currentSegment.subname}
@@ -247,7 +248,10 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
         </div>
 
         {/* Right Controls */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
+          {currentView === 'game' && <button onClick={returnToWelcome} disabled={isStarting}
+            className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-pixel flex items-center gap-1.5 text-[10px] sm:text-[11px] cursor-pointer"
+            aria-label="回到主页" title="回到主页"><House className="w-3.5 h-3.5 hidden sm:block" /><span>主页</span></button>}
           {activeInterior && <button onClick={exitInterior} className="px-2.5 py-1 bg-slate-800 text-slate-200 font-pixel text-[10px] cursor-pointer" title="直接返回建筑门口 · ESC" aria-label="退出内景">退出内景</button>}
           <button
             onClick={() => {
@@ -256,10 +260,10 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
             }}
             onMouseEnter={() => pixelSound.playSelect()}
             className="px-2.5 py-1 rounded-lg bg-blue-600/90 hover:bg-blue-600 text-white font-pixel flex items-center gap-1.5 transition text-[10px] sm:text-[11px] shadow-sm cursor-pointer"
-            disabled={isStarting} title="招聘方全览索引"
+            disabled={isStarting} title="招聘方全览索引" aria-label="INDEX 索引"
           >
             <Compass className="w-3.5 h-3.5" />
-            <span>INDEX 索引</span>
+            <span><span className="hidden sm:inline">INDEX </span>索引</span>
           </button>
 
           <button
@@ -269,10 +273,10 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
             }}
             onMouseEnter={() => pixelSound.playSelect()}
             className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-pixel flex items-center gap-1.5 transition text-[10px] sm:text-[11px] cursor-pointer"
-            disabled={isStarting} title="创作者简历与介绍"
+            disabled={isStarting} title="查看原版 PDF 简历" aria-label="INFO 简历"
           >
             <User className="w-3.5 h-3.5" />
-            <span>INFO 介绍</span>
+            <span><span className="hidden sm:inline">INFO </span>简历</span>
           </button>
 
           {playerX >= 5000 && (
@@ -416,7 +420,7 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
               }}
               onMouseEnter={() => pixelSound.playSelect()}
               className="w-8 h-4 rotate-[-25deg] hover:bg-white/15 active:bg-white/30 rounded-full cursor-pointer"
-              disabled={isStarting} title="START: 作者介绍"
+              disabled={isStarting} title="START: 查看简历 PDF"
             />
           </div>
         </div>

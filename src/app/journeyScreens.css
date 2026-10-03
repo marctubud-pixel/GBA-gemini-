@@ -1,6 +1,6 @@
 .journey-screen{position:absolute;inset:0;z-index:35;overflow:hidden;color:#fbf8ee;font-family:'DotGothic16','Cubic 11',monospace;image-rendering:pixelated;background:#78c8ec;isolation:isolate}
 .journey-backdrop{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;pointer-events:none;z-index:-1}
-.journey-welcome-copy{position:absolute;top:20%;left:29%;right:4%;display:flex;flex-direction:column;align-items:center;text-align:center}
+.journey-welcome-copy{position:absolute;top:14%;left:0;right:0;display:flex;flex-direction:column;align-items:center;text-align:center}
 .journey-kicker{font-size:8px;letter-spacing:1.5px;font-weight:700;color:#edf4dd;text-shadow:1px 1px #356c86}
 .journey-welcome h1,.journey-loading h2{font-family:'Press Start 2P',monospace;margin:12px 0 10px;font-size:23px;line-height:1.4;letter-spacing:1px;color:#fbf8ee;text-shadow:2px 3px #2679bd,3px 4px #173a50}
 .journey-tagline{font-size:11px;letter-spacing:2px;margin:0;text-shadow:1px 2px #356c86;font-weight:700}
@@ -11,7 +11,7 @@
 .journey-caption{font-size:10px;margin:10px 0 0;text-shadow:1px 1px #356c86}.journey-screen-hint{position:absolute;bottom:7px;left:0;right:0;text-align:center;font-size:9px;color:#e6f3e6;text-shadow:1px 1px #345565}
 .journey-sound{position:absolute;right:10px;top:8px;font-family:inherit;font-size:8px;background:#f7f3dfe8;color:#235a70;border:1px solid #235a70;padding:3px 6px;cursor:pointer}
 .journey-ending-actions .journey-button.is-selected{outline:2px solid #f3c653;outline-offset:2px;box-shadow:inset 1px 2px #fff2c4,2px 3px #173a50}
-.journey-loading-copy{position:absolute;top:16%;left:22%;right:8%;display:flex;align-items:center;flex-direction:column;text-align:center}.journey-loading h2{font-size:21px}.journey-loading-title{font-size:11px;letter-spacing:2px;color:#fbf8ee;margin:8px 0 12px;text-shadow:1px 2px #2679bd}
+.journey-loading-copy{position:absolute;top:16%;left:0;right:0;display:flex;align-items:center;flex-direction:column;text-align:center}.journey-loading h2{font-size:21px}.journey-loading-title{font-size:11px;letter-spacing:2px;color:#fbf8ee;margin:8px 0 12px;text-shadow:1px 2px #2679bd}
 .journey-progress{width:260px;max-width:95%;padding:3px;border:2px solid #fff8df;background:#173a50;box-shadow:2px 3px #173a50}.journey-progress>div{display:flex;gap:3px;height:12px}.journey-progress i{display:block;flex:1;background:#31576b;border-bottom:2px solid #264557}.journey-progress i.is-filled{background:#5eb6ed;border-top:2px solid #a8e7ed;border-bottom:2px solid #2679bd}.journey-loading-status{font-size:10px;margin:12px 0;text-shadow:1px 1px #356c86}
  .journey-ending { z-index: 45; }
 .journey-ending-copy { display: flex; flex-direction: column; align-items: center; text-align: center; width: 92%; gap: 9px; transform: translateY(-28px); }
@@ -23,7 +23,10 @@
 .journey-contact { background: #fff8e4; border: 2px solid #285668; box-shadow: 2px 3px #143d53; color: #214a5b; text-align: left; padding: 16px 20px; width: 68%; max-height: 90%; overflow: auto; font-size: 13px; line-height: 1.65; }
 .journey-contact h3 { font-size: 15px; margin: 0 0 8px; }.journey-contact p { margin: 6px 0; }.journey-contact a { color: #2679bd; text-decoration: underline; }.journey-contact .journey-button { margin-top: 14px; min-height: 28px; font-size: 11px; }
 .journey-button:focus-visible,.journey-sound:focus-visible,.journey-contact a:focus-visible { outline: 2px solid #f3c653; outline-offset: 2px; }
-@media(max-width:520px){.journey-welcome h1{font-size:18px}.journey-welcome-copy{top:19%;left:26%;right:3%}.journey-menu{width:195px}.journey-tagline{font-size:9px;letter-spacing:1px}.journey-kicker{font-size:7px}.journey-ending h2{font-size:19px}.journey-ending-actions .journey-button{font-size:8px;padding:4px 6px}.journey-contact{font-size:10px}.journey-loading h2{font-size:18px}}
+@media(max-width:520px){.journey-welcome h1{font-size:18px}.journey-menu{width:195px}.journey-tagline{font-size:9px;letter-spacing:1px}.journey-kicker{font-size:7px}.journey-ending h2{font-size:19px}.journey-ending-actions .journey-button{font-size:8px;padding:4px 6px}.journey-contact{font-size:10px}.journey-loading h2{font-size:18px}}
 
 .journey-layout{position:absolute;left:0;top:0;width:640px;height:360px;transform-origin:top left;isolation:isolate;overflow:hidden}
 .journey-ending .journey-layout { display: grid; place-items: center; padding: 0; }
+.journey-welcome h1{animation:journey-title-idle 1.8s steps(1,end) infinite}
+@keyframes journey-title-idle{0%,70%,100%{opacity:1}80%,90%{opacity:.45}}
+@media(prefers-reduced-motion:reduce){.journey-welcome h1{animation:none}}

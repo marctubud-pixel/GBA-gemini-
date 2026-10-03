@@ -18,6 +18,7 @@ import { PostcardModal } from '../portfolio/PostcardModal';
 import { EndingModal } from '../portfolio/EndingModal';
 import { LoadingScreen, WelcomeScreen } from './JourneyScreens';
 import { useProjectPreview } from './useProjectPreview';
+import { clearJourneyTextures } from './journeyTextures';
 
 const TRANSITION_MS=2200;
 const WELCOME_KEYS=new Set(['KeyJ','KeyK','KeyE','KeyA','KeyD','KeyW','KeyS','Enter','Space','Escape','ArrowLeft','ArrowRight','ArrowUp','ArrowDown']);
@@ -51,6 +52,7 @@ export const App = () => {
       startInProgress.current=false;
       useWorldStore.getState().setStarting(false);
       game?.destroy(true);phaserGameRef.current=null;
+      clearJourneyTextures();
     };
   },[]);
 

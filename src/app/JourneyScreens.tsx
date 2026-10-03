@@ -23,7 +23,7 @@ export function JourneyFrame({ children, className = '', ...props }: HTMLAttribu
 export function JourneyBackdrop({ kind, progress=0 }: { kind: JourneySceneKind; progress?: number }) {
   const canvas=useRef<HTMLCanvasElement>(null);const latest=useRef(progress);latest.current=progress;
   useEffect(()=>{let raf=0;const start=performance.now();let last=-100;
-    const draw=(now:number)=>{const ctx=canvas.current?.getContext('2d');if(ctx&&now-last>=70){drawJourneyScene(ctx,kind,now-start,latest.current);last=now;}raf=requestAnimationFrame(draw);};raf=requestAnimationFrame(draw);return()=>cancelAnimationFrame(raf);
+    const draw=(now:number)=>{const ctx=canvas.current?.getContext('2d');if(ctx&&now-last>=70){drawJourneyScene(ctx,kind,Math.max(0,now-start),latest.current);last=now;}raf=requestAnimationFrame(draw);};raf=requestAnimationFrame(draw);return()=>cancelAnimationFrame(raf);
   },[kind]);
   return <canvas ref={canvas} width={640} height={360} className="journey-backdrop" aria-hidden="true" />;
 }

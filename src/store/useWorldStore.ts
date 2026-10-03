@@ -14,6 +14,9 @@ export type LandmarkModalType = 'write-house' | 'brand-museum' | 'marc-cinema' |
 interface WorldState {
   // Navigation & View
   currentView: ViewMode;
+  infoReturnView: Exclude<ViewMode, 'info'>;
+  closeInfo: () => void;
+  returnToWelcome: () => void;
   isStarting: boolean;
   setStarting: (starting: boolean) => void;
   deviceShell: ShellType;
@@ -111,6 +114,21 @@ interface WorldState {
 
 export const useWorldStore = create<WorldState>((set, get) => ({
   currentView: 'welcome',
+  infoReturnView: 'welcome',
+  closeInfo: () => get().setCurrentView(get().infoReturnView),
+  returnToWelcome: () => {
+    if (get().isStarting) return;
+    if (get().activeInterior) get().exitInterior();
+    pixelSound.playClose();
+    set({ currentView: 'welcome', infoReturnView: 'welcome', playerState: 'RIDING',
+      playerX: 200, playerY: 270, bikeSpeed: 0, currentSegment: WORLD_SEGMENTS[0],
+      activeInterior: null, activeLandmarkModal: null, modalContext: null, interiorPrompt: null,
+      isOverlayOpen: false, isPrintHouseInterior: false, isPrintHouseBookOpen: false,
+      isPostcardOpen: false, isEndingModalOpen: false, activeProject: null, activeContentId: null,
+      activeLocation: null, nearInteraction: null, nearParkingZone: null, nearParkedBike: false,
+      virtualInput: { left: false, right: false, up: false, down: false, action: false, accelerate: false, brake: false } });
+    window.dispatchEvent(new CustomEvent('teleport-player', { detail: { x: 200, state: 'RIDING' } }));
+  },
   isStarting: false,
   setStarting: (isStarting) => set({ isStarting, virtualInput: { left: false, right: false, action: false } }),
   deviceShell: 'gba',
@@ -186,7 +204,10 @@ export const useWorldStore = create<WorldState>((set, get) => ({
 
   setCurrentView: (view) => {
     if (get().isStarting) return;
-    set({ currentView: view, virtualInput: { left: false, right: false, action: false } });
+    const from = get().currentView;
+    set({ currentView: view,
+      ...(view === 'info' && from !== 'info' ? { infoReturnView: from } : {}),
+      virtualInput: { left: false, right: false, action: false } });
   },
   setDeviceShell: (shell) => set({ deviceShell: shell }),
   toggleSound: () => set((state) => ({ soundEnabled: !state.soundEnabled })),

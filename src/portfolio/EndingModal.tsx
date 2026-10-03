@@ -23,7 +23,7 @@ export const EndingModal=()=>{
   },[showContact]);
   useEffect(()=>{if(isOpen){setShowContact(false);setSelectedAction(2);}},[isOpen]);
   const restart=useCallback(()=>{pixelSound.playConfirm();setShowContact(false);closeEndingModal();},[closeEndingModal]);
-  const resume=useCallback(()=>{pixelSound.playConfirm();setShowContact(false);closeEndingModal();useWorldStore.getState().setCurrentView('info');},[closeEndingModal]);
+  const resume=useCallback(()=>{pixelSound.playConfirm();setShowContact(false);useWorldStore.getState().setCurrentView('info');},[]);
   const back=useCallback(()=>{if(showContact){pixelSound.playCancel();setShowContact(false);}else restart();},[showContact,restart]);
   const contact=useCallback(()=>{pixelSound.playSelect();setSelectedAction(1);setShowContact(true);},[]);
   const moveAction=useCallback((step:number)=>{if(showContact)return;pixelSound.playSelect();setSelectedAction(index=>(index+step+3)%3);},[showContact]);
