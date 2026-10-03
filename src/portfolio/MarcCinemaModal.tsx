@@ -10,6 +10,7 @@ import { CinemaProjectViewer } from './CinemaProjectViewer';
 import { ManagedProjectViewer, openExternalDetail, usesManagedViewer } from './ManagedProjectViewer';
 import './mediaModals.css';
 import './cinemaTicket.css';
+import { readPreviewContext } from '../content/projectPreview';
 
 type CinemaPanel = 'ticket' | 'player';
 function ticketImage(asset?: MediaAsset): MediaAsset | undefined {
@@ -20,6 +21,7 @@ function ticketImage(asset?: MediaAsset): MediaAsset | undefined {
 export const MarcCinemaModal = () => {
   const isOpen = useWorldStore((s) => s.activeLandmarkModal === 'marc-cinema' && s.currentView === 'game' && !s.isOverlayOpen);
   const closeLandmarkModal = useWorldStore((s) => s.closeLandmarkModal);
+  const modalContext = useWorldStore((s) => s.modalContext);
   const entries = useContentStore((s) => s.entries);
   const films = useMemo(() => entries.filter((entry) => entry.kind === 'film'), [entries]);
   const [filmIndex, setFilmIndex] = useState(0);
@@ -31,8 +33,12 @@ export const MarcCinemaModal = () => {
   const cover = ticketImage(film?.cover || film?.media.find((asset) => asset.type === 'image') || video);
 
   useEffect(() => {
-    if (isOpen) { setFilmIndex(0); setPanel('ticket'); setShowDetail(false); setPlaybackError(false); }
-  }, [isOpen]);
+    if (isOpen) {
+      const preview = readPreviewContext(modalContext);
+      const index = films.findIndex(entry => entry.id === (preview?.entryId || modalContext));
+      setFilmIndex(Math.max(0, index)); setPanel('ticket'); setShowDetail(preview?.page === 'detail'); setPlaybackError(false);
+    }
+  }, [isOpen, modalContext]);
   useEffect(() => {
     setFilmIndex((index) => Math.min(index, Math.max(0, films.length - 1)));
   }, [films.length]);

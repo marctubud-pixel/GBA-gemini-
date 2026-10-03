@@ -17,6 +17,7 @@ import { InfoView } from '../portfolio/InfoView';
 import { PostcardModal } from '../portfolio/PostcardModal';
 import { EndingModal } from '../portfolio/EndingModal';
 import { LoadingScreen, WelcomeScreen } from './JourneyScreens';
+import { useProjectPreview } from './useProjectPreview';
 
 const TRANSITION_MS=2200;
 const WELCOME_KEYS=new Set(['KeyJ','KeyK','KeyE','KeyA','KeyD','KeyW','KeyS','Enter','Space','Escape','ArrowLeft','ArrowRight','ArrowUp','ArrowDown']);
@@ -33,6 +34,7 @@ export const App = () => {
   const [progress,setProgress]=useState(0);
   const [isWorldReady,setWorldReady]=useState(false);
   const [loadingError,setLoadingError]=useState(false);
+  const preview = useProjectPreview(phaserGameRef);
 
   useEffect(()=>{void useContentStore.getState().load();},[]);
   useEffect(()=>pixelSound.connectStore(useWorldStore),[]);
@@ -106,10 +108,11 @@ export const App = () => {
   return <div className="relative w-screen h-screen overflow-hidden bg-[#0d131a]">
     <DeviceShell>
       <div ref={gameContainerRef} id="phaser-container" className="w-full h-full flex items-center justify-center" />
-      {currentView==='welcome'&&(isLoading?<LoadingScreen progress={progress} ready={isWorldReady} error={loadingError} onRetry={handleStartGame}/>:<WelcomeScreen onStart={handleStartGame} onResume={handleResume} soundEnabled={soundEnabled} onSound={()=>useWorldStore.getState().toggleSound()}/>)}
+      {currentView==='welcome'&&!preview.active&&(isLoading?<LoadingScreen progress={progress} ready={isWorldReady} error={loadingError} onRetry={handleStartGame}/>:<WelcomeScreen onStart={handleStartGame} onResume={handleResume} soundEnabled={soundEnabled} onSound={()=>useWorldStore.getState().toggleSound()}/>)}
       <WriteHouseModal/><MarcCinemaModal/><BrandMuseumModal/><ArcadeGameModal/><HobbyStudioModal/><ExperimentLabModal/>
       <PostcardModal/><EndingModal/>
     </DeviceShell>
     <PortfolioOverlay/><ProjectIndex/><InfoView/>
+    {preview.active && (preview.waiting || preview.error) && <div className="project-preview-loading" role="status">{preview.error || '正在准备房间与作品…'}</div>}
   </div>;
 };

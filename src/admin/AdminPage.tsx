@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ContentEntry, ContentKind, CoverLayout, MediaAsset } from '../data/contentTypes';
-import { isContentUrl } from '../content/contentRepository';
+import { isContentUrl, parseContentDocument } from '../content/contentRepository';
 import { ProjectCover } from '../portfolio/ProjectCover';
+import { GamePreviewDialog } from './GamePreviewDialog';
+import type { ContentDocument } from '../data/contentTypes';
 import { adminRequest, loadSnapshot, saveSnapshot, uploadFile, type Snapshot } from './adminApi';
 import './admin.css';
 
@@ -35,6 +37,7 @@ export default function AdminPage() {
   const [progress, setProgress] = useState('');
   const [message, setMessage] = useState('正在连接本机作品库…');
   const [error, setError] = useState('');
+  const [preview, setPreview] = useState<{ document: ContentDocument; entryId: string; unsaved: boolean } | null>(null);
   const draftRef = useRef(draft); draftRef.current = draft;
   const group = GROUPS[groupIndex];
   const dirty = !!draft && JSON.stringify(draft) !== original;
@@ -132,6 +135,17 @@ export default function AdminPage() {
     const url = URL.createObjectURL(new Blob([JSON.stringify(snapshot.document, null, 2)], { type: 'application/json' }));
     const anchor = document.createElement('a'); anchor.href = url; anchor.download = 'portfolio-content.json'; anchor.click(); URL.revokeObjectURL(url);
   }
+  function openPreview() {
+    if (!draft || busy) return;
+    try {
+      const value = { ...clone(draft), title: draft.title.trim() || '未命名作品' };
+      // An unfinished PDF/link choice has no detail file yet; still preview its cover and panel.
+      if (value.detail && !value.detail.url) delete value.detail;
+      const document = parseContentDocument({ version: 1, entries: entries.some(entry => entry.id === value.id)
+        ? entries.map(entry => entry.id === value.id ? value : entry) : [...entries, value] });
+      setError(''); setPreview({ document, entryId: value.id, unsaved: dirty });
+    } catch { setError('请检查作品链接与文件设置后再预览'); }
+  }
 
   return <div className="admin-page">
     <aside className="admin-sidebar"><a className="admin-wordmark" href="/" target="_blank" rel="noopener noreferrer"><span>▦</span> MARC ISLAND</a><span className="admin-eyebrow">作品管理</span>
@@ -146,7 +160,7 @@ export default function AdminPage() {
         <div className="admin-project-cards">{list.map(entry => <button key={entry.id} data-admin-entry={entry.id} className={`admin-project-card ${draft?.id === entry.id ? 'is-active' : ''}`} onClick={() => edit(entry)} disabled={busy}>{thumbnail(entry) ? <span className="admin-list-cover"><ProjectCover asset={{ id: 'thumbnail', type: 'image', url: thumbnail(entry)! }} layout={entry.coverLayout} title={entry.title} /></span> : <span className="admin-cover-empty">▧</span>}<span><strong>{entry.title}</strong><small>{group.categories.find(([id]) => id === entry.category)?.[1] || entry.category}</small></span></button>)}{!list.length && <p className="admin-empty">这里还没有作品。点击「添加作品」，上传你的内容。</p>}</div>
       </section>
       {!draft ? <section className="admin-editor admin-editor-empty"><span>▧</span><h2>把作品放进小岛</h2><p>选择一个项目进行编辑，或新建一个项目。</p><p>支持封面、系列图片、视频、PDF 和外部详情链接。</p></section> : <section className="admin-editor" aria-label="项目编辑">
-        <div className="admin-editor-heading"><h2>{draft.title || '新项目'}</h2><span>{dirty ? '修改未保存' : '已保存'}</span></div>
+        <div className="admin-editor-heading"><h2>{draft.title || '新项目'}</h2><div className="admin-editor-tools"><span>{dirty ? '修改未保存' : '已保存'}</span><button className="admin-button subtle" disabled={busy} onClick={openPreview}>游戏中预览</button></div></div>
         <fieldset disabled={busy}>
         <div className="admin-form-row"><label>项目名称<input value={draft.title} onChange={event => patch({ title: event.target.value })} maxLength={200} /></label><label>所属分类<select aria-label="所属分类" value={draft.category} onChange={event => patch({ category: event.target.value })}>{!group.categories.some(([id]) => id === draft.category) && <option value={draft.category}>{draft.category}</option>}{group.categories.map(([id, name]) => <option key={id} value={id}>{name}</option>)}</select></label></div>
         <label>简短介绍<textarea aria-label="简短介绍" rows={2} value={draft.description} onChange={event => patch({ description: event.target.value })} /></label>
@@ -162,9 +176,10 @@ export default function AdminPage() {
         </div>
         <label>体验链接（选填）<input type="url" value={draft.demoUrl || ''} placeholder="H5 / 游戏体验的 https:// 地址" onChange={event => patch({ demoUrl: event.target.value || undefined })} /></label>
         </fieldset>
-        <footer className="admin-save-bar"><button className="admin-text-button danger" disabled={busy} onClick={remove}>移除项目</button><span>{progress || (dirty ? '保存后更新到前台' : '内容已保存在本机')}</span><button className="admin-button" disabled={busy || !dirty} onClick={save}>{busy ? '正在处理…' : '保存到作品库'}</button></footer>
+        <footer className="admin-save-bar"><button className="admin-text-button danger" disabled={busy} onClick={remove}>移除项目</button><span>{progress || (dirty ? '可先预览，保存后更新前台' : '内容已保存在本机')}</span><div className="admin-save-actions"><button className="admin-button subtle" disabled={busy} onClick={openPreview}>游戏中预览</button><button className="admin-button" disabled={busy || !dirty} onClick={save}>{busy ? '正在处理…' : '保存到作品库'}</button></div></footer>
       </section>}</div>
       {session && <details className="admin-storage-info"><summary>本机保存与备份</summary><p>上传文件和作品信息保存在：<code>{session.dataDirectory}</code></p><p>每次保存都会备份上一份内容清单。完整备份请复制整个目录，导出的清单不包含图片、视频和 PDF。线上数据库与文件存储尚未连接。</p></details>}
     </main>
+    {preview && <GamePreviewDialog {...preview} onClose={() => setPreview(null)} />}
   </div>;
 }

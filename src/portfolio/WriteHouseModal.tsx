@@ -7,6 +7,7 @@ import { SceneModalFrame, useModalKeys } from './SceneModalFrame';
 import { WritingProjectDetail, getWritingMedia } from './WritingProjectDetail';
 import { ManagedProjectViewer, openExternalDetail, usesManagedViewer } from './ManagedProjectViewer';
 import './writingHouse.css';
+import { readPreviewContext } from '../content/projectPreview';
 
 const CATEGORIES = [
   { id: 'tvc', title: 'TVC 文案', icon: PixelTV },
@@ -42,11 +43,12 @@ export const WriteHouseModal = () => {
   useEffect(() => {
     if (!isOpen) return;
     setDetailId(null); setPage(0); setMediaIndex(0); setZoomed(false);
-    const requested = writing.find(entry => entry.id === modalContext);
+    const preview = readPreviewContext(modalContext);
+    const requested = writing.find(entry => entry.id === (preview?.entryId || modalContext));
     if (requested) {
       if (CATEGORIES.some(item => item.id === requested.category)) setCategory(requested.category as WritingCategory);
       setPage(Math.max(0, writing.filter(entry => entry.category === requested.category).findIndex(entry => entry.id === requested.id)));
-      setDetailId(requested.id);
+      setDetailId(preview?.page === 'panel' ? null : requested.id);
     } else if (CATEGORIES.some(item => item.id === modalContext)) setCategory(modalContext as WritingCategory);
   }, [isOpen, modalContext]);
   useEffect(() => { setMediaIndex(0); setZoomed(false); }, [detailId]);

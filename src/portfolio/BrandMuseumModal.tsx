@@ -8,6 +8,7 @@ import { BrandCaseViewer } from './BrandCaseViewer';
 import { ManagedProjectViewer, openExternalDetail, usesManagedViewer } from './ManagedProjectViewer';
 import { ProjectCover } from './ProjectCover';
 import './brandMuseum.css';
+import { readPreviewContext } from '../content/projectPreview';
 
 const PANELS = [
   { id: 'ip', title: 'IP', icon: PixelSeagull, slogan: '让角色成为品牌的好朋友。' },
@@ -32,10 +33,15 @@ export const BrandMuseumModal: React.FC = () => {
   useEffect(() => {
     if (!isOpen) return;
     setDetailId(null);
-    const requested = brands.find((entry) => entry.id === modalContext);
+    const preview = readPreviewContext(modalContext);
+    const requested = brands.find((entry) => entry.id === (preview?.entryId || modalContext));
     if (requested) {
-      if (PANELS.some((panel) => panel.id === requested.category)) setSelected(requested.category as BrandCategory);
-      setDetailId(requested.id);
+      if (PANELS.some((panel) => panel.id === requested.category)) {
+        const category = requested.category as BrandCategory;
+        setSelected(category);
+        setPages(previous => ({ ...previous, [category]: brands.filter(entry => entry.category === category).findIndex(entry => entry.id === requested.id) }));
+      }
+      setDetailId(preview?.page === 'panel' ? null : requested.id);
     } else if (PANELS.some((panel) => panel.id === modalContext)) setSelected(modalContext as BrandCategory);
   }, [isOpen, modalContext]);
   const close = () => { pixelSound.playCancel(); setDetailId(null); closeLandmarkModal(); };

@@ -1,13 +1,15 @@
 import { create } from 'zustand';
 import { CONTENT_SEED } from '../data/contentSeed';
-import type { ContentEntry } from '../data/contentTypes';
+import type { ContentDocument, ContentEntry } from '../data/contentTypes';
 import { HttpContentRepository } from '../content/contentRepository';
+import { getPreviewToken } from '../content/projectPreview';
 
 interface ContentState {
   entries: ContentEntry[];
   status: 'local' | 'loading' | 'ready' | 'error';
   error: string | null;
   load: (refresh?: boolean) => Promise<void>;
+  setPreviewDocument: (document: ContentDocument) => void;
 }
 
 const endpoint = (import.meta.env.VITE_CONTENT_URL as string | undefined) || '/api/content';
@@ -17,7 +19,10 @@ export const useContentStore = create<ContentState>((set, get) => ({
   entries: CONTENT_SEED,
   status: 'local',
   error: null,
+  setPreviewDocument: document => set({ entries: document.entries, status: 'ready', error: null }),
   load: async (refresh = false) => {
+    // A draft preview must never be replaced by saved content on focus or storage events.
+    if (getPreviewToken()) return;
     if (get().status === 'loading' || (!refresh && get().status === 'ready')) return;
     set({ status: 'loading', error: null });
     try {

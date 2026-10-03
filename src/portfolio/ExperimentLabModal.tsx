@@ -8,6 +8,7 @@ import { SceneModalFrame, useModalKeys } from './SceneModalFrame';
 import { CompleteProjectViewer } from './CompleteProjectViewer';
 import { ManagedProjectViewer, openExternalDetail, usesManagedViewer } from './ManagedProjectViewer';
 import './experimentLab.css';
+import { readPreviewContext } from '../content/projectPreview';
 
 const FILES = [
   { id: 'film', label: '影像实验', short: 'FILM', icon: PixelFilm },
@@ -32,8 +33,9 @@ export const ExperimentLabModal: React.FC = () => {
 
   useEffect(() => {
     if (!isOpen) return;
-    setShowDetail(false);
-    const requested = experiments.find(entry => entry.id === modalContext || entry.category === modalContext);
+    const preview = readPreviewContext(modalContext);
+    setShowDetail(preview?.page === 'detail');
+    const requested = experiments.find(entry => entry.id === (preview?.entryId || modalContext) || entry.category === modalContext);
     setSelectedId(requested?.id ?? experiments[0]?.id ?? null);
   }, [isOpen, modalContext]);
   useEffect(() => {

@@ -10,6 +10,7 @@ import { HobbyMediaViewer, type HobbyMediaItem } from './HobbyMediaViewer';
 import { ManagedProjectViewer, openExternalDetail } from './ManagedProjectViewer';
 import './mediaModals.css';
 import './hobbyRack.css';
+import { readPreviewContext } from '../content/projectPreview';
 
 const HOBBIES = [
   { id: 'photo', name: 'Photography', label: '摄影', icon: PixelCamera, aliases: ['photo', 'photography', '摄影'] },
@@ -57,8 +58,21 @@ export const HobbyStudioModal = () => {
 
   useEffect(() => {
     if (!isOpen) return;
-    const index = categoryIndex(modalContext);
-    setActiveCategory(index < 0 ? 0 : index); setMediaIndex(0); setViewIndex(null); setDetailId(null);
+    const previewRequest = readPreviewContext(modalContext);
+    const requested = entries.find(entry => entry.id === previewRequest?.entryId);
+    const index = Math.max(0, categoryIndex(requested?.category || modalContext));
+    const targetEntries = entries.filter(entry => entry.kind === 'hobby' && categoryIndex(entry.category) === index);
+    const targetMedia = targetEntries.flatMap(showcaseMedia);
+    const targetItems = ['photo', 'cycling'].includes(HOBBIES[index].id) ? targetMedia : targetEntries.map(entry => showcaseMedia(entry)[0]);
+    setActiveCategory(index); setMediaIndex(Math.max(0, targetItems.findIndex(item => item.entry.id === requested?.id)));
+    setViewIndex(null); setDetailId(null);
+    if (previewRequest?.page === 'detail' && requested) {
+      if (requested.detail) setDetailId(requested.id);
+      else {
+        const view = targetMedia.filter(item => item.asset).findIndex(item => item.entry.id === requested.id);
+        if (view >= 0) setViewIndex(view);
+      }
+    }
   }, [isOpen, modalContext]);
   useEffect(() => {
     setMediaIndex(index => Math.min(index, Math.max(0, items.length - 1)));

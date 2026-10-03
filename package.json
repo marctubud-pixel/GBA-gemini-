@@ -8,7 +8,8 @@
     "build": "tsc && tsc -p server/tsconfig.json && vite build",
     "preview": "vite preview",
     "start": "vite preview --host 127.0.0.1 --port 3012 --strictPort",
-    "test:content": "node --test tests/localContent.test.mjs"
+    "test:content": "node --test tests/localContent.test.mjs",
+    "test:preview": "node --test tests/projectPreview.test.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.441.0",

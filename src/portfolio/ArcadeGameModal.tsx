@@ -9,6 +9,7 @@ import { ProjectCover } from './ProjectCover';
 import { CompleteProjectViewer } from './CompleteProjectViewer';
 import { ManagedProjectViewer, openExternalDetail, usesManagedViewer } from './ManagedProjectViewer';
 import './arcadeLibrary.css';
+import { readPreviewContext } from '../content/projectPreview';
 
 function gameCover(entry: ContentEntry): MediaAsset | undefined {
   const asset = entry.cover || entry.media.find((media) => media.type === 'image');
@@ -25,7 +26,9 @@ export const ArcadeGameModal = () => {
   const modalContext = useWorldStore((s) => s.modalContext);
   const closeLandmarkModal = useWorldStore((s) => s.closeLandmarkModal);
   const entries = useContentStore((s) => s.entries);
-  const isMaking = modalContext === 'making';
+  const preview = readPreviewContext(modalContext);
+  const previewEntry = entries.find(entry => entry.id === preview?.entryId);
+  const isMaking = modalContext === 'making' || previewEntry?.kind === 'game-project';
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [detailId, setDetailId] = useState<string | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -34,8 +37,11 @@ export const ArcadeGameModal = () => {
   const detail = isMaking ? games.find((entry) => entry.id === detailId) : undefined;
 
   useEffect(() => {
-    if (isOpen) { setSelectedIndex(0); setDetailId(null); }
-  }, [isOpen, isMaking]);
+    if (isOpen) {
+      const index = games.findIndex(entry => entry.id === preview?.entryId);
+      setSelectedIndex(Math.max(0, index)); setDetailId(isMaking && preview?.page === 'detail' ? preview.entryId : null);
+    }
+  }, [isOpen, isMaking, modalContext]);
   useEffect(() => {
     setSelectedIndex((index) => Math.min(index, Math.max(0, games.length - 1)));
     if (detailId && !games.some((entry) => entry.id === detailId)) setDetailId(null);
