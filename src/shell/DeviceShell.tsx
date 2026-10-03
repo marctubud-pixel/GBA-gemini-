@@ -4,31 +4,27 @@ import { TOTAL_WORLD_WIDTH } from '../data/worldSegments';
 import { WORLD_LOCATIONS } from '../data/locations';
 import { Volume2, VolumeX, Compass, User, Sparkles, House } from 'lucide-react';
 import { pixelSound } from '../game/audio/PixelSoundManager';
-import { GBAHardware, GBA_HIT_AREAS, GBA_LCD_RECT, GBA_SMALL_HIT_AREAS, GBA_COLORS, hardwarePosition, GBAPressedKeys, GBAColor } from './GBAHardware';
-import './gbaHardware.css';
+import { HandheldHardware, HANDHELD_DEVICES, HANDHELD_LAYOUTS, HANDHELD_SCREEN_RECT, hardwarePosition, HandheldPressedKeys, HandheldDevice } from './HandheldHardware';
+import './handheldHardware.css';
 
 interface DeviceShellProps {
   children: React.ReactNode;
 }
 
-/** Photographed hardware around the unchanged pixel-art game viewport. */
+/** Physical 3D hardware around the shared, full-size pixel-art viewport. */
 export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
-  const [shellColor, setShellColor] = useState<GBAColor>(() => {
+  const [device, setDevice] = useState<HandheldDevice>(() => {
     try {
-      const saved = localStorage.getItem('marc-island-gba-color');
-      if (saved && Object.prototype.hasOwnProperty.call(GBA_COLORS, saved)) return saved as GBAColor;
-    } catch { /* Color selection still works when browser storage is unavailable. */ }
-    return 'classic-grey';
+      const saved = localStorage.getItem('marc-island-handheld');
+      if (saved && Object.prototype.hasOwnProperty.call(HANDHELD_DEVICES, saved)) return saved as HandheldDevice;
+    } catch { /* Device selection still works when browser storage is unavailable. */ }
+    return 'switch';
   });
-  const chooseColor = (color: GBAColor) => {
-    setShellColor(color);
-    try { localStorage.setItem('marc-island-gba-color', color); } catch { /* Optional preference. */ }
+  const chooseDevice = (nextDevice: HandheldDevice) => {
+    setDevice(nextDevice);
+    try { localStorage.setItem('marc-island-handheld', nextDevice); } catch { /* Optional preference. */ }
   };
-  useEffect(() => {
-    for (const option of Object.values(GBA_COLORS)) {
-      const image = new Image(); image.src = option.image;
-    }
-  }, []);
+  const layout = HANDHELD_LAYOUTS[device];
   const {
     currentView,
     isStarting,
@@ -59,8 +55,8 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
     isEndingModalOpen,
   } = useWorldStore();
 
-  // Track pressed state for all GBA buttons
-  const [pressedKeys, setPressedKeys] = useState<GBAPressedKeys>({
+  // Track pressed state for all handheld buttons
+  const [pressedKeys, setPressedKeys] = useState<HandheldPressedKeys>({
     left: false,
     right: false,
     up: false,
@@ -103,12 +99,12 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
   useEffect(() => {
     const handleVolumeKey = (event: KeyboardEvent) => {
       const target = event.target instanceof HTMLElement ? event.target : null;
-      const colorGroup = target?.closest('[data-gba-colors]');
-      if (colorGroup && event.code !== 'Tab') {
+      const deviceGroup = target?.closest('[data-handheld-devices]');
+      if (deviceGroup && event.code !== 'Tab') {
         event.stopImmediatePropagation();
         if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.code)) {
           event.preventDefault();
-          const buttons = Array.from(colorGroup.querySelectorAll<HTMLButtonElement>('button'));
+          const buttons = Array.from(deviceGroup.querySelectorAll<HTMLButtonElement>('button'));
           const direction = ['ArrowRight', 'ArrowDown'].includes(event.code) ? 1 : -1;
           const next = buttons[(buttons.indexOf(target as HTMLButtonElement) + direction + buttons.length) % buttons.length];
           next.focus(); next.click();
@@ -117,7 +113,7 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
         }
         return;
       }
-      if (!target?.closest('[data-gba-volume]') || event.code === 'Tab') return;
+      if (!target?.closest('[data-handheld-volume]') || event.code === 'Tab') return;
       event.stopImmediatePropagation();
       if (target instanceof HTMLInputElement) {
         const current = useWorldStore.getState().soundVolume;
@@ -277,7 +273,7 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
   });
 
   return (
-    <div className="relative w-full h-full flex flex-col items-center justify-center gba-stage select-none overflow-hidden">
+    <div className="relative w-full h-full flex flex-col items-center justify-center handheld-stage select-none overflow-hidden">
       {/* Top Floating HUD Bar */}
       <header className="absolute top-0 left-0 right-0 z-30 px-3 sm:px-6 py-2 bg-slate-950/80 backdrop-blur-md border-b border-white/10 flex items-center justify-between text-xs text-white">
         {/* Left: Current Zone & Segment */}
@@ -355,20 +351,20 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
 
       {/* Main Console Viewport Area */}
       <div className="relative w-full h-full flex items-center justify-center pt-8 pb-10 px-2 sm:px-4">
-        <div className="gba-console" data-gba-color={shellColor} aria-label="GBA 游戏机">
-          <GBAHardware pressed={pressedKeys} color={shellColor} />
+        <div className="handheld-console" data-handheld-device={device} aria-label={`${HANDHELD_DEVICES[device].label} 掌机`}>
+          <HandheldHardware pressed={pressedKeys} device={device} />
 
-          {/* Preserve the original LCD opening and center the 16:9 game within it. */}
+          {/* Every device shares this 16:9 viewport; hardware never changes its size. */}
           <div 
-            className="absolute z-10 overflow-hidden bg-black flex items-center justify-center pixel-canvas gba-screen"
-            style={hardwarePosition(...GBA_LCD_RECT)}
+            className="absolute z-10 overflow-hidden bg-black flex items-center justify-center pixel-canvas handheld-screen"
+            style={hardwarePosition(...HANDHELD_SCREEN_RECT)}
           >
             {/* The Live Game Canvas + In-Screen Modals */}
-            <div className="gba-game-viewport flex items-center justify-center">
+            <div className="handheld-game-viewport flex items-center justify-center">
               {children}
             </div>
 
-            {/* Subtle GBA LCD Scanlines overlay */}
+            {/* Subtle LCD Scanlines overlay */}
             <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.12)_50%)] bg-[length:100%_4px] opacity-20" />
             {/* Subtle Lens Glare Reflection */}
             <div className="absolute inset-0 bg-gradient-to-br from-white/[.035] via-transparent to-black/[.04] pointer-events-none" />
@@ -378,18 +374,18 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
             ['up', '▲ 上'], ['down', '▼ 下'], ['left', '◀ 向左移动'], ['right', '▶ 向右移动'],
             ['j', 'J 确认'], ['k', 'K 互动或返回'],
           ] as const).map(([control, label]) => <button key={control} {...controlEvents(control)}
-            className={`gba-hit ${control === 'j' || control === 'k' ? 'gba-hit-round' : ''}`}
-            style={hardwarePosition(...GBA_HIT_AREAS[control])} aria-label={label}
-            title={control === 'j' ? 'B · J 加速 / 确认' : control === 'k' ? 'A · K 互动 / 返回' : label} />)}
+            className={`handheld-hit ${control === 'j' || control === 'k' ? 'handheld-hit-round' : ''}`}
+            style={hardwarePosition(...layout.controls[control])} aria-label={label}
+            title={control === 'j' ? 'J 加速 / 确认' : control === 'k' ? 'K 互动 / 返回' : label} />)}
 
-          {([{ control: 'start', label: 'START', view: 'info', title: '查看简历 PDF' },
-            { control: 'select', label: 'SELECT', view: 'index', title: '打开索引' }] as const).map(({ control, label, view, title }) =>
-              <button key={label} className="gba-small-button" style={hardwarePosition(...GBA_SMALL_HIT_AREAS[control])}
-                onClick={() => { pixelSound.playConfirm(); if (!isStarting) setCurrentView(view); }}
-                disabled={isStarting} title={`${label}: ${title}`} aria-label={`${label}: ${title}`} />)}
+          {([{ control: 'info', label: 'INFO 简历', title: '查看简历 PDF' },
+            { control: 'index', label: 'INDEX 索引', title: '打开索引' }] as const).map(({ control, label, title }) =>
+              <button key={control} className="handheld-small-button" style={hardwarePosition(...layout.shortcuts[control])}
+                onClick={() => { pixelSound.playConfirm(); if (!isStarting) setCurrentView(control); }}
+                disabled={isStarting} title={title} aria-label={label} />)}
 
-          <div className="gba-volume" data-gba-volume style={hardwarePosition(430, 400, 150, 17)} role="group" aria-label="机身音量控制">
-            <button className="gba-mute" onClick={toggleSound} aria-label={soundEnabled ? '静音' : '开启声音'}
+          <div className="handheld-volume" data-handheld-volume style={hardwarePosition(...layout.volume)} role="group" aria-label="机身音量控制">
+            <button className="handheld-mute" onClick={toggleSound} aria-label={soundEnabled ? '静音' : '开启声音'}
               aria-pressed={!soundEnabled} title={soundEnabled ? '静音' : '开启声音'}>
               {soundEnabled ? <Volume2 /> : <VolumeX />}
             </button>
@@ -400,10 +396,11 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
               title={`音量 ${Math.round(soundVolume * 100)}%`} />
             <button onClick={() => setSoundVolume(soundVolume + .05)} aria-label="提高音量" title="提高音量">+</button>
           </div>
-          <div className="gba-color-options" data-gba-colors role="radiogroup" aria-label="机身配色">
-            {(Object.entries(GBA_COLORS) as [GBAColor, typeof GBA_COLORS[GBAColor]][]).map(([color, option]) =>
-              <button key={color} role="radio" aria-checked={shellColor === color} tabIndex={shellColor === color ? 0 : -1}
-                onClick={() => chooseColor(color)} aria-label={option.label}>
+          <div className="handheld-device-options" data-handheld-devices role="radiogroup" aria-label="选择掌机">
+            {currentView === 'welcome' && <span className="handheld-device-label">选择掌机</span>}
+            {(Object.entries(HANDHELD_DEVICES) as [HandheldDevice, typeof HANDHELD_DEVICES[HandheldDevice]][]).map(([nextDevice, option]) =>
+              <button key={nextDevice} role="radio" aria-checked={device === nextDevice} tabIndex={device === nextDevice ? 0 : -1}
+                onClick={() => chooseDevice(nextDevice)} aria-label={option.label}>
                 <span style={{ backgroundColor: option.swatch }} aria-hidden="true" />{option.label}
               </button>)}
           </div>

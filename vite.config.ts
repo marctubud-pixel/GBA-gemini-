@@ -21,6 +21,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           'vendor-phaser': ['phaser'],
+          'vendor-hardware': ['three'],
           'vendor-react': ['react', 'react-dom'],
           'vendor-icons': ['lucide-react']
         }
