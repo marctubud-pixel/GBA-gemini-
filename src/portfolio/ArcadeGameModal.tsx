@@ -10,6 +10,7 @@ import { CompleteProjectViewer } from './CompleteProjectViewer';
 import { ManagedProjectViewer, openExternalDetail, usesManagedViewer } from './ManagedProjectViewer';
 import './arcadeLibrary.css';
 import { readPreviewContext } from '../content/projectPreview';
+import { gameProjectType } from '../data/gameProjectTypes';
 
 function gameCover(entry: ContentEntry): MediaAsset | undefined {
   const asset = entry.cover || entry.media.find((media) => media.type === 'image');
@@ -102,7 +103,9 @@ export const ArcadeGameModal = () => {
               onFocus={() => setSelectedIndex(index)}
               onClick={() => { select(index); if (isMaking) openDetail(entry); }}>
               <span className="arcade-library-thumb"><ProjectCover asset={gameCover(entry)} layout={isMaking ? entry.coverLayout : { ratio: '1:1', fit: entry.coverLayout?.fit || 'contain' }} kind="game" title={entry.title} fit="cover" /></span>
-              <span className="arcade-library-copy"><strong>{entry.title}</strong>{!isMaking && <span className="arcade-library-hours"><svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true" shapeRendering="crispEdges"><path d="M5 1h6v1h2v2h1v2h1v5h-1v2h-2v1h-2v1H5v-1H3v-2H2v-2H1V6h1V4h2V2h1V1ZM5 3v1H4v1H3v6h1v1h1v1h6v-1h1v-1h1V5h-1V4h-1V3H5Z" fill="currentColor" fillRule="evenodd" /><path d="M7 4h2v4h3v2H7z" fill="currentColor" /></svg>体验时长 <b>{playHours(entry)}</b></span>}</span>
+              <span className="arcade-library-copy"><strong>{entry.title}</strong></span>
+              {isMaking ? <span className="arcade-library-type">{gameProjectType(entry) || '类型待补充'}</span>
+                : <span className="arcade-library-hours"><span>游玩时长</span><b>{playHours(entry)}</b></span>}
             </button>)}</div>}
         </div>
       </SceneModalFrame>

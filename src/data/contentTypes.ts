@@ -25,6 +25,7 @@ export interface ContentEntry {
   id: string;
   kind: ContentKind;
   category: string;
+  projectType?: import('./gameProjectTypes').GameProjectType;
   title: string;
   subtitle?: string;
   description: string;

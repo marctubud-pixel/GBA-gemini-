@@ -11,7 +11,7 @@ test('local content service preserves uploads, rejects unsafe writes, and surviv
   process.env.PORTFOLIO_DATA_DIR = directory;
   let server;
   const start = async () => {
-    server = await createServer({ server: { host: '127.0.0.1', port: 0 }, logLevel: 'silent' });
+    server = await createServer({ cacheDir: join(directory, 'vite-cache'), server: { host: '127.0.0.1', port: 0 }, logLevel: 'silent' });
     await server.listen();
     return `http://127.0.0.1:${server.httpServer.address().port}`;
   };
@@ -40,7 +40,8 @@ test('local content service preserves uploads, rejects unsafe writes, and surviv
     assert.equal((await fetch(base + '/api/uploads/..%2Fcontent.json')).status, 404);
     const entry = { id: 'test-only', kind: 'brand', category: 'ecommerce', title: 'Test H5', description: '', tags: [],
       media: [{ id: file.id, type: 'image', url: file.url }], presentation: 'portrait', coverLayout: { ratio: '4:3', fit: 'cover' }, detail: { type: 'link', url: 'https://example.org/project' } };
-    const document = { version: 1, entries: [...initial.document.entries, entry] };
+    const interaction = { id: 'test-interaction', kind: 'game-project', category: 'making', title: 'Interactive project', projectType: 'H5', description: '', tags: [], media: [] };
+    const document = { version: 1, entries: [...initial.document.entries, entry, interaction] };
     assert.equal((await save({ revision: initial.revision, document })).status, 200);
     assert.equal((await save({ revision: initial.revision, document })).status, 409);
     const current = await get();
@@ -48,6 +49,9 @@ test('local content service preserves uploads, rejects unsafe writes, and surviv
     assert.equal((await save({ revision: current.revision, document: { version: 1, entries: [{ ...entry, detail: { type: 'link', url: 'javascript:alert(1)' } }] } })).status, 400);
     for (const coverLayout of [null, { ratio: '3:0', fit: 'cover' }, { ratio: '16:9', fit: 'stretch' }, { ratio: '9:16' }]) {
       assert.equal((await save({ revision: current.revision, document: { version: 1, entries: [{ ...entry, coverLayout }] } })).status, 400);
+    }
+    for (const projectType of [null, 123, 'arbitrary-type']) {
+      assert.equal((await save({ revision: current.revision, document: { version: 1, entries: [{ ...interaction, projectType }] } })).status, 400);
     }
     const disk = JSON.parse(await readFile(join(directory, 'content.json'), 'utf8'));
     assert.equal(disk.revision, current.revision);

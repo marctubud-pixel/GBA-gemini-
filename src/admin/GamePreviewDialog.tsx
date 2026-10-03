@@ -46,7 +46,7 @@ export function GamePreviewDialog({ document, entryId, unsaved, onClose }: {
         <nav aria-label="预览视角"><button className={page === 'panel' ? 'is-active' : ''} aria-pressed={page === 'panel'} onClick={() => choosePage('panel')}>房间界面</button><button className={page === 'detail' ? 'is-active' : ''} aria-pressed={page === 'detail'} disabled={entry.kind === 'game-experience'} onClick={() => choosePage('detail')}>作品详情</button></nav>
         <button className="admin-preview-close" ref={closeButton} onClick={onClose}>关闭预览</button>
       </header>
-      <iframe ref={frame} title="游戏中的作品预览" src={`/?${PREVIEW_PARAM}=${token}`} />
+      <iframe ref={frame} title="游戏中的作品预览" src={`/?${PREVIEW_PARAM}=${token}`} allow="fullscreen; autoplay" allowFullScreen />
       <footer><span role="status">{status}</span><span>预览中可使用游戏按键。关闭后继续编辑，保存到作品库后更新前台。</span></footer>
     </section>
   </div>;

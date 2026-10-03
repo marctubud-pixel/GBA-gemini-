@@ -39,7 +39,7 @@
 
 必填：`id`（全局唯一）、`kind`、`category`、`title`、`description`、`media`（可为空数组）、`tags`（可为空数组）。可选字段不要填 `null`，无内容时省略。
 
-可选：`subtitle`、`body`（纯文本，保留换行）、`englishTitle`、`date`、`duration`、`hours`（非负数）、`locationId`、`section`、`cover`、`coverLayout`、`demoUrl`、`caseStudy`、`isSample`、`source`、`status`、`fileSize`、`documentUrl`、`attachments`、`presentation`、`detail`。`caseStudy` 为 `[{"heading":"背景","text":"项目背景"}]`。
+可选：`subtitle`、`body`（纯文本，保留换行）、`englishTitle`、`date`、`duration`、`projectType`（H5 / Demo / 短片 / 互动原型 / 游戏）、`hours`（非负数）、`locationId`、`section`、`cover`、`coverLayout`、`demoUrl`、`caseStudy`、`isSample`、`source`、`status`、`fileSize`、`documentUrl`、`attachments`、`presentation`、`detail`。`caseStudy` 为 `[{"heading":"背景","text":"项目背景"}]`。
 
 媒体包含 `id`、`type`（`image` 或 `video`）、`url`，可选 `caption`、`alt`、`poster`。媒体、封面、poster、Demo、文档和附件 URL 使用相同校验：支持 HTTP(S)、`/` 开头的站内路径和 `./` 相对路径；拒绝危险协议、`//` 协议相对地址、反斜杠、空白、控制字符及带用户名/密码的 HTTP(S) 地址。图片和视频使用原文件比例，视频支持浏览器原生控制；媒体失效时显示明确提示。影院以 `media` 内的第一个视频为播放源。
 
@@ -118,3 +118,5 @@
 前台接口定义位于 `src/data/contentTypes.ts`，HTTP 校验与加载位于 `src/content/contentRepository.ts`，各场景 UI 和全览索引共用 `src/store/useContentStore.ts`。保持 `version: 1` 结构即可替换内容。`status` 与 `fileSize` 仅用于前台展示；后台后续需提供真实文件大小与发布状态，不能把客户端显示文本当作上传验证。
 
 兴趣工作室的架子由 `cover` 与 `media` 生成。照片与骑行展示各媒体，书籍 / 唱片 / 电影每项展示一个封面，其余媒体在原图层切换。缺少媒体时保留禁用空框；无条目时显示空展柜。旧 `games` / `figures` 数据仍可读取，但不在兴趣馆导航或热点中展示，不会删除存储内容。可通过 `/admin` 的个人兴趣板块上传和替换这些收藏。
+
+影院票根读取该影片的 `detail.type = "link"` 地址，本地生成可扫码、可点击的二维码；无链接时显示待添加占位。票内封面固定为 16:9，原始图片与详情比例保留。上传影片后，J / 票下播放入口打开全窗口播放器并请求浏览器全屏，K / ESC 返回同一张电影票。游戏互动列表显示 `projectType`；旧记录缺少该字段时从项目简介与标签识别 H5 / Demo。

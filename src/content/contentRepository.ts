@@ -63,6 +63,7 @@ export function parseContentDocument(value: unknown): ContentDocument {
     }
     if (!optionalStringsAreValid(entry, ['subtitle', 'body', 'date', 'duration', 'englishTitle', 'locationId', 'fileSize', 'source'])
       || (entry.hours !== undefined && (typeof entry.hours !== 'number' || !Number.isFinite(entry.hours) || entry.hours < 0))
+      || (entry.projectType !== undefined && !['H5', 'Demo', '短片', '互动原型', '游戏'].includes(entry.projectType as string))
       || (entry.demoUrl !== undefined && !isContentUrl(entry.demoUrl))
       || (entry.documentUrl !== undefined && !isContentUrl(entry.documentUrl))
       || (entry.presentation !== undefined && !['portrait', 'landscape', 'square', 'original'].includes(entry.presentation as string))

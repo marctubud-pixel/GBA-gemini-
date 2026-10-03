@@ -6,7 +6,7 @@
 .hobby-rack-cover::after { top: auto; left: auto; bottom: 1px; right: 1px; transform: rotate(180deg); }
 .hobby-rack-cover .content-media { width: 100%; height: 100%; overflow: hidden; }
 .hobby-rack-cover img { image-rendering: auto !important; }
-.hobby-rack-item:hover .hobby-rack-cover,.hobby-rack-item.is-active .hobby-rack-cover { border-color: #277fb1; outline: 2px solid #64c3e2; outline-offset: 1px; box-shadow: 2px 3px #95b6be, 0 0 7px #9fdceca6; }
+.hobby-rack-item.is-active .hobby-rack-cover { border-color: #277fb1; outline: 2px solid #64c3e2; outline-offset: 1px; box-shadow: 2px 3px #95b6be, 0 0 7px #9fdceca6; }
 .hobby-rack-item:focus-visible { outline: none; }
 .hobby-rack-item:focus-visible .hobby-rack-cover { outline: 2px solid #e5b952; outline-offset: 2px; }
 .hobby-rack-item:disabled { cursor: default; opacity: .6; }

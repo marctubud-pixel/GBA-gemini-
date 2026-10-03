@@ -125,7 +125,7 @@ export const HobbyStudioModal = () => {
             {items.map((item, index) => <button key={`${item.entry.id}:${item.asset?.url || 'empty'}`} data-entry-id={item.entry.id} data-rack-index={index}
               className={`hobby-rack-item ${index === mediaIndex ? 'is-active' : ''}`} aria-pressed={index === mediaIndex}
               aria-label={item.asset?.caption || item.entry.title} title={`${item.entry.title} · J 查看`} disabled={!item.asset && !item.entry.detail}
-              onMouseEnter={() => setMediaIndex(index)} onFocus={() => setMediaIndex(index)} onClick={() => { setMediaIndex(index); view(item); }}>
+              onPointerMove={event => { if (event.movementX || event.movementY) setMediaIndex(index); }} onFocus={() => setMediaIndex(index)} onClick={() => { setMediaIndex(index); view(item); }}>
               <span className="hobby-rack-cover"><ProjectCover asset={preview(item.asset)} layout={item.entry.coverLayout} kind={category.id} title={item.entry.title} fit="cover" />
                 {item.asset?.type === 'video' && <span className="hobby-rack-video" aria-hidden="true">▶</span>}
               </span>

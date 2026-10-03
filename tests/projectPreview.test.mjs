@@ -1,9 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createServer } from 'vite';
+import { mkdtemp, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 
 test('draft preview rejects stale sessions and unsafe or missing works without changing the draft', async () => {
-  const server = await createServer({ configFile: false, server: { middlewareMode: true, hmr: false }, logLevel: 'silent' });
+  const cacheDir = await mkdtemp(join(tmpdir(), 'portfolio-preview-cache-'));
+  const server = await createServer({ configFile: false, cacheDir, server: { middlewareMode: true, hmr: false }, logLevel: 'silent' });
   try {
     const { parsePreviewMessage, previewContext, readPreviewContext } = await server.ssrLoadModule('/src/content/projectPreview.ts');
     const token = '642a5b78-401c-438a-9f72-136797eeb2d2';
@@ -24,5 +28,5 @@ test('draft preview rejects stale sessions and unsafe or missing works without c
     ]) assert.throws(() => parsePreviewMessage({ ...message, ...change }, token));
     assert.equal(readPreviewContext('making'), null);
     assert.equal(readPreviewContext('preview:detail:wrong-session:draft'), null);
-  } finally { await server.close(); }
+  } finally { await server.close(); await rm(cacheDir, { recursive: true, force: true }); }
 });
