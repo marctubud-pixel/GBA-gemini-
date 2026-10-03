@@ -1,5 +1,5 @@
 import React from 'react';
-import { PixelBook, PixelGamepad, PixelLighthouse, PixelPalmTree, PixelSeagull, PixelShell } from '../shell/PixelIcons';
+import { PixelBook, PixelCamera, PixelGamepad, PixelLighthouse, PixelPalmTree, PixelSeagull, PixelShell } from '../shell/PixelIcons';
 
 export type SceneHeaderKind = 'book' | 'ticket' | 'gallery' | 'console' | 'collection' | 'lab';
 
@@ -21,7 +21,8 @@ const frames: Record<SceneHeaderKind, { outline: string; plaque?: string }> = {
     outline: 'M4 60V28Q4 12 20 12H194L208 4H392L406 12H580Q596 12 596 28V60Z',
   },
   collection: {
-    outline: 'M4 60V16L12 8H292L300 14L308 8H588L596 16V60Z',
+    outline: 'M4 60V20L16 8H286L300 14L314 8H584L596 20V60Z',
+    plaque: 'M158 52V23L168 15H432L442 23V52Z',
   },
   lab: {
     outline: 'M4 60V24L12 16H32V8H182V16H588L596 24V60Z',
@@ -79,11 +80,33 @@ const HeaderDetails: React.FC<{ kind: SceneHeaderKind }> = ({ kind }) => {
       <path d="M132 30H158V24H146V20H138V24H132ZM434 28H461V22H450V18H442V22H434Z" fill="#d7edf2" />
     </>;
     case 'collection': return <>
-      <path d="M300 16V22M300 53V58" fill="none" stroke="var(--header-light)" strokeWidth="2" />
-      {[462, 488, 514].map((x) => <g key={x}>
-        <rect x={x} y="31" width="13" height="13" fill="#102e45" />
-        <rect x={x + 2} y="33" width="9" height="8" fill="#bce0e9" />
-      </g>)}
+      {/* A photo album on the left, a record and books on the right. */}
+      <g data-collection-detail="photo-album" stroke="#102e45" strokeWidth="2">
+        <path d="M27 22H57V52H27Z" fill="#d6c697" />
+        <path d="M39 15H76V48H39Z" fill="#fff8e5" />
+        <path d="M44 20H71V38H44Z" fill="#76bacc" stroke="none" />
+        <path d="M44 31H71V38H44Z" fill="#3287a1" stroke="none" />
+        <path d="M44 38V34L54 27L62 32L71 28V38Z" fill="#84a97e" stroke="none" />
+        <path d="M52 44H64" fill="none" stroke="#a8beb6" />
+      </g>
+      <g transform="translate(79 27)" data-collection-detail="camera"><PixelCamera size={26} color="#f8efd5" /></g>
+      <path d="M117 29H121V25H125V29H129V33H125V37H121V33H117Z" fill="#ebc875" />
+      <g data-collection-detail="vinyl">
+        <circle cx="507" cy="37" r="16" fill="#0d293f" stroke="#82b2c4" strokeWidth="1" />
+        <circle cx="507" cy="37" r="12" fill="none" stroke="#355c72" strokeWidth="1" />
+        <circle cx="507" cy="37" r="9" fill="none" stroke="#355c72" strokeWidth="1" />
+        <circle cx="507" cy="37" r="5" fill="#e5c885" />
+        <rect x="506" y="36" width="2" height="2" fill="#163b55" />
+        <path d="M495 31L499 27M497 34L502 29" fill="none" stroke="#769aa7" strokeWidth="1" />
+      </g>
+      <g transform="translate(537 25)" data-collection-detail="books"><PixelBook size={29} color="#faf3df" /></g>
+      <path d="M474 34H477V31H480V34H483V37H480V40H477V37H474Z" fill="#9ecbd2" />
+      <path d="M19 55H145M455 55H580M166 18H434" fill="none" stroke="#a8d4d7" strokeWidth="1" />
+      <path d="M171 49H429M162 55H438M165 57H435" fill="none" stroke="#d7cba9" strokeWidth="1" />
+      <path d="M300 56V61M296 59H304" fill="none" stroke="#80a8bb" strokeWidth="2" />
+      <path d="M170 25V30H175M430 25V30H425" fill="none" stroke="#d3ad6d" strokeWidth="2" />
+      <path d="M16 13H140M460 13H584" fill="none" stroke="#91bfcc" strokeWidth="1" strokeDasharray="3 5" />
+      <path d="M18 18V46M582 18V46" fill="none" stroke="#194362" strokeWidth="2" />
     </>;
     case 'lab': return <>
       <path d="M55 10V2H95V10H89V6H61V10Z" fill="#edcf76" stroke="#7c663e" strokeWidth="2" />

@@ -14,11 +14,11 @@
 .journey-loading-copy{position:absolute;top:16%;left:22%;right:8%;display:flex;align-items:center;flex-direction:column;text-align:center}.journey-loading h2{font-size:21px}.journey-loading-title{font-size:11px;letter-spacing:2px;color:#fbf8ee;margin:8px 0 12px;text-shadow:1px 2px #2679bd}
 .journey-progress{width:260px;max-width:95%;padding:3px;border:2px solid #fff8df;background:#173a50;box-shadow:2px 3px #173a50}.journey-progress>div{display:flex;gap:3px;height:12px}.journey-progress i{display:block;flex:1;background:#31576b;border-bottom:2px solid #264557}.journey-progress i.is-filled{background:#5eb6ed;border-top:2px solid #a8e7ed;border-bottom:2px solid #2679bd}.journey-loading-status{font-size:10px;margin:12px 0;text-shadow:1px 1px #356c86}
  .journey-ending { z-index: 45; }
-.journey-ending-copy { display: flex; flex-direction: column; align-items: center; text-align: center; width: 92%; gap: 9px; }
+.journey-ending-copy { display: flex; flex-direction: column; align-items: center; text-align: center; width: 92%; gap: 9px; transform: translateY(-28px); }
 .journey-ending h2 { font-family: 'Press Start 2P',monospace; font-size: 25px; line-height: 1.6; text-transform: uppercase; margin: 0; color: #fff9e8; text-shadow: 2px 3px #2679bd, 3px 4px #23546a; max-width: 560px; }
 .journey-ending-line { font-size: 16px; margin: 0; color: #fff8e7; text-shadow: 1px 2px #356c86; }
-.journey-ending-actions { display: flex; gap: 12px; justify-content: center; margin-top: 16px; }
-.journey-ending-actions .journey-button { min-width: 119px; font-size: 10px; padding: 6px 10px; }
+.journey-ending-actions { position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%); display: flex; gap: 9px; justify-content: center; }
+.journey-ending-actions .journey-button { min-width: 94px; min-height: 24px; font-size: 9px; padding: 3px 8px; line-height: 1.4; }
 .journey-contact-backdrop { position: absolute; inset: 0; display: grid; place-items: center; background: #153b5ac4; }
 .journey-contact { background: #fff8e4; border: 2px solid #285668; box-shadow: 2px 3px #143d53; color: #214a5b; text-align: left; padding: 16px 20px; width: 68%; max-height: 90%; overflow: auto; font-size: 13px; line-height: 1.65; }
 .journey-contact h3 { font-size: 15px; margin: 0 0 8px; }.journey-contact p { margin: 6px 0; }.journey-contact a { color: #2679bd; text-decoration: underline; }.journey-contact .journey-button { margin-top: 14px; min-height: 28px; font-size: 11px; }
