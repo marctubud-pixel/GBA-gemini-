@@ -16,6 +16,11 @@ export interface MediaAsset {
   poster?: string;
 }
 
+export interface CoverLayout {
+  ratio: '4:3' | '16:9' | '9:16' | '1:1' | 'original';
+  fit: 'contain' | 'cover';
+}
+
 export interface ContentEntry {
   id: string;
   kind: ContentKind;
@@ -29,6 +34,8 @@ export interface ContentEntry {
   hours?: number;
   englishTitle?: string;
   cover?: MediaAsset;
+  /** Independent of the full-size project media / PDF presentation. */
+  coverLayout?: CoverLayout;
   media: MediaAsset[];
   demoUrl?: string;
   tags: string[];

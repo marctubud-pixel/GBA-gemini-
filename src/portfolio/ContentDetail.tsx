@@ -1,6 +1,7 @@
 import React from 'react';
 import type { ContentEntry } from '../data/contentTypes';
 import { ContentMedia } from './ContentMedia';
+import { ProjectCover } from './ProjectCover';
 import { isContentUrl } from '../content/contentRepository';
 import { ManagedProjectViewer, usesManagedViewer } from './ManagedProjectViewer';
 
@@ -16,7 +17,7 @@ export const ContentDetail: React.FC<ContentDetailProps> = ({ entry, onBack }) =
         <span>{[entry.category, entry.date, entry.isSample ? '示例内容' : entry.source].filter(Boolean).join(' · ')}</span>
       </div>
       <div className="content-detail-intro">
-        <div className="content-detail-cover"><ContentMedia asset={entry.cover} kind={entry.kind} title={entry.title} fit="contain" /></div>
+        <div className="content-detail-cover"><ProjectCover asset={entry.cover} layout={entry.coverLayout} kind={entry.kind} title={entry.title} /></div>
         <div className="content-detail-heading">
           <h3>{entry.title}</h3>
           {entry.englishTitle && <p className="content-detail-english">{entry.englishTitle}</p>}

@@ -6,7 +6,7 @@ import { PixelSeagull, PixelPalette, PixelTag, PixelCart, PixelShell } from '../
 import { SceneModalFrame, useModalKeys } from './SceneModalFrame';
 import { BrandCaseViewer } from './BrandCaseViewer';
 import { ManagedProjectViewer, openExternalDetail, usesManagedViewer } from './ManagedProjectViewer';
-import { ContentMedia } from './ContentMedia';
+import { ProjectCover } from './ProjectCover';
 import './brandMuseum.css';
 
 const PANELS = [
@@ -82,7 +82,7 @@ export const BrandMuseumModal: React.FC = () => {
           return <section key={id} className={`brand-panel ${selected === id ? 'is-active' : ''}`} onMouseEnter={() => setSelected(id)}>
             <button className="brand-panel-label" onClick={() => setSelected(id)} aria-pressed={selected === id}><Icon size={20} /><h3>{title}</h3><span>0{index + 1}</span></button>
             <div className="brand-panel-content">
-            <button className="brand-panel-art brand-art-entry" disabled={!entry} onClick={() => entry && openCase(entry.id)} aria-label={entry ? `打开${entry.title}完整案例` : `${title}作品待补充`}><ContentMedia asset={entry?.cover} kind={`brand-${id}`} title={entry?.title ?? title} fit="contain" /></button>
+            <button className="brand-panel-art brand-art-entry" disabled={!entry} onClick={() => entry && openCase(entry.id)} aria-label={entry ? `打开${entry.title}完整案例` : `${title}作品待补充`}><ProjectCover asset={entry?.cover} layout={entry?.coverLayout} kind={`brand-${id}`} title={entry?.title ?? title} /></button>
             <h4>{entry?.title ?? title}</h4>
             <p>{entry?.description ?? slogan}</p>
             {entry?.isSample && <small className="scene-sample-label">示例内容</small>}

@@ -39,13 +39,16 @@ test('local content service preserves uploads, rejects unsafe writes, and surviv
     assert.equal((await fetch(base + file.url, { headers: { Range: 'bytes=999999-' } })).status, 416);
     assert.equal((await fetch(base + '/api/uploads/..%2Fcontent.json')).status, 404);
     const entry = { id: 'test-only', kind: 'brand', category: 'ecommerce', title: 'Test H5', description: '', tags: [],
-      media: [{ id: file.id, type: 'image', url: file.url }], presentation: 'portrait', detail: { type: 'link', url: 'https://example.org/project' } };
+      media: [{ id: file.id, type: 'image', url: file.url }], presentation: 'portrait', coverLayout: { ratio: '4:3', fit: 'cover' }, detail: { type: 'link', url: 'https://example.org/project' } };
     const document = { version: 1, entries: [...initial.document.entries, entry] };
     assert.equal((await save({ revision: initial.revision, document })).status, 200);
     assert.equal((await save({ revision: initial.revision, document })).status, 409);
     const current = await get();
     assert.equal((await save({ revision: current.revision, document: { version: 1, entries: [entry, entry] } })).status, 400);
     assert.equal((await save({ revision: current.revision, document: { version: 1, entries: [{ ...entry, detail: { type: 'link', url: 'javascript:alert(1)' } }] } })).status, 400);
+    for (const coverLayout of [null, { ratio: '3:0', fit: 'cover' }, { ratio: '16:9', fit: 'stretch' }, { ratio: '9:16' }]) {
+      assert.equal((await save({ revision: current.revision, document: { version: 1, entries: [{ ...entry, coverLayout }] } })).status, 400);
+    }
     const disk = JSON.parse(await readFile(join(directory, 'content.json'), 'utf8'));
     assert.equal(disk.revision, current.revision);
     assert.deepEqual(disk.document, document);

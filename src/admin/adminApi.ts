@@ -18,7 +18,7 @@ export async function saveSnapshot(token: string, snapshot: Snapshot, document: 
 }
 export interface UploadResult { id: string; url: string; mime: string; size: number; }
 export function uploadFile(file: File, token: string, onProgress: (percent: number) => void): Promise<UploadResult> {
-  const max = file.type.startsWith('video/') ? 250 : 50;
+  const max = file.type.startsWith('video/') || /\.(mp4|webm)$/i.test(file.name) ? 250 : 50;
   if (file.size > max * 1024 * 1024) return Promise.reject(new Error(`${file.name} 超过 ${max} MB，请压缩后上传`));
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();

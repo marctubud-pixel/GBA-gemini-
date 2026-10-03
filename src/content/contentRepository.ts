@@ -55,6 +55,12 @@ export function parseContentDocument(value: unknown): ContentDocument {
       || !entry.media.every(mediaIsValid) || !Array.isArray(entry.tags)
       || !entry.tags.every(tag => typeof tag === 'string')) throw new Error('作品字段不完整或 ID 重复');
     if (entry.cover !== undefined && !mediaIsValid(entry.cover)) throw new Error('作品封面格式不正确');
+    if (entry.coverLayout !== undefined) {
+      const layout = entry.coverLayout as Record<string, unknown> | null;
+      if (!layout || typeof layout !== 'object'
+        || !['4:3', '16:9', '9:16', '1:1', 'original'].includes(layout.ratio as string)
+        || !['contain', 'cover'].includes(layout.fit as string)) throw new Error('封面比例或适配方式不正确');
+    }
     if (!optionalStringsAreValid(entry, ['subtitle', 'body', 'date', 'duration', 'englishTitle', 'locationId', 'fileSize', 'source'])
       || (entry.hours !== undefined && (typeof entry.hours !== 'number' || !Number.isFinite(entry.hours) || entry.hours < 0))
       || (entry.demoUrl !== undefined && !isContentUrl(entry.demoUrl))

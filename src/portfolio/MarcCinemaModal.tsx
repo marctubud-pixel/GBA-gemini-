@@ -5,7 +5,7 @@ import type { MediaAsset } from '../data/contentTypes';
 import { pixelSound } from '../game/audio/PixelSoundManager';
 import { PixelFilm } from '../shell/PixelIcons';
 import { SceneModalFrame, useModalKeys } from './SceneModalFrame';
-import { ContentMedia } from './ContentMedia';
+import { ProjectCover } from './ProjectCover';
 import { CinemaProjectViewer } from './CinemaProjectViewer';
 import { ManagedProjectViewer, openExternalDetail, usesManagedViewer } from './ManagedProjectViewer';
 import './mediaModals.css';
@@ -89,7 +89,7 @@ export const MarcCinemaModal = () => {
                 <path d="M17 12H465M495 12H583M17 228H465M495 228H583" stroke="#e1c891" strokeWidth="2" />
                 <path d="M22 20H30V18H38V20H46M554 222H562V220H570V222H578" fill="none" stroke="#b4cdd3" strokeWidth="2" />
               </svg>
-              <div className="cinema-ticket-art"><ContentMedia asset={cover} kind="film" title={film.title} fit="contain" /></div>
+              <div className="cinema-ticket-art"><ProjectCover asset={cover} layout={film.coverLayout} kind="film" title={film.title} /></div>
               <div className="cinema-ticket-copy">
                 <span className="cinema-ticket-label">影片名称</span><h3>{film.title}</h3>
                 <dl className="cinema-ticket-meta"><div><dt>影片类型</dt><dd>{film.category || '待补充'}</dd></div><div><dt>上映日期</dt><dd>{film.date || '待补充'}</dd></div></dl>

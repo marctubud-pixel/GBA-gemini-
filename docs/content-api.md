@@ -26,6 +26,7 @@
       "date": "2026.10.03",
       "duration": "3 分 24 秒",
       "cover": { "id": "poster-001", "type": "image", "url": "/uploads/poster.jpg", "alt": "影片海报" },
+      "coverLayout": { "ratio": "16:9", "fit": "contain" },
       "media": [{ "id": "video-001", "type": "video", "url": "/uploads/film.mp4", "poster": "/uploads/poster.jpg", "caption": "完整影片" }],
       "tags": ["短片"],
       "isSample": false
@@ -36,7 +37,7 @@
 
 必填：`id`（全局唯一）、`kind`、`category`、`title`、`description`、`media`（可为空数组）、`tags`（可为空数组）。可选字段不要填 `null`，无内容时省略。
 
-可选：`subtitle`、`body`（纯文本，保留换行）、`englishTitle`、`date`、`duration`、`hours`（非负数）、`locationId`、`section`、`cover`、`demoUrl`、`caseStudy`、`isSample`、`source`、`status`、`fileSize`、`documentUrl`、`attachments`、`presentation`、`detail`。`caseStudy` 为 `[{"heading":"背景","text":"项目背景"}]`。
+可选：`subtitle`、`body`（纯文本，保留换行）、`englishTitle`、`date`、`duration`、`hours`（非负数）、`locationId`、`section`、`cover`、`coverLayout`、`demoUrl`、`caseStudy`、`isSample`、`source`、`status`、`fileSize`、`documentUrl`、`attachments`、`presentation`、`detail`。`caseStudy` 为 `[{"heading":"背景","text":"项目背景"}]`。
 
 媒体包含 `id`、`type`（`image` 或 `video`）、`url`，可选 `caption`、`alt`、`poster`。媒体、封面、poster、Demo、文档和附件 URL 使用相同校验：支持 HTTP(S)、`/` 开头的站内路径和 `./` 相对路径；拒绝危险协议、`//` 协议相对地址、反斜杠、空白、控制字符及带用户名/密码的 HTTP(S) 地址。图片和视频使用原文件比例，视频支持浏览器原生控制；媒体失效时显示明确提示。影院以 `media` 内的第一个视频为播放源。
 
@@ -105,6 +106,7 @@
 
 ### 详情和比例
 
+- `coverLayout: {"ratio":"4:3","fit":"contain"}`：封面画框可选 `4:3`、`16:9`、`9:16`、`1:1`、`original`；适配可选 `contain`（完整显示）或 `cover`（居中裁切）。原始比例始终完整显示。新画框在现有封面槽内自适应，不改变室内弹窗尺寸，也不改动原文件或详情页比例。旧条目未设置时保持现有封面外观。后台预览与各场景封面共用组件。
 - `detail: {"type":"pdf","url":"/api/uploads/…pdf"}`：点击详情直接打开连续 PDF 阅读层，支持鼠标滚动、拖动、触摸滚动、W / S 阅读与放大缩小。PDF.js、worker、CMap、字体及解码资源随本机构建提供。渲染按可见页加载，避免一次解码所有页面。密码保护 PDF 显示提示，不绕过权限。
 - `detail: {"type":"link","url":"https://…"}`：详情入口直接在新窗口打开外部文档，不出现中间子菜单。仅接受无账号密码的 HTTP(S) 地址；飞书文档分享权限由原平台设置。
 - 无 `detail`：继续显示作品图片 / 视频。旧条目不改变原来的专用详情样式；指定 `presentation` 的新作品使用支持比例的媒体阅读层。

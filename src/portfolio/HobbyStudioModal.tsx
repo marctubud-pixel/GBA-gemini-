@@ -5,7 +5,7 @@ import type { ContentEntry, MediaAsset } from '../data/contentTypes';
 import { pixelSound } from '../game/audio/PixelSoundManager';
 import { PixelCamera, PixelBook, PixelDisc, PixelBike, PixelFilm } from '../shell/PixelIcons';
 import { SceneModalFrame, useModalKeys } from './SceneModalFrame';
-import { ContentMedia } from './ContentMedia';
+import { ProjectCover } from './ProjectCover';
 import { HobbyMediaViewer, type HobbyMediaItem } from './HobbyMediaViewer';
 import { ManagedProjectViewer, openExternalDetail } from './ManagedProjectViewer';
 import './mediaModals.css';
@@ -112,7 +112,7 @@ export const HobbyStudioModal = () => {
               className={`hobby-rack-item ${index === mediaIndex ? 'is-active' : ''}`} aria-pressed={index === mediaIndex}
               aria-label={item.asset?.caption || item.entry.title} title={`${item.entry.title} · J 查看`} disabled={!item.asset && !item.entry.detail}
               onMouseEnter={() => setMediaIndex(index)} onFocus={() => setMediaIndex(index)} onClick={() => { setMediaIndex(index); view(item); }}>
-              <span className="hobby-rack-cover"><ContentMedia asset={preview(item.asset)} kind={category.id} title={item.entry.title} fit="cover" />
+              <span className="hobby-rack-cover"><ProjectCover asset={preview(item.asset)} layout={item.entry.coverLayout} kind={category.id} title={item.entry.title} fit="cover" />
                 {item.asset?.type === 'video' && <span className="hobby-rack-video" aria-hidden="true">▶</span>}
               </span>
               {!['photo', 'cycling'].includes(category.id) && <span className="hobby-rack-label">{item.entry.title}</span>}
