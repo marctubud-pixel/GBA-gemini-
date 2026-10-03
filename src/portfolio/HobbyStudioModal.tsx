@@ -7,6 +7,7 @@ import { PixelCamera, PixelBook, PixelDisc, PixelBike, PixelFilm } from '../shel
 import { SceneModalFrame, useModalKeys } from './SceneModalFrame';
 import { ContentMedia } from './ContentMedia';
 import { HobbyMediaViewer, type HobbyMediaItem } from './HobbyMediaViewer';
+import { ManagedProjectViewer, openExternalDetail } from './ManagedProjectViewer';
 import './mediaModals.css';
 import './hobbyRack.css';
 
@@ -43,6 +44,7 @@ export const HobbyStudioModal = () => {
   const [activeCategory, setActiveCategory] = useState(0);
   const [mediaIndex, setMediaIndex] = useState(0);
   const [viewIndex, setViewIndex] = useState<number | null>(null);
+  const [detailId, setDetailId] = useState<string | null>(null);
   const rackRef = useRef<HTMLDivElement>(null);
   const category = HOBBIES[activeCategory];
   const categoryEntries = useMemo(() => entries.filter(entry => entry.kind === 'hobby' && categoryIndex(entry.category) === activeCategory), [entries, activeCategory]);
@@ -56,7 +58,7 @@ export const HobbyStudioModal = () => {
   useEffect(() => {
     if (!isOpen) return;
     const index = categoryIndex(modalContext);
-    setActiveCategory(index < 0 ? 0 : index); setMediaIndex(0); setViewIndex(null);
+    setActiveCategory(index < 0 ? 0 : index); setMediaIndex(0); setViewIndex(null); setDetailId(null);
   }, [isOpen, modalContext]);
   useEffect(() => {
     setMediaIndex(index => Math.min(index, Math.max(0, items.length - 1)));
@@ -75,6 +77,7 @@ export const HobbyStudioModal = () => {
   }, [items.length]);
   const view = useCallback((item?: HobbyMediaItem) => {
     const current = item || selected;
+    if (current?.entry.detail) { if (!openExternalDetail(current.entry)) setDetailId(current.entry.id); return; }
     if (!current?.asset) return;
     const index = viewMedia.findIndex(media => media.entry.id === current.entry.id && media.asset?.url === current.asset?.url);
     if (index < 0) return;
@@ -86,7 +89,7 @@ export const HobbyStudioModal = () => {
     setViewIndex(index); if (rackIndex >= 0) setMediaIndex(rackIndex);
   };
   const closeViewer = () => { pixelSound.playCancel(); setViewIndex(null); };
-  useModalKeys({ isOpen: isOpen && viewIndex === null, onClose: closeLandmarkModal,
+  useModalKeys({ isOpen: isOpen && viewIndex === null && detailId === null, onClose: closeLandmarkModal,
     onPrev: () => moveMedia(-1), onNext: () => moveMedia(1),
     onUp: () => chooseCategory(activeCategory - 1), onDown: () => chooseCategory(activeCategory + 1),
     onConfirm: () => view(),
@@ -107,7 +110,7 @@ export const HobbyStudioModal = () => {
           <div className="hobby-rack-grid" ref={rackRef}>
             {items.map((item, index) => <button key={`${item.entry.id}:${item.asset?.url || 'empty'}`} data-entry-id={item.entry.id} data-rack-index={index}
               className={`hobby-rack-item ${index === mediaIndex ? 'is-active' : ''}`} aria-pressed={index === mediaIndex}
-              aria-label={item.asset?.caption || item.entry.title} title={`${item.entry.title} · J 查看`} disabled={!item.asset}
+              aria-label={item.asset?.caption || item.entry.title} title={`${item.entry.title} · J 查看`} disabled={!item.asset && !item.entry.detail}
               onMouseEnter={() => setMediaIndex(index)} onFocus={() => setMediaIndex(index)} onClick={() => { setMediaIndex(index); view(item); }}>
               <span className="hobby-rack-cover"><ContentMedia asset={preview(item.asset)} kind={category.id} title={item.entry.title} fit="cover" />
                 {item.asset?.type === 'video' && <span className="hobby-rack-video" aria-hidden="true">▶</span>}
@@ -123,5 +126,6 @@ export const HobbyStudioModal = () => {
       </div>
     </SceneModalFrame>
     {viewIndex !== null && viewMedia[viewIndex]?.asset && <HobbyMediaViewer items={viewMedia} index={viewIndex} onChange={changeView} onClose={closeViewer} />}
+    {detailId && <ManagedProjectViewer entries={categoryEntries} entryId={detailId} onEntryChange={setDetailId} onClose={() => setDetailId(null)} returnLabel="返回收藏架" />}
   </>;
 };

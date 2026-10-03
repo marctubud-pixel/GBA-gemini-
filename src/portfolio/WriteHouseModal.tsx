@@ -5,6 +5,7 @@ import { pixelSound } from '../game/audio/PixelSoundManager';
 import { PixelBook, PixelCart, PixelTV, PixelUsers, PixelTag } from '../shell/PixelIcons';
 import { SceneModalFrame, useModalKeys } from './SceneModalFrame';
 import { WritingProjectDetail, getWritingMedia } from './WritingProjectDetail';
+import { ManagedProjectViewer, openExternalDetail, usesManagedViewer } from './ManagedProjectViewer';
 import './writingHouse.css';
 
 const CATEGORIES = [
@@ -67,6 +68,7 @@ export const WriteHouseModal = () => {
   };
   const openSeries = () => {
     if (!currentWork) return;
+    if (openExternalDetail(currentWork)) return;
     pixelSound.playConfirm(); setDetailId(currentWork.id); setMediaIndex(0);
   };
   const close = () => { pixelSound.playCancel(); setDetailId(null); setZoomed(false); closeLandmarkModal(); };
@@ -82,7 +84,7 @@ export const WriteHouseModal = () => {
     area?.scrollBy({ top: direction * 75, behavior: 'auto' });
   };
   useModalKeys({
-    isOpen, onClose: back,
+    isOpen: isOpen && !usesManagedViewer(detail), onClose: back,
     onPrev: detail ? () => turnImage(-1) : () => turnProject(-1),
     onNext: detail ? () => turnImage(1) : () => turnProject(1),
     onUp: detail ? () => scrollDetail(-1) : () => changeCategory(-1),
@@ -91,9 +93,9 @@ export const WriteHouseModal = () => {
   });
 
   if (!isOpen) return null;
-  return <SceneModalFrame title="WRITE HOUSE" variant="book" onClose={close}
+  return <><SceneModalFrame title="WRITE HOUSE" variant="book" onClose={close}
     footer={<><span><PixelBook size={12} /> 文案工坊</span><span>{detail ? 'A / D 切图 · W / S 阅读 · J 放大 · K 返回' : 'W / S 分类 · A / D 项目 · J 查看 · K 返回'}</span></>}>
-    <div className="writing-surface"><WritingPageTrim />{detail ? <div className="writing-detail">
+    <div className="writing-surface"><WritingPageTrim />{detail && !usesManagedViewer(detail) ? <div className="writing-detail">
       <div className="writing-detail-scroll"><WritingProjectDetail entry={detail} mediaIndex={mediaIndex} onMediaIndexChange={setMediaIndex} zoomed={zoomed} onZoomChange={setZoomed} /></div>
       <div className="writing-detail-actions"><button className="scene-button scene-button-muted" onClick={() => { setZoomed(false); setDetailId(null); }}>◀ 返回项目</button></div>
     </div> : <div className="writing-house">
@@ -104,5 +106,5 @@ export const WriteHouseModal = () => {
         </> : <div className="writing-house-empty"><h3>暂未添加项目</h3><p>请选择其他文案分类。</p></div>}
       </section>
     </div>}</div>
-  </SceneModalFrame>;
+  </SceneModalFrame>{detail && usesManagedViewer(detail) && <ManagedProjectViewer entries={works} entryId={detail.id} onEntryChange={id => setDetailId(id)} onClose={() => setDetailId(null)} returnLabel="返回文案项目" />}</>;
 };

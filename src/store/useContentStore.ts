@@ -7,18 +7,18 @@ interface ContentState {
   entries: ContentEntry[];
   status: 'local' | 'loading' | 'ready' | 'error';
   error: string | null;
-  load: () => Promise<void>;
+  load: (refresh?: boolean) => Promise<void>;
 }
 
-const endpoint = import.meta.env.VITE_CONTENT_URL as string | undefined;
-const repository = endpoint ? new HttpContentRepository(endpoint) : null;
+const endpoint = (import.meta.env.VITE_CONTENT_URL as string | undefined) || '/api/content';
+const repository = new HttpContentRepository(endpoint);
 
 export const useContentStore = create<ContentState>((set, get) => ({
   entries: CONTENT_SEED,
   status: 'local',
   error: null,
-  load: async () => {
-    if (!repository || get().status === 'loading' || get().status === 'ready') return;
+  load: async (refresh = false) => {
+    if (get().status === 'loading' || (!refresh && get().status === 'ready')) return;
     set({ status: 'loading', error: null });
     try {
       const doc = await repository.load();
@@ -28,3 +28,7 @@ export const useContentStore = create<ContentState>((set, get) => ({
     }
   }
 }));
+
+// Another admin tab can update the collection without restarting the game.
+window.addEventListener('storage', event => { if (event.key === 'portfolio-content-updated') void useContentStore.getState().load(true); });
+window.addEventListener('focus', () => { void useContentStore.getState().load(true); });

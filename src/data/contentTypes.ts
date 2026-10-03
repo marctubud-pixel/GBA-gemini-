@@ -41,6 +41,9 @@ export interface ContentEntry {
   fileSize?: string;
   documentUrl?: string;
   attachments?: ContentAttachment[];
+  /** Omitted for the existing gallery; PDF and links open directly from details. */
+  detail?: { type: 'pdf' | 'link'; url: string };
+  presentation?: 'portrait' | 'landscape' | 'square' | 'original';
 }
 
 export interface ContentDocument {
@@ -48,7 +51,7 @@ export interface ContentDocument {
   entries: ContentEntry[];
 }
 
-// A future CMS can return this document from VITE_CONTENT_URL. Media URLs can
+// A local backend or future CMS returns this document. Media URLs can
 // point to its object storage; UI and game logic do not depend on the provider.
 export interface ContentRepository {
   load(signal?: AbortSignal): Promise<ContentDocument>;

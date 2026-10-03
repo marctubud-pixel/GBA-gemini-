@@ -4,6 +4,7 @@ import { useContentStore } from '../store/useContentStore';
 import { projectToContentEntry } from '../data/contentSeed';
 import { WORLD_LOCATIONS } from '../data/locations';
 import { ContentDetail } from './ContentDetail';
+import { usesManagedViewer } from './ManagedProjectViewer';
 import { SceneModalFrame, useModalKeys } from './SceneModalFrame';
 
 export const PortfolioOverlay: React.FC = () => {
@@ -22,7 +23,7 @@ export const PortfolioOverlay: React.FC = () => {
       : (currentIndex + direction + related.length) % related.length;
     openContentOverlay(related[nextIndex].id);
   };
-  useModalKeys({ isOpen: isOverlayOpen, onClose: closeOverlay, onPrev: () => navigate(-1), onNext: () => navigate(1) });
+  useModalKeys({ isOpen: isOverlayOpen && !usesManagedViewer(entry), onClose: closeOverlay, onPrev: () => navigate(-1), onNext: () => navigate(1) });
 
   if (!isOverlayOpen) return null;
   return <div className="portfolio-content-overlay">

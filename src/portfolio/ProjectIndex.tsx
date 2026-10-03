@@ -5,6 +5,7 @@ import type { ContentKind } from '../data/contentTypes';
 import { WORLD_LOCATIONS } from '../data/locations';
 import { PixelBook, PixelBike } from '../shell/PixelIcons';
 import './sceneModal.css';
+import { openExternalDetail } from './ManagedProjectViewer';
 
 const KIND_LABELS: Record<ContentKind, string> = {
   writing: '文案与叙事', brand: '品牌与视觉', film: '电影与影像',
@@ -19,6 +20,7 @@ export const ProjectIndex: React.FC = () => {
   const isOpen = currentView === 'index';
   const kinds = Array.from(new Set(entries.map((entry) => entry.kind)));
   const filtered = selectedKind === 'all' ? entries : entries.filter((entry) => entry.kind === selectedKind);
+  const openEntry = (id: string) => { const entry = entries.find(item => item.id === id); if (!openExternalDetail(entry)) openContentOverlay(id); };
 
   useEffect(() => {
     if (!isOpen || isOverlayOpen) return;
@@ -56,7 +58,7 @@ export const ProjectIndex: React.FC = () => {
         <p className="portfolio-index-card-description">{entry.description}</p>
         <div className="portfolio-index-tags">{entry.tags.slice(0, 4).map((tag) => <span key={tag}>{tag}</span>)}</div>
         <div className="portfolio-index-card-actions">
-          <button className="scene-button" onClick={() => openContentOverlay(entry.id)}>查看详情 ▶</button>
+          <button className="scene-button" onClick={() => openEntry(entry.id)}>查看详情 ▶</button>
           {entry.locationId && <button className="scene-button scene-button-muted" onClick={() => teleportToLocation(entry.locationId!)} title={`前往${location?.name ?? '对应地标'}`}><PixelBike size={16} /> 前往地标</button>}
         </div>
         {location && <small className="portfolio-index-location">{location.name}</small>}

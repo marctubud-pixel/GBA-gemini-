@@ -7,6 +7,7 @@ import { PixelFilm } from '../shell/PixelIcons';
 import { SceneModalFrame, useModalKeys } from './SceneModalFrame';
 import { ContentMedia } from './ContentMedia';
 import { CinemaProjectViewer } from './CinemaProjectViewer';
+import { ManagedProjectViewer, openExternalDetail, usesManagedViewer } from './ManagedProjectViewer';
 import './mediaModals.css';
 import './cinemaTicket.css';
 
@@ -53,11 +54,12 @@ export const MarcCinemaModal = () => {
   }, [video]);
   const openDetail = () => {
     if (!film) return;
-    pixelSound.playConfirm(); setShowDetail(true);
+    pixelSound.playConfirm(); if (!openExternalDetail(film)) setShowDetail(true);
   };
   const selectDetailFilm = (id: string) => {
     const index = films.findIndex((entry) => entry.id === id);
     if (index < 0) return;
+    if (openExternalDetail(films[index])) return;
     pixelSound.playSelect(); setFilmIndex(index);
   };
   useModalKeys({ isOpen: isOpen && !showDetail, onClose: back,
@@ -106,6 +108,6 @@ export const MarcCinemaModal = () => {
     </div>
   </SceneModalFrame>
   </div>
-  {showDetail && film && <CinemaProjectViewer entries={films} entryId={film.id} onEntryChange={selectDetailFilm} onClose={() => { pixelSound.playCancel(); setShowDetail(false); }} />}
+  {showDetail && film && (usesManagedViewer(film) ? <ManagedProjectViewer entries={films} entryId={film.id} onEntryChange={selectDetailFilm} onClose={() => setShowDetail(false)} /> : <CinemaProjectViewer entries={films} entryId={film.id} onEntryChange={selectDetailFilm} onClose={() => { pixelSound.playCancel(); setShowDetail(false); }} />)}
   </>;
 };

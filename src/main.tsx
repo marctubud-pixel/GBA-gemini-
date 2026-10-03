@@ -1,7 +1,8 @@
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import React, { Component, ErrorInfo, ReactNode, lazy, Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
-import { App } from './app/App';
 import './styles/index.css';
+const App = lazy(() => import('./app/App').then(module => ({ default: module.App })));
+const AdminPage = lazy(() => import('./admin/AdminPage'));
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -93,8 +94,9 @@ const rootElement = document.getElementById('root');
 if (rootElement) {
   ReactDOM.createRoot(rootElement).render(
     <ErrorBoundary>
-      <App />
+      <Suspense fallback={<div style={{ padding: 40, color: '#d7e6e9' }}>正在打开页面…</div>}>
+        {window.location.pathname.replace(/\/$/, '') === '/admin' ? <AdminPage /> : <App />}
+      </Suspense>
     </ErrorBoundary>
   );
 }
-

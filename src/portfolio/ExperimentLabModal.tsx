@@ -6,6 +6,7 @@ import { pixelSound } from '../game/audio/PixelSoundManager';
 import { PixelBook, PixelFilm, PixelGamepad, PixelPalette, PixelShell, PixelTag } from '../shell/PixelIcons';
 import { SceneModalFrame, useModalKeys } from './SceneModalFrame';
 import { CompleteProjectViewer } from './CompleteProjectViewer';
+import { ManagedProjectViewer, openExternalDetail, usesManagedViewer } from './ManagedProjectViewer';
 import './experimentLab.css';
 
 const FILES = [
@@ -47,10 +48,10 @@ export const ExperimentLabModal: React.FC = () => {
     if (!experiments.length) return;
     choose(experiments[(selectedIndex + direction + experiments.length) % experiments.length]);
   };
-  const openDetail = () => { if (selected) { pixelSound.playConfirm(); setShowDetail(true); } };
+  const openDetail = () => { if (selected) { pixelSound.playConfirm(); if (!openExternalDetail(selected)) setShowDetail(true); } };
   const changeDetail = (id: string) => {
     const entry = experiments.find(item => item.id === id);
-    if (entry) choose(entry);
+    if (entry && !openExternalDetail(entry)) choose(entry);
   };
   useModalKeys({ isOpen: isOpen && !showDetail, onClose: close, onUp: () => move(-1),
     onDown: () => move(1), onConfirm: selected ? openDetail : undefined });
@@ -87,6 +88,6 @@ export const ExperimentLabModal: React.FC = () => {
       </div>}
     </SceneModalFrame>
     </div>
-    {showDetail && selected && <CompleteProjectViewer entries={experiments} entryId={selected.id} onEntryChange={changeDetail} onClose={closeDetail} returnLabel="返回实验档案" />}
+    {showDetail && selected && (usesManagedViewer(selected) ? <ManagedProjectViewer entries={experiments} entryId={selected.id} onEntryChange={changeDetail} onClose={closeDetail} returnLabel="返回实验档案" /> : <CompleteProjectViewer entries={experiments} entryId={selected.id} onEntryChange={changeDetail} onClose={closeDetail} returnLabel="返回实验档案" />)}
   </>;
 };

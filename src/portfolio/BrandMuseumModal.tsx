@@ -5,6 +5,7 @@ import { pixelSound } from '../game/audio/PixelSoundManager';
 import { PixelSeagull, PixelPalette, PixelTag, PixelCart, PixelShell } from '../shell/PixelIcons';
 import { SceneModalFrame, useModalKeys } from './SceneModalFrame';
 import { BrandCaseViewer } from './BrandCaseViewer';
+import { ManagedProjectViewer, openExternalDetail, usesManagedViewer } from './ManagedProjectViewer';
 import { ContentMedia } from './ContentMedia';
 import './brandMuseum.css';
 
@@ -47,7 +48,7 @@ export const BrandMuseumModal: React.FC = () => {
       setSelected(category);
       setPages(previous => ({ ...previous, [category]: categoryIndex }));
     }
-    pixelSound.playConfirm(); setDetailId(id);
+    pixelSound.playConfirm(); if (!openExternalDetail(entry)) setDetailId(id);
   };
   const selectPanel = (direction: number) => {
     const index = PANELS.findIndex((panel) => panel.id === selected);
@@ -96,6 +97,6 @@ export const BrandMuseumModal: React.FC = () => {
       </div>
     </SceneModalFrame>
     </div>
-    {detail && <BrandCaseViewer entries={brands} entryId={detail.id} onEntryChange={openCase} onClose={() => { pixelSound.playCancel(); setDetailId(null); }} />}
+    {detail && (usesManagedViewer(detail) ? <ManagedProjectViewer entries={brands} entryId={detail.id} onEntryChange={openCase} onClose={() => setDetailId(null)} /> : <BrandCaseViewer entries={brands} entryId={detail.id} onEntryChange={openCase} onClose={() => { pixelSound.playCancel(); setDetailId(null); }} />)}
   </>);
 };

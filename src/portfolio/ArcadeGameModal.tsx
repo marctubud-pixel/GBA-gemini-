@@ -7,6 +7,7 @@ import { PixelGamepad } from '../shell/PixelIcons';
 import { SceneModalFrame, useModalKeys } from './SceneModalFrame';
 import { ContentMedia } from './ContentMedia';
 import { CompleteProjectViewer } from './CompleteProjectViewer';
+import { ManagedProjectViewer, openExternalDetail, usesManagedViewer } from './ManagedProjectViewer';
 import './arcadeLibrary.css';
 
 function gameCover(entry: ContentEntry): MediaAsset | undefined {
@@ -53,6 +54,7 @@ export const ArcadeGameModal = () => {
   }, [games.length]);
   const openDetail = useCallback((entry?: ContentEntry) => {
     if (!isMaking || !entry) return;
+    if (openExternalDetail(entry)) return;
     pixelSound.playConfirm();
     setSelectedIndex(games.findIndex((game) => game.id === entry.id));
     setDetailId(entry.id);
@@ -60,6 +62,7 @@ export const ArcadeGameModal = () => {
   const changeDetail = useCallback((id: string) => {
     const index = games.findIndex((entry) => entry.id === id);
     if (index < 0) return;
+    if (openExternalDetail(games[index])) return;
     pixelSound.playSelect();
     setSelectedIndex(index);
     setDetailId(id);
@@ -98,6 +101,6 @@ export const ArcadeGameModal = () => {
         </div>
       </SceneModalFrame>
     </div>
-    {detail && <CompleteProjectViewer entries={games} entryId={detail.id} onEntryChange={changeDetail} onClose={closeDetail} returnLabel="返回游戏互动" />}
+    {detail && (usesManagedViewer(detail) ? <ManagedProjectViewer entries={games} entryId={detail.id} onEntryChange={changeDetail} onClose={closeDetail} returnLabel="返回游戏互动" /> : <CompleteProjectViewer entries={games} entryId={detail.id} onEntryChange={changeDetail} onClose={closeDetail} returnLabel="返回游戏互动" />)}
   </>;
 };

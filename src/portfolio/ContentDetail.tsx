@@ -2,10 +2,12 @@ import React from 'react';
 import type { ContentEntry } from '../data/contentTypes';
 import { ContentMedia } from './ContentMedia';
 import { isContentUrl } from '../content/contentRepository';
+import { ManagedProjectViewer, usesManagedViewer } from './ManagedProjectViewer';
 
 export interface ContentDetailProps { entry: ContentEntry; onBack: () => void; }
 
 export const ContentDetail: React.FC<ContentDetailProps> = ({ entry, onBack }) => {
+  if (usesManagedViewer(entry)) return <ManagedProjectViewer entries={[entry]} entryId={entry.id} onEntryChange={() => {}} onClose={onBack} />;
   const gallery = entry.media.filter((asset) => asset.id !== entry.cover?.id);
   return (
     <article className="content-detail" key={entry.id}>

@@ -59,6 +59,11 @@ export function parseContentDocument(value: unknown): ContentDocument {
       || (entry.hours !== undefined && (typeof entry.hours !== 'number' || !Number.isFinite(entry.hours) || entry.hours < 0))
       || (entry.demoUrl !== undefined && !isContentUrl(entry.demoUrl))
       || (entry.documentUrl !== undefined && !isContentUrl(entry.documentUrl))
+      || (entry.presentation !== undefined && !['portrait', 'landscape', 'square', 'original'].includes(entry.presentation as string))
+      || (entry.detail !== undefined && (!entry.detail || typeof entry.detail !== 'object'
+        || !['pdf', 'link'].includes((entry.detail as Record<string, unknown>).type as string)
+        || !isContentUrl((entry.detail as Record<string, unknown>).url)
+        || ((entry.detail as Record<string, unknown>).type === 'link' && !/^https?:\/\//i.test((entry.detail as Record<string, unknown>).url as string))))
       || (entry.status !== undefined && !['in-progress', 'completed', 'planned'].includes(entry.status as string))
       || (entry.attachments !== undefined && !attachmentsAreValid(entry.attachments))
       || (entry.section !== undefined && !['IDEA', 'WORDS', 'LIFE'].includes(entry.section as string))

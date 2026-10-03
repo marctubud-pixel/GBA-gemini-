@@ -1,14 +1,14 @@
-# 作品内容接口（预留）
+# 作品内容接口与本机后台
 
-本轮提供统一内容模型与 HTTP 读取接口。管理后台、登录、文件上传、数据库和对象存储尚未实现。前台默认使用从用户提供的简历整理的占位内容，条目用 `source` 标明页码。详情见 `docs/resume-placement.md`。旧示例文件继续保留用于接口测试。
+现已提供可用的本机管理后台 `/admin`，支持按板块编辑作品，上传封面、图片、视频和 PDF，并保存到磁盘。前台默认读取 `/api/content`；首次使用时，作品库从简历占位集合初始化，后续启动不会覆盖编辑结果。在线账号、数据库与对象存储尚未连接。简历条目用 `source` 标明页码。详情见 `docs/resume-placement.md`。旧示例文件继续保留用于接口测试。
 
 ## 接入方式
 
-复制 `.env.example` 为 `.env.local`，设置 `VITE_CONTENT_URL`，然后重启开发服务（部署时重新构建）。前台启动后会向该地址发送一次 GET，请求 JSON，成功后用返回的完整作品集合替换默认集合。
+复制 `.env.example` 为 `.env.local`，设置 `VITE_CONTENT_URL`，然后重启开发服务（部署时重新构建）。该变量可覆盖默认的 `/api/content`。前台启动、窗口重新获得焦点或另一管理标签页保存后，会读取完整作品集合。成功后替换已有集合；失败时保留当前内容。若设置了远程接口，本机后台的修改不会写到该远程服务。
 
 可以先用 `VITE_CONTENT_URL=/content/portfolio.example.json` 验证读取。这个文件包含所有示例数据，修改它不会改动房间、交互点或界面组件。接口异常或数据不符合模型时，保留本地默认内容，并在作品索引显示加载失败提示。
 
-未来后台上传文件后，把可访问的图片/视频 URL 保存到作品记录中的 `cover` 或 `media`，通过同一接口返回即可。前台不依赖具体数据库或存储供应商。`VITE_` 变量会进入客户端代码，不能放服务端密钥。
+本机后台上传后把 `/api/uploads/<随机文件名>` 保存到作品记录的 `cover`、`media` 或 `detail`。以后接在线存储时，使用在线媒体 URL，通过同一模型返回即可。前台不依赖具体数据库或存储供应商。`VITE_` 变量会进入客户端代码，不能放服务端密钥。
 
 ## 响应结构
 
@@ -36,7 +36,7 @@
 
 必填：`id`（全局唯一）、`kind`、`category`、`title`、`description`、`media`（可为空数组）、`tags`（可为空数组）。可选字段不要填 `null`，无内容时省略。
 
-可选：`subtitle`、`body`（纯文本，保留换行）、`englishTitle`、`date`、`duration`、`hours`（非负数）、`locationId`、`section`、`cover`、`demoUrl`、`caseStudy`、`isSample`、`source`、`status`、`fileSize`、`documentUrl`、`attachments`。`caseStudy` 为 `[{"heading":"背景","text":"项目背景"}]`。
+可选：`subtitle`、`body`（纯文本，保留换行）、`englishTitle`、`date`、`duration`、`hours`（非负数）、`locationId`、`section`、`cover`、`demoUrl`、`caseStudy`、`isSample`、`source`、`status`、`fileSize`、`documentUrl`、`attachments`、`presentation`、`detail`。`caseStudy` 为 `[{"heading":"背景","text":"项目背景"}]`。
 
 媒体包含 `id`、`type`（`image` 或 `video`）、`url`，可选 `caption`、`alt`、`poster`。媒体、封面、poster、Demo、文档和附件 URL 使用相同校验：支持 HTTP(S)、`/` 开头的站内路径和 `./` 相对路径；拒绝危险协议、`//` 协议相对地址、反斜杠、空白、控制字符及带用户名/密码的 HTTP(S) 地址。图片和视频使用原文件比例，视频支持浏览器原生控制；媒体失效时显示明确提示。影院以 `media` 内的第一个视频为播放源。
 
@@ -95,10 +95,22 @@
 
 旧示例文件中的五条实验日志全部为 `isSample: true`，不代表真实项目完成情况、文件大小或播放素材。默认集合现使用三条依据简历的过程档案占位，不填未确认的状态、日期或文件大小。原有实验室的通用案例已从默认示例集合移除，避免双重内容入口。
 
-## 后续后台边界
+## 本机后台与后续在线接口
 
-后台负责身份认证、上传权限、文件大小和类型验证、持久保存、分类、排序与发布。GET 内容接口供访客读取已发布作品；管理写入接口与上传接口在后续后台阶段实现。跨域内容接口和媒体存储需允许网站访问；视频服务需正确返回媒体类型并支持播放所需的范围请求。
+使用方式、文件存储目录、备份与启动命令见 [local-admin.md](local-admin.md)。当前写入 API 只允许本机来源与本机 Host，并验证短期管理令牌；不作为互联网登录系统。`GET /api/content` 返回公开作品文档，`GET /api/admin/content` 与 `PUT /api/admin/content` 使用 `{revision, document}` 包装。写入需携带 `X-Admin-Token`，过期版本返回 409，防止并行编辑覆盖。管理令牌由同源 `GET /api/admin/session` 获取，不放在环境变量或代码中。
+
+上传使用 `POST /api/admin/uploads` 原始二进制请求体，返回 `{id, url, mime, size}`。服务器检查文件签名与大小，支持 JPEG、PNG、WebP、GIF、MP4、WebM 和 PDF，拒绝 HTML / SVG 等活动文件。视频上限 250 MB，图片 / PDF 上限 50 MB。文件读取支持 HEAD 与单段 Range，供 PDF 和视频定位。移除条目或媒体仅移除引用，避免误删原文件；每次保存备份上一版信息。
+
+线上阶段需要服务端身份认证、访问控制、数据库与对象存储。该阶段可替换读取地址和管理服务，保留当前作品结构。静态 GitHub Pages 只承载前台，不能运行本机写入 API；仓库不会包含私人的上传目录。
+
+### 详情和比例
+
+- `detail: {"type":"pdf","url":"/api/uploads/…pdf"}`：点击详情直接打开连续 PDF 阅读层，支持鼠标滚动、拖动、触摸滚动、W / S 阅读与放大缩小。PDF.js、worker、CMap、字体及解码资源随本机构建提供。渲染按可见页加载，避免一次解码所有页面。密码保护 PDF 显示提示，不绕过权限。
+- `detail: {"type":"link","url":"https://…"}`：详情入口直接在新窗口打开外部文档，不出现中间子菜单。仅接受无账号密码的 HTTP(S) 地址；飞书文档分享权限由原平台设置。
+- 无 `detail`：继续显示作品图片 / 视频。旧条目不改变原来的专用详情样式；指定 `presentation` 的新作品使用支持比例的媒体阅读层。
+- `presentation` 可选 `portrait`（9:16 容器）、`landscape`（16:9）、`square`、`original`。原文件不拉伸、不截掉内容。竖屏 H5 的系列画面通过 A / D、侧边三角或横向滑动切换，J / 小字入口放大阅读；竖长画面可放大后上下滚动。实际 H5 体验地址放在 `demoUrl`，不上传和执行任意 HTML 程序。
+- 视频在页面内使用原生播放器播放。兴趣展柜仍使用各自的书籍 / 唱片 / 照片布局，有配置的 PDF 或链接时 J 直接打开对应详情。
 
 前台接口定义位于 `src/data/contentTypes.ts`，HTTP 校验与加载位于 `src/content/contentRepository.ts`，各场景 UI 和全览索引共用 `src/store/useContentStore.ts`。保持 `version: 1` 结构即可替换内容。`status` 与 `fileSize` 仅用于前台展示；后台后续需提供真实文件大小与发布状态，不能把客户端显示文本当作上传验证。
 
-兴趣工作室的架子由 `cover` 与 `media` 生成。照片与骑行展示各媒体，书籍 / 唱片 / 电影每项展示一个封面，其余媒体在原图层切换。缺少媒体时保留禁用空框；无条目时显示空展柜。旧 `games` / `figures` 数据仍可读取，但不在兴趣馆导航或热点中展示，不会删除存储内容。后台仍只有内容读取接口，没有上传或管理页面。
+兴趣工作室的架子由 `cover` 与 `media` 生成。照片与骑行展示各媒体，书籍 / 唱片 / 电影每项展示一个封面，其余媒体在原图层切换。缺少媒体时保留禁用空框；无条目时显示空展柜。旧 `games` / `figures` 数据仍可读取，但不在兴趣馆导航或热点中展示，不会删除存储内容。可通过 `/admin` 的个人兴趣板块上传和替换这些收藏。

@@ -41,7 +41,7 @@
 - 可独立读取的集合：`public/content/portfolio.resume.json`。
 - 媒体：`public/media/resume/`，保留原图比例并压缩为 WebP；文字工坊的 7 张图片保留原始分辨率（最大 3200 像素），供放大阅读。缺素材的项目继续使用像素示意图。
 - `public/content/portfolio.example.json` 保留旧示例文件用于接口测试。配置 `VITE_CONTENT_URL=/content/portfolio.resume.json` 可测试这份实际占位集合。
-- 后台继续只预留 HTTP 内容读取接口，未增加上传、管理页面或发布操作。
+- 本机后台 `/admin` 已接入，初次启动以这份简历集合建立作品库，后续修改持久保存并保留备份；不自动改写原始简历 JSON。在线存储仍待接入。
 
 ## 本轮验证
 
