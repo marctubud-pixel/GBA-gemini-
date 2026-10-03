@@ -4,6 +4,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
 import { createHandheldModel } from './handheldModels';
 import { loadHandheldAsset } from './importedHandheldModels';
+import { createHardwareFeedback } from './handheldFeedback';
 
 export type HandheldControl = 'left' | 'right' | 'up' | 'down' | 'j' | 'k';
 export type HandheldPressedKeys = Record<HandheldControl, boolean>;
@@ -17,7 +18,7 @@ type HardwareRect = [number, number, number, number];
 interface HardwareLayout {
   controls: Record<HandheldControl, HardwareRect>;
   shortcuts: Record<'info' | 'index', HardwareRect>;
-  volume: HardwareRect;
+  sticks?: Partial<Record<'left' | 'right', HardwareRect>>;
 }
 // One screen for all three models, independent of their grips and body silhouettes.
 export const HANDHELD_SCREEN_RECT: HardwareRect = [270, 50, 660, 371.25];
@@ -27,26 +28,28 @@ export const hardwarePosition = (x: number, y: number, width: number, height: nu
 export const HANDHELD_LAYOUTS: Record<HandheldDevice, HardwareLayout> = {
   switch: {
     controls: { up: [126, 241, 28, 28], down: [126, 299, 28, 28], left: [97, 270, 28, 28], right: [155, 270, 28, 28], j: [1083, 110, 36, 36], k: [1045, 148, 36, 36] },
-    shortcuts: { info: [175, 387, 22, 22], index: [1006, 374, 26, 26] }, volume: [525, 438, 150, 13],
+    shortcuts: { info: [175, 387, 22, 22], index: [1006, 374, 26, 26] },
   },
   'steam-deck': {
-    controls: { up: [68, 33, 28, 28], down: [68, 91, 28, 28], left: [39, 62, 28, 28], right: [97, 62, 28, 28], j: [1107, 98, 36, 36], k: [1137, 63, 36, 36] },
-    shortcuts: { info: [166, 313, 54, 29], index: [980, 313, 54, 29] }, volume: [525, 438, 150, 13],
+    controls: { up: [76, 46, 28, 28], down: [76, 98, 28, 28], left: [50, 72, 28, 28], right: [102, 72, 28, 28], j: [1093, 97, 34, 34], k: [1120, 70, 34, 34] },
+    shortcuts: { info: [166, 313, 54, 29], index: [980, 313, 54, 29] },
+    sticks: { left: [134, 57, 88, 88], right: [978, 57, 88, 88] },
   },
   'ps-portal': {
     controls: { up: [103.45, 108.28, 39.84, 47.92], down: [101.43, 170.67, 39.84, 47.92], left: [67.2, 142.32, 47.91, 39.83], right: [129.44, 144.36, 47.92, 39.84], j: [1057.68, 189.57, 39.51, 39.84], k: [1104.13, 143.77, 38.79, 39.26] },
-    shortcuts: { info: [163.1, 81.27, 16.44, 28.21], index: [1020.46, 81.27, 16.44, 28.21] }, volume: [525, 438, 150, 13],
+    shortcuts: { info: [163.1, 81.27, 16.44, 28.21], index: [1020.46, 81.27, 16.44, 28.21] },
+    sticks: { left: [177.5, 209.5, 82, 82], right: [941, 209.5, 82, 82] },
   },
 };
 export const HANDHELD_FALLBACK_LAYOUTS: Record<HandheldDevice, HardwareLayout> = {
   switch: HANDHELD_LAYOUTS.switch,
   'steam-deck': {
     controls: { up: [73, 94, 28, 28], down: [73, 151, 28, 28], left: [44, 123, 28, 28], right: [102, 123, 28, 28], j: [1093, 145, 34, 34], k: [1125, 113, 34, 34] },
-    shortcuts: { info: [187, 373, 32, 32], index: [985, 373, 32, 32] }, volume: [525, 438, 150, 13],
+    shortcuts: { info: [187, 373, 32, 32], index: [985, 373, 32, 32] },
   },
   'ps-portal': {
     controls: { up: [118, 101, 28, 28], down: [118, 156, 28, 28], left: [89, 128, 28, 28], right: [147, 128, 28, 28], j: [1051, 160, 38, 38], k: [1085, 126, 38, 38] },
-    shortcuts: { info: [208, 79, 24, 24], index: [965, 79, 24, 24] }, volume: [525, 438, 150, 13],
+    shortcuts: { info: [208, 79, 24, 24], index: [965, 79, 24, 24] },
   },
 };
 
@@ -55,10 +58,9 @@ interface HardwareRuntime {
   scene: THREE.Scene;
   model: Model;
   device: HandheldDevice;
-  restPositions: Map<THREE.Object3D, number>;
+  feedback: ReturnType<typeof createHardwareFeedback>;
   dirty: boolean;
 }
-const restPositions = (model: Model) => new Map(Object.values(model.buttons).filter((object): object is THREE.Object3D => !!object).map(object => [object, object.position.z]));
 function disposeObject(root: THREE.Object3D) {
   const geometries = new Set<THREE.BufferGeometry>();
   const materials = new Set<THREE.Material>();
@@ -74,10 +76,11 @@ function disposeObject(root: THREE.Object3D) {
   geometries.forEach(value => value.dispose()); materials.forEach(value => value.dispose()); textures.forEach(value => value.dispose());
 }
 
-export function HandheldHardware({ pressed, device, onAssetReady }: { pressed: HandheldPressedKeys; device: HandheldDevice; onAssetReady?: (device: HandheldDevice, ready: boolean) => void }) {
+export function HandheldHardware({ pressed, device, activeStick, onAssetReady }: { activeStick?: 'left' | 'right' | null; pressed: HandheldPressedKeys; device: HandheldDevice; onAssetReady?: (device: HandheldDevice, ready: boolean) => void }) {
   const mount = useRef<HTMLDivElement>(null);
   const runtime = useRef<HardwareRuntime | null>(null);
   const input = useRef(pressed); input.current = pressed;
+  const stickInput = useRef(activeStick); stickInput.current = activeStick;
   const [ready, setReady] = useState(false);
   const [unavailable, setUnavailable] = useState(false);
   const [renderedDevice, setRenderedDevice] = useState(device);
@@ -95,7 +98,7 @@ export function HandheldHardware({ pressed, device, onAssetReady }: { pressed: H
     renderer.toneMapping = THREE.NeutralToneMapping;
     renderer.toneMappingExposure = .92;
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.type = THREE.PCFShadowMap;
     renderer.shadowMap.autoUpdate = false;
     renderer.domElement.dataset.handheldCanvas = 'true';
     host.appendChild(renderer.domElement);
@@ -127,7 +130,7 @@ export function HandheldHardware({ pressed, device, onAssetReady }: { pressed: H
     const ground = new THREE.Mesh(new THREE.PlaneGeometry(1450, 700), new THREE.ShadowMaterial({ opacity: .12 }));
     ground.position.z = -65; ground.receiveShadow = true; scene.add(ground);
     const model = createHandheldModel(device); scene.add(model.group);
-    const state: HardwareRuntime = { scene, model, device, restPositions: restPositions(model), dirty: true };
+    const state: HardwareRuntime = { scene, model, device, feedback: createHardwareFeedback(model, device !== 'switch'), dirty: true };
     runtime.current = state;
     const resize = () => { const box = host.getBoundingClientRect(); renderer.setSize(Math.max(1, box.width), Math.max(1, box.height), false); state.dirty = true; };
     const observer = new ResizeObserver(resize); observer.observe(host); resize();
@@ -144,27 +147,15 @@ export function HandheldHardware({ pressed, device, onAssetReady }: { pressed: H
     consoleElement?.addEventListener('pointerleave', leave);
     let frame = 0, previous = performance.now();
     const draw = (now: number) => {
-      const blend = reducedMotion ? 1 : 1 - Math.exp(-Math.min(50, now - previous) / 45); previous = now;
-      let moving = false;
-      const held = new Map<THREE.Object3D, boolean>();
-      for (const [control, object] of Object.entries(state.model.buttons) as [HandheldControl, THREE.Object3D][]) {
-        if (object) held.set(object, !!input.current[control] || !!held.get(object));
-      }
-      let maxDepth = 0;
-      for (const [object, down] of held) {
-        const rest = state.restPositions.get(object) ?? object.position.z;
-        const target = rest - (down ? (object.userData.pressDepth ?? 3.5) : 0);
-        if (Math.abs(object.position.z - target) > .01) { object.position.z = THREE.MathUtils.lerp(object.position.z, target, blend); moving = true; }
-        maxDepth = Math.max(maxDepth, rest - object.position.z);
-        if (object.userData.rocker) {
-          const tiltX = ((input.current.down ? 1 : 0) - (input.current.up ? 1 : 0)) * .06;
-          const tiltY = ((input.current.right ? 1 : 0) - (input.current.left ? 1 : 0)) * .06;
-          if (Math.abs(object.rotation.x - tiltX) + Math.abs(object.rotation.y - tiltY) > .0002) {
-            object.rotation.x = THREE.MathUtils.lerp(object.rotation.x, tiltX, blend);
-            object.rotation.y = THREE.MathUtils.lerp(object.rotation.y, tiltY, blend); moving = true;
-          }
-        }
-      }
+      const dt = Math.min(50, now - previous); previous = now;
+      const blend = reducedMotion ? 1 : 1 - Math.exp(-dt / 45);
+      const feedback = state.feedback.update(input.current, now, dt, reducedMotion, stickInput.current ?? null);
+      let moving = feedback.moving;
+      // Portal's glass and inner black grips need a soft side reflection to
+      // remain distinct from the page, without turning the black polymer gray.
+      const portal = state.device === 'ps-portal';
+      fill.intensity = portal ? .38 : .16;
+      scene.environmentIntensity = portal ? .42 : .32;
       if (Math.abs(key.position.x - targetLight.x) + Math.abs(key.position.y - targetLight.y) > .1) {
         key.position.x = THREE.MathUtils.lerp(key.position.x, targetLight.x, blend);
         key.position.y = THREE.MathUtils.lerp(key.position.y, targetLight.y, blend); moving = true;
@@ -175,7 +166,9 @@ export function HandheldHardware({ pressed, device, onAssetReady }: { pressed: H
       if (state.dirty || moving) {
         renderer.shadowMap.needsUpdate = true;
         renderer.render(scene, camera);
-        renderer.domElement.dataset.buttonDepth = maxDepth.toFixed(2);
+        renderer.domElement.dataset.buttonDepth = feedback.depth.toFixed(2);
+        renderer.domElement.dataset.buttonFeedback = feedback.pressure.toFixed(3);
+        renderer.domElement.dataset.stickTilt = feedback.stickTilt.toFixed(3);
         state.dirty = false;
       }
       frame = requestAnimationFrame(draw);
@@ -195,7 +188,7 @@ export function HandheldHardware({ pressed, device, onAssetReady }: { pressed: H
     let cancelled = false;
     const replace = (next: Model) => {
       state.scene.remove(state.model.group); disposeObject(state.model.group);
-      state.model = next; state.device = device; state.restPositions = restPositions(next);
+      state.model = next; state.device = device; state.feedback = createHardwareFeedback(next, device !== 'switch');
       state.scene.add(next.group); state.dirty = true; setRenderedDevice(device);
     };
     if (state.device !== device) replace(createHandheldModel(device));

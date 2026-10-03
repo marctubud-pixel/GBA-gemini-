@@ -39,7 +39,7 @@ at `[270, 50]` on the common 1200 × 500 plane.
 
 Controls have centered origins for movement. Cross maps to `button-j`; Circle
 maps to `button-k`; Create and Options map to the project's Info and Index
-shortcuts. A new recessed volume channel aligns with the on-device volume control.
+shortcuts. The prepared GLB includes an earlier recessed volume channel; the current runtime removes it and places the volume controls in the page header.
 Physical material parameters are adjusted. The original texture maps and symbol
 decals are removed. Cross, Circle, Square, Triangle and directional arrows are
 new molded 3D geometry that follows each curved key surface and moves with it.
@@ -66,3 +66,5 @@ python3 scripts/prepare-portal-model.py \
 The source can optionally be downloaded from the pinned revision with
 `--download-source`. The script checks its SHA-256 before processing it and
 never executes code from the source repository.
+
+Further runtime refinements add independent cap-pressure and stick-tilt feedback, soften black polymer reflections and use a brighter side fill and background halo for visual separation. The source geometry and the shared game aperture are preserved.

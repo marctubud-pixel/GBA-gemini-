@@ -8,16 +8,19 @@
 .handheld-hit:focus-visible { outline: 2px solid #f4ebaa; outline-offset: 2px; }
 .handheld-small-button { position: absolute; z-index: 20; background: transparent; border: 0; border-radius: 50%; cursor: pointer; }
 .handheld-small-button:active { background: #0003; }
-.handheld-volume { position: absolute; z-index: 20; display: flex; align-items: center; gap: 4%; font-family: Arial, sans-serif; }
-.handheld-volume::before { content: 'VOLUME'; position: absolute; left: 29%; right: 16%; top: -55%; text-align: center; color: var(--handheld-mark); font: 700 .52cqw Arial, sans-serif; letter-spacing: .1em; text-shadow: 0 1px #ffffff20; pointer-events: none; }
-.handheld-volume button { display: grid; place-items: center; flex: 0 0 12%; height: 88%; padding: 0; border: 1px solid #75787b; border-radius: 50%; color: #44474a; font: 700 .85cqw Arial, sans-serif; background: linear-gradient(145deg, #e5e5e1, #a9aca8 70%); box-shadow: 0 2px 2px #2225, inset 0 1px 1px #ffff; }
-.handheld-volume button:active { box-shadow: inset 0 2px 2px #555; background: #9b9d99; }
+.handheld-volume { display: flex; align-items: center; gap: 3px; margin-left: 4px; padding-left: 8px; border-left: 1px solid #ffffff18; }
+.handheld-volume button { display: grid; place-items: center; width: 22px; height: 25px; padding: 0; border: 0; border-radius: 6px; color: #c9d7e8; font: 15px/1 system-ui, sans-serif; background: transparent; cursor: pointer; }
+.handheld-volume button:hover { background: #ffffff10; color: #fff; }
+.handheld-volume button:active { background: #ffffff20; }
 .handheld-volume button:focus-visible, .handheld-small-button:focus-visible, .handheld-volume input:focus-visible { outline: 2px solid #f4ebaa; outline-offset: 2px; }
-.handheld-volume .handheld-mute { flex-basis: 14%; margin-right: 3%; }
-.handheld-volume svg { width: 65%; height: 65%; }
-.handheld-volume input { appearance: none; -webkit-appearance: none; min-width: 0; flex: 1; height: 42%; margin: 0; border-radius: 50px; background: #353639; box-shadow: inset 0 2px 2px #101015dd, 0 1px 0 #dadad666; outline: none; cursor: ew-resize; touch-action: none; }
-.handheld-volume input::-webkit-slider-thumb { appearance: none; width: 1.35cqw; height: .9cqw; border-radius: 3px; border: 1px solid #696b6f; background: repeating-linear-gradient(90deg, #cccdcb 0px, #cccdcb 1px, #929591 1px, #929591 2px); box-shadow: 0 2px 2px #303138, inset 0 1px 0 #fff9; }
-.handheld-volume input::-moz-range-thumb { width: 1.35cqw; height: .9cqw; border-radius: 3px; border: 1px solid #696b6f; background: repeating-linear-gradient(90deg, #cccdcb 0px, #cccdcb 1px, #929591 1px, #929591 2px); box-shadow: 0 2px 2px #303138; }
+.handheld-volume .handheld-mute { width: 28px; background: #1e293b; }
+.handheld-volume svg { width: 15px; height: 15px; }
+.handheld-volume input { appearance: none; -webkit-appearance: none; width: 66px; height: 4px; margin: 0 3px; border-radius: 4px; background: #58667b; outline: none; cursor: ew-resize; touch-action: none; }
+.handheld-volume input::-webkit-slider-thumb { appearance: none; width: 10px; height: 10px; border: 1px solid #bae6fd; border-radius: 50%; background: #7dd3fc; }
+.handheld-volume input::-moz-range-thumb { width: 10px; height: 10px; border: 1px solid #bae6fd; border-radius: 50%; background: #7dd3fc; }
+@media (max-width: 640px) { .handheld-volume { gap: 1px; padding-left: 5px; margin-left: 0; } .handheld-volume input { width: 42px; } .handheld-volume button:not(.handheld-mute) { display: none; } }
+.handheld-stage[data-handheld-device="ps-portal"] { background: radial-gradient(ellipse at 50% 46%, #4b505d 0%, #303541 40%, #171b25 75%, #0c0f16 100%); }
+.handheld-console[data-handheld-device="ps-portal"] { filter: drop-shadow(0 27px 19px #0009) drop-shadow(0 4px 2px #0008); }
 
 .handheld-console { --handheld-mark: #b7b8bc; }
 .handheld-device-options { position: absolute; left: 50%; bottom: -34px; transform: translateX(-50%); display: flex; align-items: center; gap: 6px; padding: 4px 7px; border-radius: 20px; background: #15161dcc; border: 1px solid #ffffff0d; white-space: nowrap; }
@@ -36,3 +39,17 @@
 
 .handheld-hardware > canvas { display: block; width: 100%; height: 100%; image-rendering: auto; }
 .handheld-render-error { position: absolute; top: 95%; left: 50%; transform: translateX(-50%); font: 11px system-ui, sans-serif; color: #b9bcc7; white-space: nowrap; }
+
+.handheld-stick-hit { position: absolute; z-index: 20; border-radius: 50%; overflow: hidden; }
+.handheld-stick-sector { position: absolute; inset: 0; border: 0; padding: 0; cursor: pointer; touch-action: none; background: transparent; }
+.handheld-stick-up { clip-path: polygon(0 0, 100% 0, 50% 50%); }
+.handheld-stick-right { clip-path: polygon(100% 0, 100% 100%, 50% 50%); }
+.handheld-stick-down { clip-path: polygon(0 100%, 100% 100%, 50% 50%); }
+.handheld-stick-left { clip-path: polygon(0 0, 0 100%, 50% 50%); }
+.handheld-stick-sector:focus-visible { background: #e3d59726; }
+
+@media (max-width: 480px) {
+  .handheld-volume { position: relative; }
+  .handheld-volume input { position: absolute; top: 35px; right: 0; width: 82px; margin: 0; opacity: 0; pointer-events: none; box-shadow: 0 0 0 10px #111b2bee; }
+  .handheld-volume:focus-within input, .handheld-volume:hover input { opacity: 1; pointer-events: auto; }
+}

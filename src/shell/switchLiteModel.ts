@@ -236,7 +236,6 @@ export function createSwitchLiteModel(): HandheldModel {
   smallKeys(group, kit); speakers(group, kit);
   // White shoulder caps sit behind the rounded shell edge rather than on its face.
   for (const x of [92, 993]) group.add(molded(rectangle(x, 10.5, 115, 11, 5), kit.key, -19, 5, 1.2));
-  group.add(molded(rectangle(525, 439, 150, 13, 4), kit.recess, 9.3, .6, .35));
   for (const object of new Set(Object.values(buttons))) if (object) object.userData.restZ = object.position.z;
   return { group, buttons };
 }

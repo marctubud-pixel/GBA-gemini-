@@ -1,10 +1,10 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useWorldStore } from '../store/useWorldStore';
 import { TOTAL_WORLD_WIDTH } from '../data/worldSegments';
 import { WORLD_LOCATIONS } from '../data/locations';
 import { Volume2, VolumeX, Compass, User, Sparkles, House } from 'lucide-react';
 import { pixelSound } from '../game/audio/PixelSoundManager';
-import { HandheldHardware, HANDHELD_DEVICES, HANDHELD_LAYOUTS, HANDHELD_FALLBACK_LAYOUTS, HANDHELD_SCREEN_RECT, hardwarePosition, HandheldPressedKeys, HandheldDevice } from './HandheldHardware';
+import { HandheldHardware, HANDHELD_DEVICES, HANDHELD_LAYOUTS, HANDHELD_FALLBACK_LAYOUTS, HANDHELD_SCREEN_RECT, hardwarePosition, HandheldPressedKeys, HandheldDevice, HandheldControl } from './HandheldHardware';
 import './handheldHardware.css';
 
 interface DeviceShellProps {
@@ -67,37 +67,65 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
     k: false
   });
 
+  const [activeStick, setActiveStick] = useState<'left' | 'right' | null>(null);
+  const pressStarted = useRef<Partial<Record<HandheldControl, number>>>({});
+  const pressTimers = useRef<Partial<Record<HandheldControl, ReturnType<typeof setTimeout>>>>({});
+  const showPress = useCallback((control: HandheldControl, down: boolean) => {
+    clearTimeout(pressTimers.current[control]);
+    if (down) {
+      pressStarted.current[control] ??= performance.now();
+      setPressedKeys(keys => keys[control] ? keys : { ...keys, [control]: true });
+    } else {
+      const remaining = Math.max(0, 110 - (performance.now() - (pressStarted.current[control] ?? 0)));
+      pressTimers.current[control] = setTimeout(() => {
+        delete pressStarted.current[control];
+        setPressedKeys(keys => !keys[control] ? keys : { ...keys, [control]: false });
+      }, remaining);
+    }
+  }, []);
+
   // Window-level key tracking for physical keyboard feedback
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const code = e.code;
-      if (code === 'KeyA' || code === 'ArrowLeft') setPressedKeys(p => p.left ? p : { ...p, left: true });
-      if (code === 'KeyD' || code === 'ArrowRight') setPressedKeys(p => p.right ? p : { ...p, right: true });
-      if (code === 'KeyW' || code === 'ArrowUp') setPressedKeys(p => p.up ? p : { ...p, up: true });
-      if (code === 'KeyS' || code === 'ArrowDown') setPressedKeys(p => p.down ? p : { ...p, down: true });
-      if (code === 'KeyJ') setPressedKeys(p => p.j ? p : { ...p, j: true });
-      if (code === 'KeyK' || code === 'KeyE' || code === 'Enter') setPressedKeys(p => p.k ? p : { ...p, k: true });
+      if (e.isTrusted && ['KeyA', 'KeyD', 'KeyW', 'KeyS', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(code)) setActiveStick('left');
+      if (code === 'KeyA' || code === 'ArrowLeft') showPress('left', true);
+      if (code === 'KeyD' || code === 'ArrowRight') showPress('right', true);
+      if (code === 'KeyW' || code === 'ArrowUp') showPress('up', true);
+      if (code === 'KeyS' || code === 'ArrowDown') showPress('down', true);
+      if (code === 'KeyJ') showPress('j', true);
+      if (code === 'KeyK' || code === 'KeyE' || code === 'Enter') showPress('k', true);
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
       const code = e.code;
-      if (code === 'KeyA' || code === 'ArrowLeft') setPressedKeys(p => !p.left ? p : { ...p, left: false });
-      if (code === 'KeyD' || code === 'ArrowRight') setPressedKeys(p => !p.right ? p : { ...p, right: false });
-      if (code === 'KeyW' || code === 'ArrowUp') setPressedKeys(p => !p.up ? p : { ...p, up: false });
-      if (code === 'KeyS' || code === 'ArrowDown') setPressedKeys(p => !p.down ? p : { ...p, down: false });
-      if (code === 'KeyJ') setPressedKeys(p => !p.j ? p : { ...p, j: false });
-      if (code === 'KeyK' || code === 'KeyE' || code === 'Enter') setPressedKeys(p => !p.k ? p : { ...p, k: false });
+      if (code === 'KeyA' || code === 'ArrowLeft') showPress('left', false);
+      if (code === 'KeyD' || code === 'ArrowRight') showPress('right', false);
+      if (code === 'KeyW' || code === 'ArrowUp') showPress('up', false);
+      if (code === 'KeyS' || code === 'ArrowDown') showPress('down', false);
+      if (code === 'KeyJ') showPress('j', false);
+      if (code === 'KeyK' || code === 'KeyE' || code === 'Enter') showPress('k', false);
     };
 
+    const clearPresses = () => {
+      Object.values(pressTimers.current).forEach(clearTimeout);
+      pressStarted.current = {};
+      setActiveStick(null);
+      setPressedKeys({ left: false, right: false, up: false, down: false, j: false, k: false });
+      useWorldStore.getState().setVirtualInput({ left: false, right: false, up: false, down: false, accelerate: false, brake: false, action: false });
+    };
+    window.addEventListener('blur', clearPresses);
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
     return () => {
+      Object.values(pressTimers.current).forEach(clearTimeout);
+      window.removeEventListener('blur', clearPresses);
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
     };
-  }, []);
+  }, [showPress]);
 
-  // Physical volume controls must not send navigation keys into the game or a popup.
+  // HUD volume controls must not send navigation keys into the game or a popup.
   useEffect(() => {
     const handleVolumeKey = (event: KeyboardEvent) => {
       const target = event.target instanceof HTMLElement ? event.target : null;
@@ -235,38 +263,39 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
     left: ['ArrowLeft', 'ArrowLeft'], right: ['ArrowRight', 'ArrowRight'],
     j: ['KeyJ', 'j'], k: ['KeyK', 'k'],
   };
-  const startControl = (control: ShellControl) => {
+  const startControl = (control: ShellControl, stick: 'left' | 'right' | null = null) => {
     if (isStarting) return;
-    setPressedKeys(p => ({ ...p, [control]: true }));
+    showPress(control, true);
+    if (!['j', 'k'].includes(control)) setActiveStick(stick);
     if (control === 'j') handleButtonJ();
     else if (control === 'k') handleButtonK();
     else if (currentView === 'welcome' || isEndingModalOpen || activeLandmarkModal || isOverlayOpen) sendPanelKey(...controlKeys[control]);
     else setVirtualInput({ [control]: true });
   };
   const releaseControl = (control: ShellControl) => {
-    setPressedKeys(p => ({ ...p, [control]: false }));
+    showPress(control, false);
     sendPanelKey(...controlKeys[control], 'keyup');
     if (control === 'j') setVirtualInput({ accelerate: false, action: false });
     else if (control === 'k') setVirtualInput({ brake: false, action: false });
     else setVirtualInput({ [control]: false });
   };
-  const controlEvents = (control: ShellControl) => ({
+  const controlEvents = (control: ShellControl, stick: 'left' | 'right' | null = null) => ({
     onPointerDown: (event: React.PointerEvent<HTMLButtonElement>) => {
       event.preventDefault();
       event.currentTarget.setPointerCapture(event.pointerId);
-      startControl(control);
+      startControl(control, stick);
     },
     onPointerUp: () => releaseControl(control),
     onPointerCancel: () => releaseControl(control),
     onLostPointerCapture: () => releaseControl(control),
     onClick: (event: React.MouseEvent<HTMLButtonElement>) => {
       // A focused control may be activated by native Enter/Space in a panel.
-      if (event.detail === 0) { startControl(control); releaseControl(control); }
+      if (event.detail === 0) { startControl(control, stick); releaseControl(control); }
     },
     onKeyDown: (event: React.KeyboardEvent<HTMLButtonElement>) => {
       if (event.code === 'Enter' || event.code === 'Space') {
         event.preventDefault(); event.stopPropagation();
-        if (!event.repeat) startControl(control);
+        if (!event.repeat) startControl(control, stick);
       }
     },
     onKeyUp: (event: React.KeyboardEvent<HTMLButtonElement>) => {
@@ -275,7 +304,7 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
   });
 
   return (
-    <div className="relative w-full h-full flex flex-col items-center justify-center handheld-stage select-none overflow-hidden">
+    <div className="relative w-full h-full flex flex-col items-center justify-center handheld-stage select-none overflow-hidden" data-handheld-device={device}>
       {/* Top Floating HUD Bar */}
       <header className="absolute top-0 left-0 right-0 z-30 px-3 sm:px-6 py-2 bg-slate-950/80 backdrop-blur-md border-b border-white/10 flex items-center justify-between text-xs text-white">
         {/* Left: Current Zone & Segment */}
@@ -348,13 +377,26 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
             </button>
           )}
 
+          <div className="handheld-volume" data-handheld-volume role="group" aria-label="音量控制">
+            <button className="handheld-mute" onClick={toggleSound} aria-label={soundEnabled ? '静音' : '开启声音'}
+              aria-pressed={!soundEnabled} title={soundEnabled ? '静音' : '开启声音'}>
+              {soundEnabled ? <Volume2 /> : <VolumeX />}
+            </button>
+            <button onClick={() => setSoundVolume(soundVolume - .05)} aria-label="降低音量" title="降低音量">−</button>
+            <input type="range" min="0" max="100" step="5" value={Math.round(soundVolume * 100)}
+              onChange={event => setSoundVolume(Number(event.currentTarget.value) / 100)} aria-label="音量"
+              aria-valuetext={soundEnabled ? `${Math.round(soundVolume * 100)}%` : '静音'}
+              title={`音量 ${Math.round(soundVolume * 100)}%`} />
+            <button onClick={() => setSoundVolume(soundVolume + .05)} aria-label="提高音量" title="提高音量">+</button>
+          </div>
+
         </div>
       </header>
 
       {/* Main Console Viewport Area */}
       <div className="relative w-full h-full flex items-center justify-center pt-8 pb-10 px-2 sm:px-4">
         <div className="handheld-console" data-handheld-device={device} aria-label={`${HANDHELD_DEVICES[device].label} 掌机`}>
-          <HandheldHardware pressed={pressedKeys} device={device} onAssetReady={onAssetReady} />
+          <HandheldHardware pressed={pressedKeys} device={device} activeStick={activeStick} onAssetReady={onAssetReady} />
 
           {/* Every device shares this 16:9 viewport; hardware never changes its size. */}
           <div 
@@ -377,8 +419,17 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
             ['j', 'J 确认'], ['k', 'K 互动或返回'],
           ] as const).map(([control, label]) => <button key={control} {...controlEvents(control)}
             className={`handheld-hit ${control === 'j' || control === 'k' ? 'handheld-hit-round' : ''}`}
-            style={hardwarePosition(...layout.controls[control])} aria-label={label}
+            style={hardwarePosition(...layout.controls[control])} aria-label={label} aria-pressed={pressedKeys[control]} data-handheld-control={control}
             title={control === 'j' ? 'J 加速 / 确认' : control === 'k' ? 'K 互动 / 返回' : label} />)}
+
+          {Object.entries(layout.sticks ?? {}).map(([side, rect]) => (
+            <div key={side} className="handheld-stick-hit" style={hardwarePosition(...rect)}>
+              {(['up', 'right', 'down', 'left'] as const).map(control => <button key={control}
+                {...controlEvents(control, side as 'left' | 'right')} className={`handheld-stick-sector handheld-stick-${control}`}
+                aria-label={`${side === 'left' ? '左' : '右'}摇杆${{ up: '向上', down: '向下', left: '向左', right: '向右' }[control]}`}
+                aria-pressed={pressedKeys[control]} title="摇杆 · 方向控制" />)}
+            </div>
+          ))}
 
           {([{ control: 'info', label: 'INFO 简历', title: '查看简历 PDF' },
             { control: 'index', label: 'INDEX 索引', title: '打开索引' }] as const).map(({ control, label, title }) =>
@@ -386,18 +437,6 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
                 onClick={() => { pixelSound.playConfirm(); if (!isStarting) setCurrentView(control); }}
                 disabled={isStarting} title={title} aria-label={label} />)}
 
-          <div className="handheld-volume" data-handheld-volume style={hardwarePosition(...layout.volume)} role="group" aria-label="机身音量控制">
-            <button className="handheld-mute" onClick={toggleSound} aria-label={soundEnabled ? '静音' : '开启声音'}
-              aria-pressed={!soundEnabled} title={soundEnabled ? '静音' : '开启声音'}>
-              {soundEnabled ? <Volume2 /> : <VolumeX />}
-            </button>
-            <button onClick={() => setSoundVolume(soundVolume - .05)} aria-label="降低音量" title="降低音量">−</button>
-            <input type="range" min="0" max="100" step="5" value={Math.round(soundVolume * 100)}
-              onChange={event => setSoundVolume(Number(event.currentTarget.value) / 100)} aria-label="音量"
-              aria-valuetext={soundEnabled ? `${Math.round(soundVolume * 100)}%` : '静音'}
-              title={`音量 ${Math.round(soundVolume * 100)}%`} />
-            <button onClick={() => setSoundVolume(soundVolume + .05)} aria-label="提高音量" title="提高音量">+</button>
-          </div>
           <div className="handheld-device-options" data-handheld-devices role="radiogroup" aria-label="选择掌机">
             {currentView === 'welcome' && <span className="handheld-device-label">选择掌机</span>}
             {(Object.entries(HANDHELD_DEVICES) as [HandheldDevice, typeof HANDHELD_DEVICES[HandheldDevice]][]).map(([nextDevice, option]) =>

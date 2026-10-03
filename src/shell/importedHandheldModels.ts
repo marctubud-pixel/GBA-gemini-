@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import type { HandheldModel, ModelControl, ModelDevice } from './handheldModels';
+import { calibrateSteamControls, discardHandheldParts } from './steamDeckControls';
 
 const ASSETS: Partial<Record<ModelDevice, string>> = {
   'steam-deck': '/assets/hardware/steam-deck/deck.glb',
@@ -78,12 +79,12 @@ function physicalMaterials(group: THREE.Group, device: ModelDevice) {
       if (!result) {
         const color = original.color?.clone() ?? new THREE.Color('#22252a');
         if (white) color.setRGB(.76, .77, .765);
-        else if (rubber) color.set(device === 'steam-deck' ? '#343538' : '#24262a');
+        else if (rubber) color.set(device === 'steam-deck' ? '#343538' : '#30343b');
         else if (well) color.set(device === 'steam-deck' ? '#282a2d' : '#181a20');
         else if (stem) color.set('#5f6265');
         else if (glyph && device === 'ps-portal') color.set('#959ba3');
         else if (rim) color.set('#e2e4e6');
-        else if (darkCap) color.set('#181b20');
+        else if (darkCap) color.set('#252932');
         else if (cap && device === 'ps-portal') color.set('#d0d3d6');
         else if (device === 'steam-deck' && !lens) color.set(trackpad ? '#303236' : direction ? '#141619' : cap ? '#202226' : '#2d2f32');
         const roughness = lens ? .2 : rim ? .24 : glyph ? .64 : rubber ? .8 : well ? .52 : stem ? .4 : direction ? .32 : darkCap ? .58 : cap ? (device === 'ps-portal' ? .36 : .3) : trackpad ? .76 : white ? .62 : .7;
@@ -142,15 +143,6 @@ function steamDetails(group: THREE.Group) {
   for (const [name, symbol] of [['button-j', 'A'], ['button-k', 'B'], ['face-X', 'X'], ['face-Y', 'Y']] as const) {
     const object = group.getObjectByName(name); if (object) steamLetter(object, symbol, glyph);
   }
-  const shape = new THREE.Shape();
-  shape.moveTo(-72, -1); shape.lineTo(72, -1); shape.quadraticCurveTo(75, -1, 75, -4);
-  shape.lineTo(75, -10); shape.quadraticCurveTo(75, -13, 72, -13);
-  shape.lineTo(-72, -13); shape.quadraticCurveTo(-75, -13, -75, -10);
-  shape.lineTo(-75, -4); shape.quadraticCurveTo(-75, -1, -72, -1);
-  const slot = new THREE.Mesh(new THREE.ExtrudeGeometry(shape, { depth: 1, bevelEnabled: true, bevelSize: .6, bevelThickness: .6, bevelSegments: 2 }),
-    new THREE.MeshPhysicalMaterial({ color: '#0b0d0e', roughness: .8 }));
-  slot.name = 'volume-slot'; slot.position.set(0, -187, 3); group.add(slot);
-
   // The source atlas supplied speaker darkness rather than a separate grille.
   // Tiny recessed inserts keep that detail visible under real material lighting.
   const grille = new THREE.MeshPhysicalMaterial({ color: '#07090c', roughness: .92, specularIntensity: .3 });
@@ -178,15 +170,23 @@ export async function loadHandheldAsset(device: ModelDevice): Promise<HandheldMo
   group.userData.screenRect = [270, 50, 660, 371.25];
   group.userData.importedAsset = url;
   physicalMaterials(group, device);
-  const buttons: HandheldModel['buttons'] = {};
+  let buttons: HandheldModel['buttons'] = {};
+  let sticks: HandheldModel['sticks'];
   for (const control of ['up', 'down', 'left', 'right', 'j', 'k'] as ModelControl[]) {
     const object = group.getObjectByName(`button-${control}`);
     if (object) buttons[control] = object;
   }
   if (device === 'steam-deck') {
-    const cross = group.getObjectByName('direction-cross');
-    if (cross) for (const control of ['up', 'down', 'left', 'right'] as const) buttons[control] = cross;
+    ({ buttons, sticks } = calibrateSteamControls(group));
     steamDetails(group);
+  } else if (device === 'ps-portal') {
+    sticks = {};
+    for (const side of ['left', 'right'] as const) {
+      const stick = group.getObjectByName(`control-${side}-stick`);
+      if (stick) sticks[side] = stick;
+    }
+    for (const object of Object.values(buttons)) if (object) object.userData.pressDepth = 2.4;
+    discardHandheldParts(group, ['volume-channel']);
   }
-  return { group, buttons };
+  return { group, buttons, sticks };
 }

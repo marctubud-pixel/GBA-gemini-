@@ -20,11 +20,11 @@ Switch Lite 对照青绿色实机参考校准左右侧弧、肩键、白色控�
 
 ### GitHub 三维资产
 
-Steam Deck 基于 wallmasterr 的 **Steam Deck console**，[GitHub 文件及许可](https://github.com/people-climbing/website/tree/33ba12bb6b23d5013be3493df08d8f2dd96ef7e4/public/models/steamdeck)明确为 CC BY 4.0。转换脚本 `scripts/prepare-steam-deck-model.py` 从原 glTF 分离连通部件，移除 LCD 和完整贴图，适配中央开口与侧翼，输出约 1.25 MB 的 `public/assets/hardware/steam-deck/deck.glb`。清掉裁切产生的退化面，仅以前表面重算壳体及握把平面法线，避免背侧支撑面污染细壳缝。Deck 的重叠闭合面不接收自身阴影，保留真实曲面反光和外部投影，消去直角黑块。一体十字键保留摇动，ABXY 使用立体字母，补小型立体扬声器插孔，点击区域对齐真实按键。
+Steam Deck 基于 wallmasterr 的 **Steam Deck console**，[GitHub 文件及许可](https://github.com/people-climbing/website/tree/33ba12bb6b23d5013be3493df08d8f2dd96ef7e4/public/models/steamdeck)明确为 CC BY 4.0。转换脚本 `scripts/prepare-steam-deck-model.py` 从原 glTF 分离连通部件，移除 LCD 和完整贴图，适配中央开口与侧翼，输出约 1.25 MB 的 `public/assets/hardware/steam-deck/deck.glb`。清掉裁切产生的退化面，仅以前表面重算壳体及握把平面法线，避免背侧支撑面污染细壳缝。Deck 的重叠闭合面不接收自身阴影，保留真实曲面反光和外部投影，消去直角黑块。一体十字键保留摇动，补小型立体扬声器插孔。`steamDeckControls.ts` 在屏幕适配之后重新构建两套圆形摇杆：旋转截面使用 96 段，XY 等比，分出摇杆井、塑料杆、橡胶凹面和细圆环。校准十字键与 ABXY 的相对位置，Y 上、X 左、B 右、A 下，四个键帽统一圆形尺寸，点击区域用射线检查对齐。
 
-GitHub 检索未找到具有明确许可、可直接接入的完整 PS Portal 模型，因此其两侧基于 Taohid Animation 的 **PS5 Controller**，[Safa Elmali 整理的 DualSense GLB 与署名](https://github.com/SafaElmali/dualsense-studio/blob/cbae4342498d4d9395aa79ec11a1569ce0977d00/controller/ATTRIBUTION.md)为 CC BY 4.0。`scripts/prepare-portal-model.py` 保留真实握柄、摇杆、按钮和扳机几何，裁切并封合内侧壳体，重新制作开孔中央屏框及音量槽。它是手柄模型改造的展示外壳，比例为游戏大屏适配，不能作为尺寸精确的官方 Portal CAD。
+GitHub 检索未找到具有明确许可、可直接接入的完整 PS Portal 模型，因此其两侧基于 Taohid Animation 的 **PS5 Controller**，[Safa Elmali 整理的 DualSense GLB 与署名](https://github.com/SafaElmali/dualsense-studio/blob/cbae4342498d4d9395aa79ec11a1569ce0977d00/controller/ATTRIBUTION.md)为 CC BY 4.0。`scripts/prepare-portal-model.py` 保留真实握柄、摇杆、按钮和扳机几何，裁切并封合内侧壳体，重新制作开孔中央屏框。旧音量槽在运行时移除，音量改放页面右上角。它是手柄模型改造的展示外壳，比例为游戏大屏适配，不能作为尺寸精确的官方 Portal CAD。
 
-Portal 约 2.78 MB。屏框保留平直黑色盖板和窄倒角，键帽原弧面分出约 0.8 单位的微亮灰边沿，按钮符号使用浅灰立体线条。白黑壳接合处有细蓝光导条，肩键保持深色，橡胶顶面与塑料摇杆井区分。外观对照 [Valve 官方 Steam Deck 图片](https://www.steamdeck.com/en/press)及 [Sony 官方 Portal 图片](https://www.playstation.com/en-us/accessories/playstation-portal-remote-player/)，所用材质参数为照片观察后的表现调整，并非厂商公开的物理测量值。Switch Lite 的几何及材质在这次资产接入中保持原样。
+Portal 约 2.78 MB。屏框保留平直黑色盖板和窄倒角，键帽原弧面分出约 0.8 单位的微亮灰边沿，按钮符号使用浅灰立体线条。白黑壳接合处有细蓝光导条，肩键保持深色，橡胶顶面与塑料摇杆井区分。外观对照 [Valve 官方 Steam Deck 图片](https://www.steamdeck.com/en/press)及 [Sony 官方 Portal 图片](https://www.playstation.com/en-us/accessories/playstation-portal-remote-player/)，所用材质参数为照片观察后的表现调整，并非厂商公开的物理测量值。Portal 的深色内握柄使用略亮的聚合物反射，配侧面补光和柔和背景光晕，分出屏框、握柄与背景。Switch Lite 保留原来的造型及材质，仅移除底部音量槽。
 
 原作者、源链接、许可和改造说明保存在各资产目录的 `ATTRIBUTION.md`，GLB 元数据也保留来源。选择掌机旁的署名入口打开 `public/assets/hardware/credits.html`。应用代码与模型分别遵循各自许可。
 
@@ -32,10 +32,12 @@ Portal 约 2.78 MB。屏框保留平直黑色盖板和窄倒角，键帽原弧�
 
 三款共用 1200 × 500 逻辑平面。贯通屏幕孔固定为 `[270, 50, 660, 371.25]`，16:9。`DeviceShell.tsx` 的游戏容器保持挂载，换机型仅替换几何和透明操作热区，人物位置、当前房间和作品选择保持不变。
 
-`handheldHardware.css` 依据浏览器尺寸等比缩放整体，优先保留宽屏可读性。机身上的六个方向/确认/互动键，INFO、INDEX 与音量继续使用原游戏输入和音频接口。机型选择和音量滑块独立接收键盘操作，方向键不会同时控制游戏或房间弹窗。静音、音量同时作用于游戏音频及页面中的上传视频。
+`handheldHardware.css` 依据浏览器尺寸等比缩放整体，优先保留宽屏可读性。机身上的六个方向/确认/互动键、INFO 和 INDEX 沿用游戏输入接口。Deck 与 Portal 的摇杆可点击方向扇区，沿用方向移动输入。`handheldFeedback.ts` 统一处理键帽下沉、小幅缩放、正面位移、反光变化和方向摇动；短按保留最小可见压力时间，松开复位，窗口失去焦点清除持续输入。音量及静音位于页面右上角，移除三款机身底部的音量控件。机型选择和音量滑块独立接收键盘操作，方向键不会同时控制游戏或房间弹窗。静音、音量同时作用于游戏音频及页面中的上传视频。
 
 ## 验证
 
 浏览器检查涵盖三款公共屏幕尺寸、机型记忆、换壳不重载、实体按键下沉、控制坐标、音量与视频、简历 PDF、索引、内景浮窗、手机横竖屏与后台真实预览。检查使用隔离浏览器上下文和独立生产测试数据，实际作品库保持原 55 条记录。生产构建验证同样检查 WebGL 模型、加载过渡、简历及后台 iframe。
 
 Switch Lite 校准另用射线命中检查六个透明热区与对应实体键帽的对齐，实际按下和释放验证实体下沉及十字键摇动。大屏的尺寸和位置与改动前一致。
+
+本轮 `node scripts/check-handheld-controls.mjs` 验证实际 GLB、重建几何及反馈：两组圆形摇杆的 XY 直径、96 段曲面、ABXY 排列、12 个实体按键热区、短按可见压力、未按键不移动、松开复位、两款摇杆倾斜及减少动态效果，共 44 项。浏览器验证右上角音量、实际点击下压与复位、共用大屏及换壳。

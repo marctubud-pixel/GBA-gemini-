@@ -7,6 +7,7 @@ export type ModelControl = 'up' | 'down' | 'left' | 'right' | 'j' | 'k';
 export interface HandheldModel {
   group: THREE.Group;
   buttons: Partial<Record<ModelControl, THREE.Object3D>>;
+  sticks?: Partial<Record<'left' | 'right', THREE.Object3D>>;
 }
 
 const SCREEN = { x: 270, y: 50, width: 660, height: 371.25 };
@@ -242,8 +243,6 @@ function commonBody(parent: THREE.Group, shape: () => THREE.Shape, kit: Material
   rim.name = 'screen-lens-surround'; parent.add(rim);
   const gasket = extrusion(withScreenHole(roundedRect(266, 46, 668, 379.25, 3), .7), kit.inset, 13, .8, .5);
   gasket.name = 'screen-gasket'; parent.add(gasket);
-  parent.add(extrusion(roundedRect(525, 438, 150, 13, 4), kit.inset, 6, .9, .6));
-  for (let i = 0; i < 7; i++) parent.add(extrusion(roundedRect(580 + i * 6, 440, 1.5, 9, .6), kit.trim, 1, .7, .15));
 }
 
 function steamDeck(group: THREE.Group, kit: Materials, buttons: HandheldModel['buttons']) {
