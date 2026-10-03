@@ -1,0 +1,39 @@
+.hobby-rack-panel { min-height: 0; min-width: 0; padding: 9px 10px 7px; border: 1px solid #bfccb9; background: #f7f2e3; box-shadow: inset 1px 1px #fffef4, inset 0 -3px #e4d7bc; }
+.hobby-rack-grid { position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-content: start; gap: 13px 12px; height: 100%; overflow: auto; overscroll-behavior: contain; padding: 4px 5px 10px; scrollbar-width: thin; scrollbar-color: #85a9b2 #ede7d7; }
+.hobby-rack-item { position: relative; min-width: 0; align-self: start; border: 0; background: transparent; padding: 0; color: #2d5a70; cursor: pointer; text-align: center; }
+.hobby-rack-cover { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 3 / 2; padding: 5px; border: 1px solid #9eac9e; background: #fffdf1; box-shadow: 2px 3px #d1c0a0, inset 1px 1px #fff; }
+.hobby-rack-cover::before,.hobby-rack-cover::after { content: ''; position: absolute; width: 3px; height: 3px; border-top: 2px solid #bfd0c8; border-left: 2px solid #bfd0c8; left: 1px; top: 1px; pointer-events: none; }
+.hobby-rack-cover::after { top: auto; left: auto; bottom: 1px; right: 1px; transform: rotate(180deg); }
+.hobby-rack-cover .content-media { width: 100%; height: 100%; overflow: hidden; }
+.hobby-rack-cover img { image-rendering: auto !important; }
+.hobby-rack-item:hover .hobby-rack-cover,.hobby-rack-item.is-active .hobby-rack-cover { border-color: #277fb1; outline: 2px solid #64c3e2; outline-offset: 1px; box-shadow: 2px 3px #95b6be, 0 0 7px #9fdceca6; }
+.hobby-rack-item:focus-visible { outline: none; }
+.hobby-rack-item:focus-visible .hobby-rack-cover { outline: 2px solid #e5b952; outline-offset: 2px; }
+.hobby-rack-item:disabled { cursor: default; opacity: .6; }
+.hobby-rack-label { display: block; margin-top: 5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; line-height: 1.4; }
+.hobby-rack-reading .hobby-rack-grid,.hobby-rack-film .hobby-rack-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px 12px; }
+.hobby-rack-reading .hobby-rack-cover,.hobby-rack-film .hobby-rack-cover { aspect-ratio: 2 / 3; padding: 2px; }
+.hobby-rack-reading .hobby-rack-cover { border-left: 4px solid #526e7c; box-shadow: 2px 2px #c9c4ad, 3px 3px #8c9d9f; }
+.hobby-rack-reading .hobby-rack-cover::before,.hobby-rack-film .hobby-rack-cover::before,.hobby-rack-reading .hobby-rack-cover::after,.hobby-rack-film .hobby-rack-cover::after { display: none; }
+.hobby-rack-vinyl .hobby-rack-cover { aspect-ratio: 1; padding: 3px; background: #e5e3d7; box-shadow: 3px 3px #809294; }
+.hobby-rack-reading .hobby-rack-item::after,.hobby-rack-vinyl .hobby-rack-item::after { content: ''; position: absolute; left: -5px; right: -5px; bottom: -6px; height: 3px; background: #b99a6b; border-top: 1px solid #e4d0a8; box-shadow: 0 2px #8d7557; pointer-events: none; }
+.hobby-rack-placeholder { opacity: .36; }
+.hobby-rack-placeholder .hobby-rack-cover { color: #7095a2; background: #e4e7df; }
+.hobby-rack-empty { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); margin: 0; padding: 5px 12px; border: 1px solid #d7d4bd; background: #fffbedf2; color: #71858a; font-size: 12px; line-height: 1.6; white-space: nowrap; }
+.hobby-rack-video { position: absolute; bottom: 6px; right: 6px; color: #fff9e8; text-shadow: 1px 1px #183d55; font-size: 10px; }
+
+.hobby-viewer-backdrop { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; background: #071b2fe3; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); color: #e9f7f5; font: 16px/1.5 'DotGothic16','Cubic 11',monospace; }
+.hobby-media-viewer { position: relative; display: grid; grid-template-rows: auto minmax(0,1fr); gap: 12px; width: min(92vw,1280px); height: 90vh; height: 90dvh; }
+.hobby-viewer-toolbar { display: flex; align-items: center; gap: 18px; min-width: 0; }
+.hobby-viewer-return { display: flex; align-items: center; gap: 8px; border: 1px solid #6d9dbd; padding: 4px 10px; background: #113b5e; color: inherit; font: inherit; cursor: pointer; white-space: nowrap; }
+.hobby-viewer-return kbd { font: inherit; font-size: 12px; color: #bde3f9; }
+.hobby-viewer-caption { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.hobby-viewer-counter { font-size: 13px; color: #98becd; }
+.hobby-viewer-picture { padding: 10px; min-width: 0; min-height: 0; background: #fbf7e9; border: 3px solid #337eac; box-shadow: inset 2px 2px #b7dfeb, 0 5px #092f48; }
+.hobby-viewer-picture .content-media { width: 100%; height: 100%; }
+.hobby-viewer-picture img { image-rendering: auto !important; }
+.hobby-viewer-prev,.hobby-viewer-next { position: absolute; top: 52%; border: 0; background: #163d509c; color: #f5faf0; padding: 8px 5px; font-size: 16px; opacity: .65; cursor: pointer; }
+.hobby-viewer-prev { left: 14px; }.hobby-viewer-next { right: 14px; }
+.hobby-viewer-prev:hover,.hobby-viewer-next:hover { opacity: 1; }
+.hobby-viewer-prev:disabled,.hobby-viewer-next:disabled { display: none; }
+.hobby-media-viewer button:focus-visible { outline: 2px solid #f3c653; outline-offset: 3px; }

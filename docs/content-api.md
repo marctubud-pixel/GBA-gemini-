@@ -49,7 +49,7 @@
 | film | 自由文本，如短片、广告、MV | marc-cinema | 电影票、票根播放与完整项目大图 |
 | game-experience | journey | arcade | 第一台街机：全宽游戏经历列表，仅图片、名称与 hours |
 | game-project | making | arcade | 第二台街机：游戏互动图与名称列表，直接完整项目大图 |
-| hobby | photo / reading / vinyl / games / cycling / film / figures | my-studio | 七分类展柜、多媒体与收藏笔记 |
+| hobby | photo / reading / vinyl / cycling / film | my-studio | 五类照片、书籍、唱片、骑行与电影展柜；选中后直接查看媒体 |
 | experiment | film / game / interaction / brand / visual | experiment-lab | 左侧五类档案，右侧标题与简介，直接完整项目大图与资源 |
 | general | 自由文本 | 其他有效地标 ID | 全览索引和通用详情 |
 
@@ -100,3 +100,5 @@
 后台负责身份认证、上传权限、文件大小和类型验证、持久保存、分类、排序与发布。GET 内容接口供访客读取已发布作品；管理写入接口与上传接口在后续后台阶段实现。跨域内容接口和媒体存储需允许网站访问；视频服务需正确返回媒体类型并支持播放所需的范围请求。
 
 前台接口定义位于 `src/data/contentTypes.ts`，HTTP 校验与加载位于 `src/content/contentRepository.ts`，各场景 UI 和全览索引共用 `src/store/useContentStore.ts`。保持 `version: 1` 结构即可替换内容。`status` 与 `fileSize` 仅用于前台展示；后台后续需提供真实文件大小与发布状态，不能把客户端显示文本当作上传验证。
+
+兴趣工作室的架子由 `cover` 与 `media` 生成。照片与骑行展示各媒体，书籍 / 唱片 / 电影每项展示一个封面，其余媒体在原图层切换。缺少媒体时保留禁用空框；无条目时显示空展柜。旧 `games` / `figures` 数据仍可读取，但不在兴趣馆导航或热点中展示，不会删除存储内容。后台仍只有内容读取接口，没有上传或管理页面。

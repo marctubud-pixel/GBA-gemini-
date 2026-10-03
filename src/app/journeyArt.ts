@@ -27,8 +27,7 @@ export type JourneySceneKind='welcome'|'loading'|'ending';
 export function drawJourneyScene(c:CanvasRenderingContext2D,kind:JourneySceneKind,time:number,progress=0){
   c.imageSmoothingEnabled=false;ocean(c,time,kind==='ending');
   if(kind==='ending'){
-    // Distant coastal town and its observatory, viewed from the summit.
-    for(let i=0;i<20;i++){const x=340+(i%7)*36,y=182+Math.floor(i/7)*25+(i%3)*4;const w=17+i%4*4,h=15+i%3*4;r(c,x,y,w,h,i%2?'#efe3c4':C.cream);poly(c,[[x-2,y],[x+w/2,y-7],[x+w+2,y]],i%2?C.coral:'#629bb0');r(c,x+4,y+5,3,5,C.navy);r(c,x+w-7,y+5,3,5,C.navy);}
+    // A quiet coastline with only the observatory on the mountain.
     r(c,562,136,28,22,C.cream);ellipse(c,576,135,15,12,'#719eaf');r(c,563,135,26,4,'#476b87');r(c,572,145,7,13,C.navy);
     poly(c,[[0,258],[36,244],[79,259],[140,248],[205,266],[279,247],[328,270],[364,298],[425,306],[475,330],[640,344],[640,360],[0,360]],'#697e75');
     poly(c,[[0,281],[57,267],[110,279],[189,272],[254,289],[293,284],[341,306],[386,320],[479,341],[640,353],[640,360],[0,360]],'#4a645d');

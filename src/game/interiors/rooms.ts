@@ -39,7 +39,6 @@ export const INTERIORS: Record<InteriorId, InteriorDefinition> = {
       { x: 270, radius: 38, prompt: '翻阅阅读书架', modal: 'my-hobby', context: 'reading', bounds: { x: 218, y: 67, width: 99, height: 177 } },
       { x: 552, radius: 42, prompt: '查看黑胶与音乐', modal: 'my-hobby', context: 'vinyl', bounds: { x: 519, y: 161, width: 114, height: 84 } },
       { x: 745, radius: 42, prompt: '查看骑行记录', modal: 'my-hobby', context: 'cycling', bounds: { x: 655, y: 155, width: 149, height: 93 } },
-      { x: 910, radius: 35, prompt: '查看游戏收藏', modal: 'my-hobby', context: 'games', bounds: { x: 867, y: 91, width: 68, height: 157 } },
     ],
   },
   'experiment-lab': {
