@@ -143,6 +143,67 @@ try {
       });
 
     }
+    if (device === 'ps-portal') {
+      check('Portal: original diagonal light guides are removed', () => {
+        assert.ok(!model.group.getObjectByName('seam-light-guide-left') && !model.group.getObjectByName('seam-light-guide-right'));
+      });
+      check('Portal: screen-side keys and molded marks exist on both bridges', () => {
+        assert.ok(model.group.getObjectByName('portal-screen-side-left-key') && model.group.getObjectByName('portal-screen-side-right-key'));
+        assert.ok(model.group.getObjectByName('portal-molded-ps-mark') && model.group.getObjectByName('portal-molded-mute-mark'));
+      });
+      check('Portal: full LCD aperture stays clear of new panels and keys', () => {
+        for (const [x, y] of [[270.1, 50.1], [929.9, 50.1], [270.1, 421.15], [929.9, 421.15], [600, 235]]) {
+          assert.equal(probeAt(x - 600, 250 - y, model.group).length, 0);
+        }
+      });
+      for (const side of ['left', 'right']) {
+        const panel = model.group.getObjectByName(`portal-${side}-white-face`);
+        const guide = model.group.getObjectByName(`portal-${side}-analog-seam-light`);
+        check(`Portal ${side}: white front skin covers the old rear-shell stripe`, () => {
+          for (const [x, y] of [[120, 80], [55, 220], [55, 340], [9, 330]]) {
+            const u = side === 'left' ? x : 1200 - x;
+            assert.equal(probeAt(u - 600, 250 - y, model.group)[0]?.object, panel);
+          }
+        });
+        check(`Portal ${side}: blue guide follows the analog rim`, () => {
+          const p = guide.geometry.getAttribute('position'), stick = model.sticks[side].getWorldPosition(new THREE.Vector3());
+          let nearest = Infinity;
+          for (let i = 0; i < p.count; i++) nearest = Math.min(nearest, Math.hypot(p.getX(i) - stick.x, p.getY(i) - stick.y));
+          assert.ok(nearest > 36 && nearest < 45);
+          assert.ok(guide.material.emissiveIntensity > 0);
+        });
+        check(`Portal ${side}: light line never crosses a control cap`, () => {
+          const p = guide.geometry.getAttribute('position');
+          const keys = Object.values(model.buttons).concat([model.group.getObjectByName('control-triangle'), model.group.getObjectByName('control-square')]);
+          const boxes = keys.map(key => new THREE.Box3().setFromObject(key).expandByScalar(2));
+          for (let i = 0; i < p.count; i++) for (const box of boxes) assert.ok(!(p.getX(i) >= box.min.x && p.getX(i) <= box.max.x && p.getY(i) >= box.min.y && p.getY(i) <= box.max.y));
+        });
+        check(`Portal ${side}: shoulder lies behind the white skin`, () => {
+          const shoulder = new THREE.Box3().setFromObject(model.group.getObjectByName(`portal-${side}-shoulder`));
+          assert.ok(shoulder.max.z < new THREE.Box3().setFromObject(panel).max.z - 10);
+        });
+      }
+      for (const control of ['up', 'down', 'left', 'right']) check(`Portal ${control}: directional glyph is a filled raised triangle`, () => {
+        const triangle = model.group.getObjectByName(`portal-solid-triangle-${control}`);
+        const origin = triangle.getWorldPosition(new THREE.Vector3());
+        assert.ok(probeAt(origin.x, origin.y, triangle).length > 0);
+        assert.ok(new THREE.Box3().setFromObject(triangle).getSize(new THREE.Vector3()).z > .35);
+        assert.ok(!model.group.getObjectByName(`molded-ps-${control}`));
+      });
+      check('Portal: four face keys and their symbols are larger and readable', () => {
+        for (const name of ['button-j', 'button-k', 'control-triangle', 'control-square']) {
+          const key = model.group.getObjectByName(name), size = new THREE.Box3().setFromObject(key).getSize(new THREE.Vector3());
+          assert.ok(size.x > 46 && size.y > 46);
+          const symbol = key.children.find(child => child.name.startsWith('molded-ps-'));
+          assert.ok(new THREE.Box3().setFromObject(symbol).getSize(new THREE.Vector3()).x > 19);
+        }
+      });
+      for (const [control, [x, y, w, h]] of Object.entries(HANDHELD_LAYOUTS[device].controls)) check(`Portal ${control}: the key is visible in front of the new skin`, () => {
+        let object = probeAt(x + w / 2 - 600, 250 - y - h / 2, model.group)[0]?.object;
+        while (object && object !== model.buttons[control]) object = object.parent;
+        assert.equal(object, model.buttons[control]);
+      });
+    }
     const feedback = createHardwareFeedback(model, true);
     const j = model.buttons.j, restPosition = j.position.clone(), restScale = j.scale.clone();
     const untouched = model.buttons.k.position.clone();

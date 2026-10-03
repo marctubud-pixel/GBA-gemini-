@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import type { HandheldModel, ModelControl, ModelDevice } from './handheldModels';
 import { calibrateSteamControls, discardHandheldParts } from './steamDeckControls';
+import { refinePortalHardware } from './portalHardwareDetails';
 
 const ASSETS: Partial<Record<ModelDevice, string>> = {
   'steam-deck': '/assets/hardware/steam-deck/deck.glb',
@@ -67,7 +68,7 @@ function physicalMaterials(group: THREE.Group, device: ModelDevice) {
       const rubber = role.includes('rubber') && !well;
       const rim = role.includes('buttons-rim');
       const cap = role.startsWith('buttons') && !glyph;
-      const darkCap = device === 'ps-portal' && ['buttons-dark', 'buttons-trigger'].includes(role);
+      const darkCap = device === 'ps-portal' && ['buttons-dark', 'buttons-trigger', 'buttons-body'].includes(role);
       const direction = object.name === 'direction-cross';
       const stem = device === 'steam-deck' && ['deck-part-0-0-2', 'deck-part-0-0-3'].includes(object.name);
       const trackpad = role === 'trackpad';
@@ -182,6 +183,7 @@ export async function loadHandheldAsset(device: ModelDevice): Promise<HandheldMo
     ({ buttons, sticks } = calibrateSteamControls(group));
     steamDetails(group);
   } else if (device === 'ps-portal') {
+    refinePortalHardware(group);
     sticks = {};
     for (const side of ['left', 'right'] as const) {
       const stick = group.getObjectByName(`control-${side}-stick`);
