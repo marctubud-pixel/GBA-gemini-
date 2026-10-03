@@ -26,8 +26,6 @@
 .lab-record-intro { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 .lab-record h3 { max-width: 100%; font-size: 20px; line-height: 1.45; color: #153b58; overflow-wrap: anywhere; }
 .lab-record-description { max-width: 31em; font-size: 12px; line-height: 1.8; color: #58716c; overflow-wrap: anywhere; }
-.lab-record-actions { display: flex; align-items: center; }
-.lab-record-actions .scene-button { min-height: 27px; width: auto; padding: 5px 11px; font-size: 10px; }
 .content-detail-resources { display: flex; flex-wrap: wrap; gap: 6px; margin: 7px 0; }
 @media (max-width: 520px) {
   .lab-archive { grid-template-columns: 33% minmax(0, 1fr); gap: 4px; }
@@ -40,5 +38,9 @@
   .lab-record { padding: 15px 12px; gap: 16px; }
   .lab-record h3 { font-size: 16px; }
   .lab-record-description { font-size: 10px; }
-  .lab-record-actions .scene-button { font-size: 9px; padding: 4px 8px; }
 }
+.lab-footer-view { display:inline-flex;align-items:center;gap:3px;padding:0;border:0;background:transparent;color:inherit;font:inherit;cursor:pointer; }
+.lab-footer-view kbd { font:inherit; }
+.lab-footer-view:hover:not(:disabled) { color:#fff4bf; }
+.lab-footer-view:focus-visible { outline:1px solid #f3c653;outline-offset:3px; }
+.lab-footer-view:disabled { opacity:.45;cursor:default; }

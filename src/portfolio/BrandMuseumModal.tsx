@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useWorldStore } from '../store/useWorldStore';
 import { useContentStore } from '../store/useContentStore';
 import { pixelSound } from '../game/audio/PixelSoundManager';
-import { PixelSeagull, PixelPalette, PixelTag, PixelCart, PixelShell } from '../shell/PixelIcons';
+import { PixelSeagull, PixelPalette, PixelTag, PixelCart, PixelEasel } from '../shell/PixelIcons';
 import { SceneModalFrame, useModalKeys } from './SceneModalFrame';
 import { BrandCaseViewer } from './BrandCaseViewer';
 import { ManagedProjectViewer, openExternalDetail, usesManagedViewer } from './ManagedProjectViewer';
@@ -15,6 +15,7 @@ const PANELS = [
   { id: 'art', title: '视觉', icon: PixelPalette, slogan: '用视觉表达更大的想象。' },
   { id: 'brand', title: '品牌', icon: PixelTag, slogan: '从策略到视觉，塑造品牌价值。' },
   { id: 'ecommerce', title: '电商', icon: PixelCart, slogan: '把好设计放进真实生活。' },
+  { id: 'offline', title: '线下', icon: PixelEasel, slogan: '展览作品待补充。' },
 ] as const;
 type BrandCategory = typeof PANELS[number]['id'];
 
@@ -23,7 +24,7 @@ export const BrandMuseumModal: React.FC = () => {
   const entries = useContentStore((state) => state.entries);
   const isOpen = activeLandmarkModal === 'brand-museum' && currentView === 'game' && !isOverlayOpen;
   const [selected, setSelected] = useState<BrandCategory>('ip');
-  const [pages, setPages] = useState<Record<BrandCategory, number>>({ ip: 0, art: 0, brand: 0, ecommerce: 0 });
+  const [pages, setPages] = useState<Record<BrandCategory, number>>({ ip: 0, art: 0, brand: 0, ecommerce: 0, offline: 0 });
   const [detailId, setDetailId] = useState<string | null>(null);
   const brands = entries.filter((entry) => entry.kind === 'brand');
   const detail = brands.find((entry) => entry.id === detailId);
@@ -78,28 +79,23 @@ export const BrandMuseumModal: React.FC = () => {
   return (<>
     <div className="brand-museum-base" aria-hidden={detail ? true : undefined}>
     <SceneModalFrame title="BRAND & VISUAL" subtitle="让品牌具象化" variant="gallery" onClose={close}
-      footer={<><span><PixelShell size={12} /> 视觉需要策略</span><span>←→ 选择 · ↑↓ 换件 · J 案例 · K 返回</span></>}
+      footer={<span className="brand-navigation-hint">←→ 选择 · ↑↓ 切换 · J 查看</span>}
     >
       <div className="brand-exhibition">
-        <div className="brand-panels">{PANELS.map(({ id, title, icon: Icon, slogan }, index) => {
+        <div className="brand-panels">{PANELS.map(({ id, title, icon: Icon, slogan }) => {
           const works = brands.filter((entry) => entry.category === id);
           const visiblePage = works.length ? pages[id] % works.length : 0;
           const entry = works[visiblePage];
-          return <section key={id} className={`brand-panel ${selected === id ? 'is-active' : ''}`} onMouseEnter={() => setSelected(id)}>
-            <button className="brand-panel-label" onClick={() => setSelected(id)} aria-pressed={selected === id}><Icon size={20} /><h3>{title}</h3><span>0{index + 1}</span></button>
+          return <section key={id} data-brand-category={id} className={`brand-panel ${selected === id ? 'is-active' : ''}`} onMouseEnter={() => setSelected(id)}>
+            <button className="brand-panel-label" onFocus={() => setSelected(id)} onClick={() => setSelected(id)} aria-pressed={selected === id}><Icon size={20} /><h3>{title}</h3></button>
             <div className="brand-panel-content">
-            <button className="brand-panel-art brand-art-entry" disabled={!entry} onClick={() => entry && openCase(entry.id)} aria-label={entry ? `打开${entry.title}完整案例` : `${title}作品待补充`}><ProjectCover asset={entry?.cover} layout={entry?.coverLayout} kind={`brand-${id}`} title={entry?.title ?? title} /></button>
-            <h4>{entry?.title ?? title}</h4>
+            <button className="brand-panel-art brand-art-entry" disabled={!entry} onFocus={() => setSelected(id)} onClick={() => entry && openCase(entry.id)} aria-label={entry ? `打开${entry.title}完整案例` : `${title}作品待补充`}><ProjectCover asset={entry?.cover} layout={entry?.coverLayout} kind={`brand-${id}`} title={entry?.title ?? title} /></button>
+            {entry && <h4>{entry.title}</h4>}
             <p>{entry?.description ?? slogan}</p>
             {entry?.isSample && <small className="scene-sample-label">示例内容</small>}
             </div>
-            <div className="brand-panel-actions">
-              {works.length > 1 && <div className="scene-pagination"><button onClick={() => turnPage(id, -1)} aria-label={`${title}上一个案例`}>◀</button><span>{visiblePage + 1} / {works.length}</span><button onClick={() => turnPage(id, 1)} aria-label={`${title}下一个案例`}>▶</button></div>}
-              <button className="brand-case-button" disabled={!entry} onClick={() => entry && openCase(entry.id)}>{entry ? '查看案例 ↗' : '暂无案例'}</button>
-            </div>
           </section>;
         })}</div>
-        <div className="brand-seaside" aria-hidden="true"><PixelShell size={16} /><i /><span>SAME SKIES · BRIGHTER IDEAS</span><i /><PixelSeagull size={20} /></div>
       </div>
     </SceneModalFrame>
     </div>

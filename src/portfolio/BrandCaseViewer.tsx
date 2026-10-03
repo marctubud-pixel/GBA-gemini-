@@ -11,7 +11,7 @@ export interface BrandCaseViewerProps {
   onClose: () => void;
 }
 
-const CATEGORY_NAMES: Record<string, string> = { ip: 'IP', art: '视觉', brand: '品牌', ecommerce: '电商' };
+const CATEGORY_NAMES: Record<string, string> = { ip: 'IP', art: '视觉', brand: '品牌', ecommerce: '电商', offline: '线下' };
 const CONTROL_KEYS = new Set([
   'Escape', 'KeyK', 'KeyA', 'KeyD', 'KeyW', 'KeyS', 'KeyJ', 'KeyE',
   'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Enter', 'Space',

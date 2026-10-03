@@ -91,7 +91,7 @@ export const ArcadeGameModal = () => {
   return <>
     <div className="arcade-library-base" aria-hidden={detail ? true : undefined}>
       <SceneModalFrame title="MY GAME" subtitle={label} variant="console" onClose={closeLandmarkModal}
-        footer={<div className="arcade-library-footer"><span>{games.length} {isMaking ? '个互动项目' : '条游戏记录'}</span><span>{isMaking ? 'W / S 选择 · J 详情' : 'W / S 浏览'} · K / ESC 关闭</span></div>}>
+        footer={<div className="arcade-library-footer"><span>{games.length} {isMaking ? '个互动项目' : '条游戏记录'}</span><span>{isMaking ? 'W / S 选择 · J 查看' : 'W / S 浏览'}</span></div>}>
         <div className="arcade-library" data-game-mode={isMaking ? 'making' : 'journey'}>
           <header className="arcade-library-heading"><PixelGamepad size={20} /><h3>{label}</h3></header>
           {!games.length ? <div className="arcade-library-empty"><PixelGamepad size={30} /><h3>{isMaking ? '互动项目待添加' : '游戏经历待记录'}</h3></div>

@@ -14,6 +14,17 @@ interface IconProps {
   color?: string;
 }
 
+export const PixelEasel: React.FC<IconProps> = ({ size = 16, className = '', color = '#245587' }) => (
+  <svg width={size} height={size} viewBox="0 0 16 16" shapeRendering="crispEdges" className={`inline-block ${className}`}>
+    <path d="M7 0h2v2H7zM3 11h2v2H3zm-1 2h2v3H2zm9-2h2v2h-2zm1 2h2v3h-2zM7 11h2v4H7z" fill="#976b43" />
+    <path d="M2 2h12v9H2z" fill={color} />
+    <path d="M3 3h10v7H3z" fill="#fff4d7" />
+    <path d="M4 7h2V5h3v2h3v2H4z" fill="#83ad92" />
+    <path d="M9 4h2v2H9z" fill="#e5b85e" />
+    <path d="M1 10h14v2H1z" fill="#b58b5a" />
+  </svg>
+);
+
 // 1. Palm Tree (16 x 16)
 export const PixelPalmTree: React.FC<IconProps> = ({ size = 16, className = '' }) => (
   <svg width={size} height={size} viewBox="0 0 16 16" shapeRendering="crispEdges" className={`inline-block ${className}`}>

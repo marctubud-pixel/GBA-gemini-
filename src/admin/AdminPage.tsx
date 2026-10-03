@@ -10,7 +10,7 @@ import { GAME_PROJECT_TYPES, gameProjectType } from '../data/gameProjectTypes';
 
 const GROUPS: { kind: ContentKind; label: string; name: string; categories: [string, string][]; location: string }[] = [
   { kind: 'writing', label: '文案作品', name: 'WRITE HOUSE', categories: [['tvc', 'TVC 文案'], ['brand', '品牌文案'], ['ecommerce', '电商文案'], ['audience', '人群文案']], location: 'print-house' },
-  { kind: 'brand', label: '品牌与视觉', name: 'BRAND & VISUAL', categories: [['ip', 'IP'], ['art', '视觉 / 海报'], ['brand', '品牌'], ['ecommerce', '电商 / H5']], location: 'brand-museum' },
+  { kind: 'brand', label: '品牌与视觉', name: 'BRAND & VISUAL', categories: [['ip', 'IP'], ['art', '视觉 / 海报'], ['brand', '品牌'], ['ecommerce', '电商 / H5'], ['offline', '线下 / 展览']], location: 'brand-museum' },
   { kind: 'film', label: '影像作品', name: 'MARC CINEMA', categories: [['短片', '短片'], ['广告', '广告'], ['MV', 'MV'], ['影像实验', '影像实验']], location: 'marc-cinema' },
   { kind: 'hobby', label: '个人兴趣', name: 'HOBBY STUDIO', categories: [['photo', '摄影'], ['reading', '书籍'], ['vinyl', '唱片'], ['cycling', '骑行'], ['film', '电影']], location: 'my-hobby' },
   { kind: 'experiment', label: '实验室', name: 'EXPERIMENT LAB', categories: [['film', '影像实验'], ['game', '游戏实验'], ['interaction', '交互实验'], ['brand', '品牌实验'], ['visual', '视觉实验']], location: 'experiment-lab' },

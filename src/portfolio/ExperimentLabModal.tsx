@@ -62,7 +62,7 @@ export const ExperimentLabModal: React.FC = () => {
   return <>
     <div className="experiment-lab-base" aria-hidden={showDetail ? true : undefined}>
     <SceneModalFrame title="EXPERIMENT LAB" subtitle="试试，再看看会发生什么" variant="gallery" onClose={close}
-    footer={<><span><PixelShell size={12} /> 创作实验档案 · {experiments.length} 条</span><span>↑↓ 选择 · J 详情 · K 返回</span></>}
+    footer={<><span><PixelShell size={12} /> 创作实验档案 · {experiments.length} 条</span><span>↑↓ 切换 · <button className="lab-footer-view" disabled={!selected} onClick={openDetail}><kbd>J</kbd> 查看</button></span></>}
   >
     {!selected ? <div className="scene-empty"><PixelBook size={30} /><h3>实验档案还没有记录</h3><p>{loadStatus === 'loading' ? '正在载入实验内容…' : '添加实验日志后，会在这里出现。'}</p></div>
       : <div className="lab-archive">
@@ -82,9 +82,6 @@ export const ExperimentLabModal: React.FC = () => {
           <div className="lab-record-intro">
             <h3>{selected.title}</h3>
             <p className="lab-record-description">{briefIntroduction(selected.description)}</p>
-          </div>
-          <div className="lab-record-actions">
-            <button className="scene-button lab-detail-button" onClick={openDetail}>查看详情 ↗</button>
           </div>
         </article>
       </div>}

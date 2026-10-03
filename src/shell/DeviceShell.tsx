@@ -106,7 +106,7 @@ export const DeviceShell: React.FC<DeviceShellProps> = ({ children }) => {
   } else if (isEndingModalOpen) {
     actionPrompt = { key: 'J / K', text: 'J 确认 · 方向键选择 · K 再次探索', color: 'bg-[#245587] text-white' };
   } else if (activeLandmarkModal || isOverlayOpen) {
-    actionPrompt = { key: 'J / K', text: 'J 确认 · K 返回 · 方向键选择', color: 'bg-slate-800 text-slate-200' };
+    actionPrompt = { key: 'J', text: 'J 确认 · 方向键切换', color: 'bg-slate-800 text-slate-200' };
   } else if (activeInterior) {
     actionPrompt = { key: interiorPrompt ? 'J / E' : 'A / D', text: interiorPrompt ? '互动' : '走动', color: 'bg-[#245587] text-white' };
   } else if (playerState === 'RIDING') {

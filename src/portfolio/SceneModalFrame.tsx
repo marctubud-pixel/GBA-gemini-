@@ -40,7 +40,7 @@ export const SceneModalFrame: React.FC<SceneModalFrameProps> = ({
       onPointerDown={(event) => event.stopPropagation()}
       onWheel={(event) => event.stopPropagation()}
     >
-      <button className="scene-modal-dismiss" onClick={onClose} aria-label="关闭面板" title="返回房间 · K / ESC"><kbd>ESC</kbd><span>关闭</span></button>
+      <button className="scene-modal-dismiss" onClick={onClose} aria-label="关闭面板" title="关闭面板 · ESC"><kbd>ESC</kbd><span>关闭</span></button>
       <header className="scene-modal-header" data-header-kind={headerKind}>
         <SceneModalCrown kind={headerKind} />
         <div className="scene-header-plaque">

@@ -96,7 +96,7 @@ export const WriteHouseModal = () => {
 
   if (!isOpen) return null;
   return <><SceneModalFrame title="WRITE HOUSE" variant="book" onClose={close}
-    footer={<><span><PixelBook size={12} /> 文案工坊</span><span>{detail ? 'A / D 切图 · W / S 阅读 · J 放大 · K 返回' : 'W / S 分类 · A / D 项目 · J 查看 · K 返回'}</span></>}>
+    footer={<><span><PixelBook size={12} /> 文案工坊</span><span>{detail ? 'A / D 切图 · W / S 阅读 · J 放大' : 'W / S 分类 · A / D 项目 · J 查看'}</span></>}>
     <div className="writing-surface"><WritingPageTrim />{detail && !usesManagedViewer(detail) ? <div className="writing-detail">
       <div className="writing-detail-scroll"><WritingProjectDetail entry={detail} mediaIndex={mediaIndex} onMediaIndexChange={setMediaIndex} zoomed={zoomed} onZoomChange={setZoomed} /></div>
       <div className="writing-detail-actions"><button className="scene-button scene-button-muted" onClick={() => { setZoomed(false); setDetailId(null); }}>◀ 返回项目</button></div>

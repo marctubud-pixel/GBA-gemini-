@@ -100,14 +100,10 @@
 .brand-panel.is-active { border-color: #2679bd; background: #f9f6e8; }
 .brand-panel-label { display: flex; align-items: center; gap: 5px; color: #0f3a5e; text-align: left; min-height: 25px; background: transparent; }
 .brand-panel-label h3 { font-size: 15px; }
-.brand-panel-label > span { font-size: 9px; color: #a99b77; margin-left: auto; }
 .brand-panel-art { height: 77px; overflow: hidden; border: 1px solid #b4c3bd; background: #c4dde0; }
 .brand-panel-art > * { width: 100%; height: 100%; }
 .brand-panel h4 { font-size: 11px; line-height: 1.35; min-height: 29px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .brand-panel > p { font-size: 9px; line-height: 1.5; color: #6f634b; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-.brand-case-button { width: 100%; font-size: 9px; padding: 3px 1px; margin-top: auto; min-height: 24px; }
-.brand-seaside { min-height: 20px; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 3px; font-size: 8px; color: #2679bd; border-bottom: 3px solid #5eb6ed; }
-.brand-seaside i { height: 2px; width: 35px; background: #b6d9df; }
 .content-detail { font-size: 11px; line-height: 1.65; padding: 2px 3px 8px; }
 .content-detail-topline { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; color: #567789; font-size: 9px; }
 .content-detail-topline span { text-align: right; }
@@ -206,9 +202,7 @@
   .brand-panel { padding: 3px; }
   .brand-panel-label { gap: 2px; }
   .brand-panel-label h3 { font-size: 12px; }
-  .brand-panel-label > span { display: none; }
   .brand-panel-art { height: 65px; }
-  .brand-case-button { font-size: 8px; }
   .content-detail-intro { grid-template-columns: 35% 1fr; gap: 7px; }
 }
 
@@ -240,14 +234,12 @@
 .scene-modal-backdrop .brand-panels { min-height: 0; grid-template-rows: minmax(0, 1fr); }
 .brand-panel-content { min-height: 0; flex: 1; overflow: auto; display: flex; flex-direction: column; gap: 5px; scrollbar-width: thin; }
 .brand-panel-content > * { flex-shrink: 0; }
+.brand-panel-label { flex-shrink: 0; }
 .brand-panel-content > p { font-size: 12px; line-height: 1.5; color: #6f634b; }
-.brand-panel-label, .brand-case-button { flex-shrink: 0; }
 .scene-modal-backdrop .brand-panel { min-height: 0; overflow: hidden; padding: 6px; gap: 5px; }
 .scene-modal-backdrop .brand-panel-label h3 { font-size: 18px; }
 .scene-modal-backdrop .brand-panel-art { height: 65px; min-height: 65px; }
 .scene-modal-backdrop .brand-panel h4 { font-size: 13px; min-height: 18px; }
-.scene-modal-backdrop .brand-case-button { font-size: 11px; }
-.scene-modal-backdrop .brand-seaside { flex-shrink: 0; min-height: 18px; font-size: 9px; overflow: hidden; }
 .scene-modal-backdrop .lab-archive { min-height: 0; }
 .scene-modal-backdrop .lab-record { overflow: auto; }
 .scene-modal-backdrop .lab-record h3 { font-size: 18px; }
@@ -257,7 +249,6 @@
 .scene-modal-backdrop .lab-file-tab { min-height: 40px; }
 .scene-modal-backdrop .lab-file-tab strong { font-size: 13px; }
 .scene-modal-backdrop .lab-file-tab small { font-size: 9px; }
-.scene-modal-backdrop .lab-record-actions { flex-shrink: 0; }
 .scene-modal-backdrop .content-detail { font-size: 14px; }
 .scene-modal-backdrop .content-detail-heading h3 { font-size: 19px; }
 .mm-cinema-program { min-height: 0; flex: 1; overflow: auto; display: flex; flex-direction: column; gap: 8px; }

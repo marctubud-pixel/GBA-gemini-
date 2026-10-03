@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { MediaAsset } from '../data/contentTypes';
-import { PixelBike, PixelBook, PixelCamera, PixelCart, PixelDisc, PixelFilm, PixelGamepad, PixelPalette, PixelRobot, PixelShell, PixelTag } from '../shell/PixelIcons';
+import { PixelBike, PixelBook, PixelCamera, PixelCart, PixelDisc, PixelEasel, PixelFilm, PixelGamepad, PixelPalette, PixelRobot, PixelShell, PixelTag } from '../shell/PixelIcons';
 
 interface ContentMediaProps {
   asset?: MediaAsset;
@@ -17,8 +17,8 @@ const PixelPlaceholder: React.FC<{ kind: string; title: string }> = ({ kind, tit
     : kind === 'film' ? PixelFilm : kind.startsWith('game') ? PixelGamepad
     : kind === 'photo' ? PixelCamera : kind === 'vinyl' ? PixelDisc
     : kind === 'cycling' ? PixelBike : kind === 'figures' || kind === 'ip' ? PixelRobot
-    : kind === 'art' ? PixelPalette : kind === 'brand' ? PixelTag : kind === 'ecommerce' ? PixelCart : PixelShell;
-  const warm = ['brand', 'art', 'ecommerce', 'figures'].includes(kind);
+    : kind === 'art' ? PixelPalette : kind === 'brand' ? PixelTag : kind === 'ecommerce' ? PixelCart : kind === 'offline' ? PixelEasel : PixelShell;
+  const warm = ['brand', 'art', 'ecommerce', 'offline', 'figures'].includes(kind);
   return <div className="content-media-placeholder" role="img" aria-label={`${title} · 像素示意图`}>
     <svg viewBox="0 0 160 96" preserveAspectRatio="xMidYMid slice" shapeRendering="crispEdges" aria-hidden="true">
       <rect width="160" height="96" fill={warm ? '#dbc59c' : '#76b5d0'} />

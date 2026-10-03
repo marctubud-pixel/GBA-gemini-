@@ -29,7 +29,7 @@ export const PortfolioOverlay: React.FC = () => {
   return <div className="portfolio-content-overlay">
     <SceneModalFrame title="WORK DETAIL" subtitle={entry ? location?.name ?? '作品详情' : `${location?.name ?? '作品'} · 内容待添加`} onClose={closeOverlay}
       variant={entry?.kind === 'writing' ? 'book' : entry?.kind === 'film' ? 'ticket' : 'gallery'}
-      footer={<><span>{entry ? 'K / ESC 返回 · ←→ 同领域作品' : 'K / ESC 关闭并返回'}</span>{related.length > 1 && <div className="portfolio-overlay-navigation"><button onClick={() => navigate(-1)} aria-label="上一个作品">◀</button><span>{currentIndex >= 0 ? `${currentIndex + 1} / ${related.length}` : `${related.length} 件相关作品`}</span><button onClick={() => navigate(1)} aria-label="下一个作品">▶</button></div>}</>}
+      footer={entry ? <><span>←→ 切换作品</span>{related.length > 1 && <div className="portfolio-overlay-navigation"><button onClick={() => navigate(-1)} aria-label="上一个作品">◀</button><span>{currentIndex >= 0 ? `${currentIndex + 1} / ${related.length}` : `${related.length} 件相关作品`}</span><button onClick={() => navigate(1)} aria-label="下一个作品">▶</button></div>}</> : undefined}
     >
       {entry ? <ContentDetail key={entry.id} entry={entry} onBack={closeOverlay} />
         : <div className="scene-empty"><h3>{location?.name ?? '作品'} · 暂无内容</h3><p>{currentView === 'index' ? '返回索引后选择其他作品。' : '关闭窗口，继续探索小镇。'}</p><button className="scene-button" onClick={closeOverlay}>关闭并返回 ▶</button></div>}
